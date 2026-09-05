@@ -12,7 +12,8 @@ The first packaged build.
 
 - Converts Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument,
   Apple iWork, email, Visio and some forty other formats, read by docling.rs.
-- Writes Markdown, docling JSON, a DocLang archive or LaTeX.
+- Writes DocLang, Markdown, docling JSON, a DocLang archive or LaTeX.
+  DocLang is the default.
 - Files and folders arrive from the command line, from a drop on the window,
   or from the Add buttons; a folder contributes every readable file under
   it. Nothing converts until Convert is pressed, so one choice of format and

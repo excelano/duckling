@@ -39,7 +39,7 @@ Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get Markdown, JSON
 
 ## Short description (Microsoft Store, 1,000)
 
-Duckling converts documents into the plain, structured text that language models, search indexes and version control want: Markdown, docling JSON, a DocLang archive or LaTeX. Drop in Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty other formats, choose what to convert to and where to put it, and press Convert.
+Duckling converts documents into the plain, structured text that language models, search indexes and version control want: DocLang, Markdown, docling JSON, a DocLang archive or LaTeX. Drop in Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty other formats, choose what to convert to and where to put it, and press Convert.
 
 Scanned PDFs and images are read by layout, table and OCR models that ship inside the app, so it works offline from the first launch and nothing you convert leaves your machine. Output goes beside each file or into one folder, and an existing file is never overwritten.
 
@@ -48,7 +48,7 @@ The converter is docling.rs, the open-source Rust port of IBM's Docling. Ducklin
 ## App features (Microsoft Store, up to 20 bullets of 200 characters)
 
     Reads Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio, and some forty formats in all.
-    Writes Markdown, docling JSON, a DocLang archive, or LaTeX.
+    Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX.
     Converts in batches: drop files or a whole folder, choose once, press Convert.
     Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.
     Output beside each file or into one folder, and never over an existing file.
@@ -66,7 +66,7 @@ Word, PowerPoint and Excel, current and legacy. PDF, digital or scanned. HTML, E
 
 WHAT COMES OUT
 
-Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. A DocLang archive, the open document markup for language models, ready to open in Segler. Or LaTeX.
+DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX.
 
 HOW IT WORKS
 

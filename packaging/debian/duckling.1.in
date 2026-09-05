@@ -22,7 +22,8 @@ duckling \- convert documents to Markdown, JSON, DocLang or LaTeX
 .B Duckling
 converts documents on the machine it runs on. Word, PowerPoint, Excel, PDF,
 HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty other
-formats go in; Markdown, docling JSON, a DocLang archive or LaTeX comes out.
+formats go in; DocLang, Markdown, docling JSON, a DocLang archive or LaTeX
+comes out.
 Files are queued from the command line, from a drop on the window or from
 the Add buttons; a folder contributes every file under it that can be read.
 Nothing converts until Convert is pressed, so the format and destination

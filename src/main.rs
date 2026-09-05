@@ -76,7 +76,7 @@ impl App {
             worker,
             jobs: Vec::new(),
             next_id: 1,
-            format: OutputFormat::Markdown,
+            format: OutputFormat::default(),
             destination: Destination::BesideSource,
             folder: None,
             selected: None,

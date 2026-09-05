@@ -65,45 +65,52 @@ pub fn locate_assets() -> Option<PathBuf> {
 pub struct JobId(pub u64);
 
 /// What a conversion writes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum OutputFormat {
+    /// DocLang markup, bare: a `.dclg`. The default, and what Segler opens.
+    #[default]
+    Doclang,
     Markdown,
     /// docling's own JSON, the lossless form of a `DoclingDocument`.
     Json,
-    /// A DocLang archive: `document.xml` inside an OPC zip. What Segler opens.
-    Doclang,
+    /// The same markup as `document.xml` inside an OPC zip, a `.dclx`. Nothing
+    /// else goes in it today; DESIGN.md §9 says what could.
+    DoclangArchive,
     Latex,
 }
 
 impl OutputFormat {
-    pub const ALL: [OutputFormat; 4] = [
+    pub const ALL: [OutputFormat; 5] = [
+        OutputFormat::Doclang,
         OutputFormat::Markdown,
         OutputFormat::Json,
-        OutputFormat::Doclang,
+        OutputFormat::DoclangArchive,
         OutputFormat::Latex,
     ];
 
     pub fn label(self) -> &'static str {
         match self {
+            OutputFormat::Doclang => "DocLang",
             OutputFormat::Markdown => "Markdown",
             OutputFormat::Json => "JSON",
-            OutputFormat::Doclang => "DocLang archive",
+            OutputFormat::DoclangArchive => "DocLang archive",
             OutputFormat::Latex => "LaTeX",
         }
     }
 
     pub fn extension(self) -> &'static str {
         match self {
+            OutputFormat::Doclang => "dclg",
             OutputFormat::Markdown => "md",
             OutputFormat::Json => "json",
-            OutputFormat::Doclang => "dclx",
+            OutputFormat::DoclangArchive => "dclx",
             OutputFormat::Latex => "tex",
         }
     }
 
     /// Whether the written file is text a person can read in the preview.
     pub fn is_text(self) -> bool {
-        !matches!(self, OutputFormat::Doclang)
+        !matches!(self, OutputFormat::DoclangArchive)
     }
 }
 
@@ -444,7 +451,11 @@ fn render(document: &DoclingDocument, format: OutputFormat) -> (Vec<u8>, String)
             let text = document.export_to_latex();
             (text.clone().into_bytes(), text)
         }
-        OutputFormat::Doclang => (
+        OutputFormat::Doclang => {
+            let text = format!("{}\n", document.export_to_doclang());
+            (text.clone().into_bytes(), text)
+        }
+        OutputFormat::DoclangArchive => (
             docling::dclx::to_dclx_bytes(document),
             document.export_to_doclang(),
         ),
@@ -487,9 +498,16 @@ mod tests {
 
     #[test]
     fn folder_keeps_the_stem() {
-        let target = Destination::Folder("/out".into())
-            .target(Path::new("/a/b/report.pdf"), OutputFormat::Doclang);
-        assert_eq!(target, PathBuf::from("/out/report.dclx"));
+        let folder = Destination::Folder("/out".into());
+        let source = Path::new("/a/b/report.pdf");
+        assert_eq!(
+            folder.target(source, OutputFormat::Doclang),
+            PathBuf::from("/out/report.dclg")
+        );
+        assert_eq!(
+            folder.target(source, OutputFormat::DoclangArchive),
+            PathBuf::from("/out/report.dclx")
+        );
     }
 
     #[test]

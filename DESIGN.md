@@ -124,7 +124,16 @@ converts into a second format.
 The **preview** shows the selected job: the output path with Open and Show
 in folder, and the written text in a read-only monospace editor capped at
 256 KB with a line saying so when the file is longer. A DocLang archive is a
-zip, so its preview is the `document.xml` inside. A conversion docling.rs
+zip, so its preview is the `document.xml` inside.
+
+**Five outputs, and DocLang is the default.** Decided 2026-09-04 after the
+first build offered four with the archive as the only DocLang form, because
+that is all the docling.rs command-line tool offers. The library writes the
+bare markup, the archive is that markup plus two fixed OPC parts, and Segler
+opens both, so bare DocLang, `.dclg`, is the first entry and the default:
+it is the format the two applications share, and it is the smaller and
+more readable of the two spellings. The archive stays for whatever
+downstream wants the packaged form. A conversion docling.rs
 reports as partial says so beside the buttons.
 
 The **status line** counts the queue by state and carries the last thing that
@@ -248,6 +257,18 @@ and paths). Decide from use; the file being right is what matters first.
 and wants Markdown beside it presses one more button than they might expect.
 The batch argument in `§4` is why it is there; the first hands-on use by
 somebody who is not David is where the question gets answered.
+
+**The DocLang archive could carry page images, and does not.** The
+specification's archive has optional `pages/N.png` and `assets/`, and Segler
+shows page images beside the document when they are there. docling.rs's
+archive writer emits `document.xml` alone, matching docling's placeholder
+image mode, but the pieces to do more are public: `render_pdf_pages`
+rasterizes through pdfium and `zip_bytes` packs arbitrary parts. So an
+archive with a page image per `<page_break/>` segment and the pictures
+under `assets/` is Duckling's to assemble, not a limit of the engine; it
+is a few dozen lines and a larger file. The reason to do it is Segler's
+page pane; the reason to wait is that nobody has asked for it from a
+converted PDF yet.
 
 **Trimming the model set.** `§2` ships docling.rs's default set. If a
 platform's package size ever matters, `§7` records what a conversion

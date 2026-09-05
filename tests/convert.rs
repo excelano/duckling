@@ -76,7 +76,7 @@ fn xlsx_to_doclang_writes_an_archive_and_previews_the_xml() {
     let out = fresh_dir("xlsx");
     let outcome = convert(
         &corpus.join("xlsx/sources/xlsx_05_table_with_title.xlsx"),
-        OutputFormat::Doclang,
+        OutputFormat::DoclangArchive,
         &out,
     )
     .unwrap();
@@ -86,6 +86,27 @@ fn xlsx_to_doclang_writes_an_archive_and_previews_the_xml() {
         outcome.preview.contains("<doclang"),
         "preview is the DocLang XML"
     );
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+#[test]
+fn docx_to_doclang_writes_the_markup_bare() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    let out = fresh_dir("dclg");
+    let outcome = convert(
+        &corpus.join("docx/sources/word_tables.docx"),
+        OutputFormat::Doclang,
+        &out,
+    )
+    .unwrap();
+    assert_eq!(outcome.output, out.join("word_tables.dclg"));
+    let text = std::fs::read_to_string(&outcome.output).unwrap();
+    assert!(text.contains("<doclang"), "{}", &text[..80.min(text.len())]);
+    assert!(text.ends_with('\n'));
+    assert_eq!(text, outcome.preview);
     std::fs::remove_dir_all(&out).unwrap();
 }
 

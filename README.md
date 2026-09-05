@@ -1,6 +1,6 @@
 # Duckling
 
-Duckling converts documents into Markdown, JSON, DocLang or LaTeX, on your
+Duckling converts documents into DocLang, Markdown, JSON or LaTeX, on your
 own machine, with nothing sent anywhere. Drop in Word, PowerPoint, Excel,
 PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty
 other formats, choose what to convert to and where to put it, and press
