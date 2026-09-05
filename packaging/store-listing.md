@@ -66,7 +66,7 @@ Word, PowerPoint and Excel, current and legacy. PDF, digital or scanned. HTML, E
 
 WHAT COMES OUT
 
-DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX.
+DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX.
 
 HOW IT WORKS
 

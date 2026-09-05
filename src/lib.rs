@@ -8,6 +8,8 @@
 
 #![forbid(unsafe_code)]
 
+pub mod doclang;
+
 use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{self, Receiver, Sender};
@@ -202,6 +204,9 @@ pub struct Outcome {
     /// output the DocLang XML inside it. `preview_truncated` says which.
     pub preview: String,
     pub preview_truncated: bool,
+    /// What the conversion could not do as well as it wanted, in words a
+    /// person can act on. Empty when nothing was lost.
+    pub notes: Vec<String>,
 }
 
 /// The preview is a courtesy, not a viewer; a 40 MB JSON export stays on disk.
@@ -363,9 +368,9 @@ impl Engine {
         // the application. The engine is rebuilt afterwards because a panic
         // may have left the pipeline's shared state poisoned.
         let converted = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-            self.document(format, &request.source, bytes, &name, progress)
+            self.document(format, &request.source, &bytes, &name, progress)
         }));
-        let (document, status) = match converted {
+        let (mut document, status) = match converted {
             Ok(Ok(pair)) => pair,
             Ok(Err(e)) => return Err(e),
             Err(panic) => {
@@ -379,25 +384,84 @@ impl Engine {
             }
         };
 
-        let (bytes, preview_source) = render(&document, request.format);
+        let mut notes = Vec::new();
+        let rendered = match request.format {
+            OutputFormat::Doclang | OutputFormat::DoclangArchive => {
+                doclang::insert_page_breaks(&mut document);
+                let xml = document.export_to_doclang();
+                let assets = doclang::assets(&document, &xml);
+                if request.format == OutputFormat::Doclang {
+                    let text = format!("{xml}\n");
+                    Rendered {
+                        bytes: text.clone().into_bytes(),
+                        preview: text,
+                        beside: assets,
+                    }
+                } else {
+                    let pages = match self.page_images(format, &bytes) {
+                        Ok(pages) => pages,
+                        Err(e) => {
+                            notes.push(format!("No page images in the archive: {e}"));
+                            Vec::new()
+                        }
+                    };
+                    Rendered {
+                        bytes: doclang::archive(&xml, &pages, &assets),
+                        preview: xml,
+                        beside: Vec::new(),
+                    }
+                }
+            }
+            other => render(&document, other),
+        };
         let target = available_path(&request.destination.target(&request.source, request.format));
-        write_atomically(&target, &bytes)
+        // Assets first, so that a document that names them never exists
+        // without them. Content-addressed names, so an existing file of the
+        // same name holds the same bytes and overwriting it changes nothing.
+        if let Some(dir) = target.parent() {
+            for (name, bytes) in &rendered.beside {
+                let path = dir.join(name);
+                if let Some(parent) = path.parent() {
+                    std::fs::create_dir_all(parent)
+                        .map_err(|e| format!("cannot create {}: {e}", parent.display()))?;
+                }
+                std::fs::write(&path, bytes)
+                    .map_err(|e| format!("cannot write {}: {e}", path.display()))?;
+            }
+        }
+        write_atomically(&target, &rendered.bytes)
             .map_err(|e| format!("cannot write {}: {e}", target.display()))?;
 
-        let (preview, preview_truncated) = cap_preview(preview_source);
+        let (preview, preview_truncated) = cap_preview(rendered.preview);
         Ok(Outcome {
             output: target,
             status,
             preview,
             preview_truncated,
+            notes,
         })
+    }
+
+    /// One PNG per page, for the archive. A PDF is rendered through pdfium at
+    /// the pipeline's own scale, on this thread, which is the only thread
+    /// that touches pdfium. An image is its own single page.
+    fn page_images(&mut self, format: InputFormat, bytes: &[u8]) -> Result<doclang::Pages, String> {
+        match format {
+            InputFormat::Pdf => docling::render_pdf_pages(bytes, None, None, 2.0)
+                .map(|pages| pages.into_iter().map(|p| p.png).collect())
+                .map_err(|e| e.to_string()),
+            InputFormat::Image => doclang::as_png(bytes)
+                .map(|png| vec![png])
+                .ok_or_else(|| "the image could not be decoded".to_owned()),
+            _ => Ok(Vec::new()),
+        }
     }
 
     fn document(
         &mut self,
         format: InputFormat,
         path: &Path,
-        bytes: Vec<u8>,
+        bytes: &[u8],
         name: &str,
         progress: impl Fn(usize, usize) + Send + Sync + 'static,
     ) -> Result<(DoclingDocument, ConversionStatus), String> {
@@ -405,7 +469,7 @@ impl Engine {
             InputFormat::Pdf => {
                 let pipeline = self.pipeline()?;
                 pipeline.set_progress(Some(Arc::new(progress)));
-                let result = pipeline.convert(&bytes, None, name);
+                let result = pipeline.convert(bytes, None, name);
                 pipeline.set_progress(None);
                 result
                     .map(|doc| (doc, ConversionStatus::Success))
@@ -413,11 +477,11 @@ impl Engine {
             }
             InputFormat::Image => self
                 .pipeline()?
-                .convert_image(&bytes, name)
+                .convert_image(bytes, name)
                 .map(|doc| (doc, ConversionStatus::Success))
                 .map_err(|e| e.to_string()),
             _ => {
-                let mut source = SourceDocument::from_bytes(name, format, bytes);
+                let mut source = SourceDocument::from_bytes(name, format, bytes.to_vec());
                 source.path = Some(path.to_path_buf());
                 let converter = self.converter.get_or_insert_with(DocumentConverter::new);
                 converter
@@ -436,29 +500,29 @@ impl Engine {
     }
 }
 
-/// The bytes to write, and the text to preview.
-fn render(document: &DoclingDocument, format: OutputFormat) -> (Vec<u8>, String) {
-    match format {
-        OutputFormat::Markdown => {
-            let text = document.export_to_markdown();
-            (text.clone().into_bytes(), text)
+/// What a conversion produced: the file, its preview, and any files that
+/// belong beside it (a bare DocLang's `assets/`).
+struct Rendered {
+    bytes: Vec<u8>,
+    preview: String,
+    beside: Vec<(String, Vec<u8>)>,
+}
+
+/// The text formats. DocLang in both spellings is rendered in `convert`,
+/// because it needs the source bytes for page images.
+fn render(document: &DoclingDocument, format: OutputFormat) -> Rendered {
+    let text = match format {
+        OutputFormat::Markdown => document.export_to_markdown(),
+        OutputFormat::Json => document.export_to_json(),
+        OutputFormat::Latex => document.export_to_latex(),
+        OutputFormat::Doclang | OutputFormat::DoclangArchive => {
+            unreachable!("DocLang is rendered in Engine::convert")
         }
-        OutputFormat::Json => {
-            let text = document.export_to_json();
-            (text.clone().into_bytes(), text)
-        }
-        OutputFormat::Latex => {
-            let text = document.export_to_latex();
-            (text.clone().into_bytes(), text)
-        }
-        OutputFormat::Doclang => {
-            let text = format!("{}\n", document.export_to_doclang());
-            (text.clone().into_bytes(), text)
-        }
-        OutputFormat::DoclangArchive => (
-            docling::dclx::to_dclx_bytes(document),
-            document.export_to_doclang(),
-        ),
+    };
+    Rendered {
+        bytes: text.clone().into_bytes(),
+        preview: text,
+        beside: Vec::new(),
     }
 }
 

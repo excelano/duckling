@@ -35,6 +35,13 @@ never overwritten: a second
 becomes
 .IR "report (1).md" .
 .PP
+A DocLang archive carries a page image per page for a PDF or an image, and
+the document's pictures under
+.IR assets/ ;
+bare DocLang gets its pictures in an
+.I assets
+folder beside the file.
+.PP
 Scanned PDFs and images are read by layout, table\-structure and OCR models
 installed under
 .IR /usr/lib/duckling ,

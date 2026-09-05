@@ -144,3 +144,85 @@ fn pdf_through_the_pipeline_finds_headings() {
     );
     std::fs::remove_dir_all(&out).unwrap();
 }
+
+#[test]
+fn pdf_to_archive_carries_one_page_image_per_page() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    if !Path::new(".models/layout_heron_int8.onnx").exists() {
+        eprintln!("skipped: models not fetched");
+        return;
+    }
+    let out = fresh_dir("pdf-dclx");
+    let outcome = convert(
+        &corpus.join("pdf/sources/normal_4pages.pdf"),
+        OutputFormat::DoclangArchive,
+        &out,
+    )
+    .unwrap();
+    assert!(outcome.notes.is_empty(), "{:?}", outcome.notes);
+    let names = zip_names(&std::fs::read(&outcome.output).unwrap());
+    assert_eq!(
+        outcome.preview.matches("<page_break/>").count(),
+        3,
+        "three breaks for four pages"
+    );
+    for n in 1..=4 {
+        assert!(names.contains(&format!("pages/{n}.png")), "{names:?}");
+    }
+    assert!(!names.contains(&"pages/5.png".to_owned()));
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+#[test]
+fn docx_with_pictures_writes_assets_beside_bare_doclang() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    let out = fresh_dir("dclg-assets");
+    let outcome = convert(
+        &corpus.join("docx/sources/word_sample.docx"),
+        OutputFormat::Doclang,
+        &out,
+    )
+    .unwrap();
+    let xml = std::fs::read_to_string(&outcome.output).unwrap();
+    let named: Vec<&str> = xml
+        .split("<src uri=\"")
+        .skip(1)
+        .filter_map(|rest| rest.split('"').next())
+        .filter(|u| u.starts_with("assets/"))
+        .collect();
+    assert!(
+        !named.is_empty(),
+        "word_sample.docx carries pictures; the markup names none:\n{}",
+        &xml[..600.min(xml.len())]
+    );
+    for name in named {
+        let path = out.join(name);
+        assert!(path.is_file(), "{} named but not written", path.display());
+        assert!(
+            std::fs::read(&path).unwrap().starts_with(b"\x89PNG"),
+            "{name} is not PNG"
+        );
+    }
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+fn zip_names(bytes: &[u8]) -> Vec<String> {
+    let mut names = Vec::new();
+    let mut i = 0;
+    while i + 46 <= bytes.len() {
+        if bytes[i..i + 4] == [0x50, 0x4b, 0x01, 0x02] {
+            let n = u16::from_le_bytes([bytes[i + 28], bytes[i + 29]]) as usize;
+            names.push(String::from_utf8_lossy(&bytes[i + 46..i + 46 + n]).into_owned());
+            i += 46 + n;
+        } else {
+            i += 1;
+        }
+    }
+    names
+}

@@ -439,6 +439,9 @@ impl App {
                         );
                     }
                 });
+                for note in &outcome.notes {
+                    ui.label(RichText::new(note).color(ui.visuals().warn_fg_color));
+                }
                 if outcome.preview_truncated {
                     ui.label(
                         RichText::new("Preview shows the beginning; the file has the rest.")

@@ -34,7 +34,10 @@ picked with the buttons are queued. A folder contributes every file under it
 that docling.rs can read. Nothing is converted until Convert is pressed, so
 the format and destination chosen at that moment apply to the whole batch.
 Output goes beside each source file or into one folder, and an existing file
-is never overwritten: a second `report.md` becomes `report (1).md`.
+is never overwritten: a second `report.md` becomes `report (1).md`. A DocLang
+archive carries a page image per page and the document's pictures, so
+Segler can show the page beside the text; bare DocLang gets its pictures
+in an `assets/` folder beside the file.
 
 ## Where things are
 

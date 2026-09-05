@@ -1435,8 +1435,10 @@ version = "0.1.0"
 dependencies = [
  "docling",
  "eframe",
+ "image",
  "opener",
  "rfd",
+ "sha2 0.10.9",
  "zbus",
 ]
 

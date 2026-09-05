@@ -133,7 +133,36 @@ bare markup, the archive is that markup plus two fixed OPC parts, and Segler
 opens both, so bare DocLang, `.dclg`, is the first entry and the default:
 it is the format the two applications share, and it is the smaller and
 more readable of the two spellings. The archive stays for whatever
-downstream wants the packaged form. A conversion docling.rs
+downstream wants the packaged form.
+
+**The archive carries page images and the pictures, and bare DocLang gets
+its pictures beside it.** Decided 2026-09-05; David: "Yes, I want the
+images." The specification's archive is `document.xml` plus optional
+`pages/N.png` and `assets/`, and Segler shows the page images beside the
+document. docling.rs's archive writer emits the markup alone, but its
+markup already names each image-bearing picture as
+`assets/image_NNNNNN_<sha256>.png`, and its page renderer and zip packer
+are public. So `src/doclang.rs` does three things the engine leaves to the
+caller. It pairs every asset name in the markup with the picture bytes
+whose hash it carries, re-encoded to PNG because the name says so. For an
+archive it renders a PDF's pages through pdfium at the pipeline's own
+scale, or takes an image input as its one page, and packs the two fixed
+OPC parts, the markup, the pages and the assets, dropping any page past the
+last segment. For a bare `.dclg` it writes the assets into `assets/` beside
+the file, content-addressed, so an existing file of the same name holds the
+same bytes. A page render that fails is a note on the result, not a failed
+conversion.
+
+**docling.rs writes no page breaks for a PDF, and Duckling inserts them.**
+Measured 2026-09-05 on `normal_4pages.pdf`: docling.rs's markup carries
+four `PageInfo` nodes and no `<page_break/>`, where the reference archive
+in its own corpus carries three. The specification ties page images to
+segments split on breaks, so without them an archive may carry one page.
+Before either DocLang output, Duckling puts a break before every page after
+the first when the converter marked pages and wrote no breaks; the
+spreadsheet, slide and RTF backends write their own and are left alone.
+This is a conformance gap in docling.rs against its own reference, not
+raised upstream yet; David decides. A conversion docling.rs
 reports as partial says so beside the buttons.
 
 The **status line** counts the queue by state and carries the last thing that
@@ -257,18 +286,6 @@ and paths). Decide from use; the file being right is what matters first.
 and wants Markdown beside it presses one more button than they might expect.
 The batch argument in `§4` is why it is there; the first hands-on use by
 somebody who is not David is where the question gets answered.
-
-**The DocLang archive could carry page images, and does not.** The
-specification's archive has optional `pages/N.png` and `assets/`, and Segler
-shows page images beside the document when they are there. docling.rs's
-archive writer emits `document.xml` alone, matching docling's placeholder
-image mode, but the pieces to do more are public: `render_pdf_pages`
-rasterizes through pdfium and `zip_bytes` packs arbitrary parts. So an
-archive with a page image per `<page_break/>` segment and the pictures
-under `assets/` is Duckling's to assemble, not a limit of the engine; it
-is a few dozen lines and a larger file. The reason to do it is Segler's
-page pane; the reason to wait is that nobody has asked for it from a
-converted PDF yet.
 
 **Trimming the model set.** `§2` ships docling.rs's default set. If a
 platform's package size ever matters, `§7` records what a conversion
