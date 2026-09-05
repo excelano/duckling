@@ -48,9 +48,13 @@ and verifies them by hash; each lane's build script copies them next to the
 executable as `models/` and `pdfium/`. The Linux script is the reference for
 the layout.
 
-pdfium is per platform. The fetch script pins the Linux x64 build; the other
-lanes pin their own from bblanchon's prebuilts, by URL and hash, in the
-script's `case`, and the Mac lane wants the universal build.
+pdfium is per platform, and the fetch script pins all three: docling.rs's
+own Linux x64 build, and bblanchon's prebuilts at `chromium/8035` for
+Windows x64 (`pdfium.dll`) and macOS (`libpdfium.dylib`, universal), each by
+the archive's hash. On Windows the script runs under Git Bash, which has
+the `tar` and `sha256sum` it needs. The Linux hash was verified by a run;
+the other two were hashed on Linux from the archives and are first
+exercised on their lanes.
 
 ## Linux
 

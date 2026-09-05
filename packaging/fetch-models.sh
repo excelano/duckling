@@ -38,14 +38,47 @@ fetch() { # <url> <path> <sha256>
   fi
 }
 
+# pdfium per platform. Linux x64 takes the build docling.rs pins for its
+# conformance runs. Windows and macOS take bblanchon's prebuilts, the same
+# source that Linux build came from, at one release tag for both, pinned by
+# the archive's hash; only the library member is kept. The Mac archive is
+# universal, so one file serves both architectures.
+PDFIUM=https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F8035
+
+fetch_member() { # <url> <archive sha256> <member> <path>
+  if [ -f "$4" ]; then
+    echo "  = $4"
+    return
+  fi
+  mkdir -p "$(dirname "$4")"
+  echo "  > $4"
+  tgz="$4.tgz.part"
+  curl -fsSL --connect-timeout 30 --retry 3 --retry-delay 2 -o "$tgz" "$1"
+  if ! echo "$2  $tgz" | sha256sum -c --quiet -; then
+    rm -f "$tgz"
+    echo "fetch-models: $(basename "$1") did not match its pinned SHA-256; not kept" >&2
+    exit 1
+  fi
+  tar xzf "$tgz" -O "$3" > "$4.part"
+  rm -f "$tgz"
+  mv "$4.part" "$4"
+}
+
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64)
     fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
       3019ad1cd6980e51d900bb9266f8980cb846cb8e0c1f6553c52a7a1626469020 ;;
+  Darwin-*)
+    fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
+      794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
+      lib/libpdfium.dylib .pdfium/lib/libpdfium.dylib ;;
+  MINGW*|MSYS*|CYGWIN*)
+    fetch_member "$PDFIUM/pdfium-win-x64.tgz" \
+      61513d611ad200a383456140739be77d156f1e3a2eef22bd89f6c3bda79bdd41 \
+      bin/pdfium.dll .pdfium/lib/pdfium.dll ;;
   *)
-    # The Windows and Mac lanes pin their own pdfium from bblanchon's
-    # prebuilts; see packaging/<platform>/README.md.
-    echo "fetch-models: no pinned pdfium for $(uname -s)-$(uname -m); fetch it by hand" >&2 ;;
+    echo "fetch-models: no pinned pdfium for $(uname -s)-$(uname -m)" >&2
+    exit 1 ;;
 esac
 
 fetch "$BASE/layout_heron.onnx"      .models/layout_heron.onnx      2e5d4dd812c46b742a031611ab7ba061bf66937a56fdee266ada4fe1e3073764

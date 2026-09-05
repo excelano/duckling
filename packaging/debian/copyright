@@ -19,6 +19,10 @@ Comment:
 Files: usr/lib/duckling/pdfium/*
 Copyright: 2014 The PDFium Authors
 License: BSD-3-clause
+Comment:
+ A prebuilt from bblanchon/pdfium-binaries with FreeType, Little CMS,
+ OpenJPEG, libjpeg-turbo, libpng, zlib, ICU, Abseil and others compiled
+ in; the archive's licenses/ directory carries each of their texts.
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
