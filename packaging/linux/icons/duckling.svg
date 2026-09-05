@@ -11,8 +11,8 @@
     body, head and tail as separate shapes; a head alone with the bill; and
     this, the rubber-duck silhouette. The profile lost its head at 16
     pixels and the head alone read as a ball with a beak; this one keeps
-    the duck at 16, 32 and 128 on light and dark. Provisional until David
-    has chosen from the sheet, which the packaging README points at.
+    the duck at 16, 32 and 128 on light and dark. David chose it from the
+    sheet on 2026-09-05.
 
     This comment sits inside the element rather than above it, and that is
     a measurement rather than a style: gdk-pixbuf sniffs the first 256
