@@ -79,10 +79,11 @@ every push, with the three `embedded-library` tags on pdfium overridden in
 
 ## The icon
 
-`linux/icons/duckling.svg`: a duckling in a blue roundel, on the fleet's
-palette so the three Excelano applications look like siblings on a launcher.
-David chose it on 2026-09-05 from a sheet of three; the file's own comment
-records what the other two cost. Checked at 16,
+`linux/icons/duckling.svg`: a yellow duckling in the fleet's blue roundel,
+so the three Excelano applications share a disc on a launcher and this one
+is the colour a rubber duck is. David chose it on 2026-09-05 from a sheet
+of three shapes and then three colours; the file's own comment records what
+the others cost. Checked at 16,
 32 and 128 pixels on light and dark grounds before committing, and any
 change should be. The SVG is the source for every platform: macOS wants
 `.icns` and Windows `.ico`, both converted from it, and slipcase-desktop's

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <!--
-    Duckling: a duckling in a blue roundel. Body and head as one cream
-    shape, an ochre bill, a dark eye.
+    Duckling: a duckling in a blue roundel. Body and head as one yellow
+    shape, an orange bill, a dark eye.
 
     Author: David M. Anderson
     Built with AI assistance (Claude, Anthropic)
@@ -12,7 +12,11 @@
     this, the rubber-duck silhouette. The profile lost its head at 16
     pixels and the head alone read as a ball with a beak; this one keeps
     the duck at 16, 32 and 128 on light and dark. David chose it from the
-    sheet on 2026-09-05.
+    sheet on 2026-09-05, and then asked the right question: shouldn't a
+    rubber duck be yellow? It was cream to match its siblings, and beside
+    a yellow one it read as a goose. Warm yellow over bright, because the
+    bright one glows on a dark ground and the warm one sits with the
+    ochre the fleet already uses.
 
     This comment sits inside the element rather than above it, and that is
     a measurement rather than a style: gdk-pixbuf sniffs the first 256
@@ -21,18 +25,18 @@
     the hard way. Keep the opening tag on the second line.
 
     Filled shapes and no interior strokes, which is what still reads at 16
-    pixels; the roundel's 3-unit outline is the only line. The palette is
-    slipcase-desktop's blue, dark and cream, so the three Excelano
-    applications look like siblings on a launcher, plus an ochre for the
-    bill because a duckling without one is an egg.
+    pixels; the roundel's 3-unit outline is the only line. The disc and
+    the outline are slipcase-desktop's blue and dark, so the three Excelano
+    applications share a roundel on a launcher; the duck is the one thing
+    on it that is not the sibling palette, on purpose.
   -->
   <circle cx="32" cy="32" r="28" fill="#4a6fa5" stroke="#2f3337" stroke-width="3"/>
   <!-- Body and head, one silhouette: the breast rises into the neck at the
        left, the head is the dome at the top right, the tail is the rise at
        the left. -->
-  <path d="M12 38 Q10 30 18 30 L26 30 Q26 18 36 18 Q46 18 46 28 L46 32 Q54 34 52 42 Q50 50 36 50 L22 50 Q12 50 12 38 z" fill="#f2eee4"/>
+  <path d="M12 38 Q10 30 18 30 L26 30 Q26 18 36 18 Q46 18 46 28 L46 32 Q54 34 52 42 Q50 50 36 50 L22 50 Q12 50 12 38 z" fill="#f5c542"/>
   <!-- The bill. -->
-  <path d="M46 24 L58 27 L46 31 z" fill="#c8862e"/>
+  <path d="M46 24 L58 27 L46 31 z" fill="#e0782a"/>
   <!-- The eye. -->
   <circle cx="40" cy="25" r="2.4" fill="#2f3337"/>
 </svg>
