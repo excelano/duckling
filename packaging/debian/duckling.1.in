@@ -1,0 +1,77 @@
+.\" Manual page for duckling.
+.\"
+.\" It exists because the binary takes arguments and has no --help to
+.\" describe them: src/main.rs queues every argument and nothing else, so
+.\" this is the only place that is written down, and lintian tags a binary
+.\" without a page.
+.\"
+.\" @VERSION@ is substituted by packaging/debian/build-deb.sh, the same way
+.\" control.in is, so the version in the header cannot drift from the package.
+.\" The date is the date this page was last revised and not the build date,
+.\" which is the convention and is also what makes the page reproducible.
+.\"
+.\" Author: David M. Anderson
+.\" Built with AI assistance (Claude, Anthropic)
+.TH DUCKLING 1 "2026\-09\-04" "duckling @VERSION@" "User Commands"
+.SH NAME
+duckling \- convert documents to Markdown, JSON, DocLang or LaTeX
+.SH SYNOPSIS
+.B duckling
+.RI [ file | folder \ ...]
+.SH DESCRIPTION
+.B Duckling
+converts documents on the machine it runs on. Word, PowerPoint, Excel, PDF,
+HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty other
+formats go in; Markdown, docling JSON, a DocLang archive or LaTeX comes out.
+Files are queued from the command line, from a drop on the window or from
+the Add buttons; a folder contributes every file under it that can be read.
+Nothing converts until Convert is pressed, so the format and destination
+chosen at that moment apply to the whole batch.
+.PP
+Output goes beside each source file or into one folder. An existing file is
+never overwritten: a second
+.I report.md
+becomes
+.IR "report (1).md" .
+.PP
+Scanned PDFs and images are read by layout, table\-structure and OCR models
+installed under
+.IR /usr/lib/duckling ,
+so nothing is downloaded after installation and nothing is sent anywhere.
+The converter is docling.rs, the Rust port of IBM's Docling.
+.SH OPTIONS
+There are none.
+.B duckling
+is a window rather than a command\-line interface. For a command\-line
+converter over the same engine, see docling.rs's own
+.BR docling\-rs .
+.SH ARGUMENTS
+.TP
+.I file
+A document to queue. A file whose extension docling.rs does not read is
+reported in the window's status line.
+.TP
+.I folder
+A folder to queue: every readable file under it, in name order, files before
+subfolders. Files that cannot be read are skipped without comment.
+.SH EXIT STATUS
+Returns success when the window has been closed. A non\-zero status means the
+window could not be created at all \(em no display, or no usable graphics
+driver \(em rather than anything about a document.
+.SH FILES
+.TP
+.I /usr/lib/duckling/models
+The ONNX models for the PDF and image pipeline.
+.TP
+.I /usr/lib/duckling/pdfium
+The pdfium library, loaded by name at run time.
+.TP
+.I /usr/share/applications/duckling.desktop
+The desktop entry, which lists the document types Duckling reads so that a
+file manager offers it under Open With.
+.SH SEE ALSO
+The converter is documented at https://github.com/docling\-project/docling.rs,
+and the design of this application in DESIGN.md in its own repository at
+https://github.com/excelano/duckling.
+.SH AUTHOR
+David M. Anderson

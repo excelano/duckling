@@ -1,0 +1,11 @@
+# pdfium is a prebuilt monolith: Chromium's PDF engine with FreeType, Little
+# CMS and OpenJPEG compiled into it, from bblanchon/pdfium-binaries, which is
+# also what docling.rs's own installer and its Python and Node packages
+# ship. Debian has no pdfium package to depend on instead, and building one
+# against the system libraries is a project of its own. The three tags are
+# right about what the file contains; the override records that the choice
+# was made rather than missed. DESIGN.md §8. The first override in the
+# fleet's three egui packages; slipcase-desktop and segler carry none.
+duckling: embedded-library freetype [usr/lib/duckling/pdfium/libpdfium.so]
+duckling: embedded-library lcms2 [usr/lib/duckling/pdfium/libpdfium.so]
+duckling: embedded-library openjpeg [usr/lib/duckling/pdfium/libpdfium.so]

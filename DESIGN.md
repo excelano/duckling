@@ -32,11 +32,19 @@ would be the weaker product on the format people most want converted.
 
 What the feature brings, measured on Linux on 2026-09-04: ONNX Runtime,
 which `ort` fetches as a prebuilt static library at build time and links
-into the executable, and pdfium, a shared library loaded by name at run
-time. The debug executable links `libstdc++` beyond libc, libgcc and libm,
-which is ONNX Runtime's. Nothing is compiled from C source; the cost is
-trusting a download at build time rather than a build from source, and it is
-the same download docling.rs's own binaries are built from.
+into the executable; pdfium, a shared library loaded by name at run time;
+and oniguruma, the regular-expression library under the HuggingFace
+tokenizer that docling-pdf carries for its code and formula enrichment
+models, which `onig_sys` compiles from C source with the system compiler.
+So the build needs a C compiler on every lane, and the executable links
+`libstdc++` beyond libc, libgcc and libm, which is ONNX Runtime's. The cost
+of the first is trusting a download at build time rather than a build from
+source, and it is the same download docling.rs's own binaries are built
+from; the cost of the third is a compiler on the build machine for a
+library this application never calls, since it ships no enrichment models.
+Measured by `cargo tree -i onig_sys` and by the `.a` files under the build
+directory; `ring`, which the shared build directory also held, is another
+repository's and not in this tree.
 
 **The models ship in the package.** Decided 2026-09-04 after the
 alternatives were priced. The standard pipeline loads its models in tiers:
@@ -183,15 +191,49 @@ reaches. Trimming them is the first cut if size ever matters.
 ## 8. Packaging
 
 Cloned from `excelano/segler`, which cloned it from `excelano/slipcase-desktop`,
-one directory per platform, with two differences that are this repository's.
-Every package carries `.models/` and `.pdfium/` beside the executable, since
-that is where docling.rs looks after the working directory. And the Windows
-import check has to admit the pdfium library that ships inside the package,
-which is a change to `check-imports.ps1`'s allowlist and a thing to measure
-against the Store's rule about software dependencies, not assume. ONNX
-Runtime is linked statically and imports nothing. Whether the static ONNX
-Runtime agrees with `+crt-static` on the MSVC target is the Windows lane's
-first question. Not begun.
+one directory per platform, with what is Duckling's own stated here and in
+`RELEASE.md`.
+
+**The models and pdfium sit beside the executable, and the executable finds
+them there.** docling.rs looks under the working directory, then under two
+environment variables, then beside the executable under the dotted names
+`.models/` and `.pdfium/`. A package cannot use dotted names in an
+application directory, so `locate_assets` in `src/lib.rs` runs once at
+startup, before any thread exists, and names `models/` and `pdfium/` beside
+the canonicalized executable through the two variables when they are there.
+A checkout with `.models/` in its working directory is left alone, and so is
+an environment somebody set by hand. On Linux the layout is
+`/usr/lib/duckling/{duckling,models,pdfium}` with `/usr/bin/duckling` a
+symlink, which is the layout docling.rs's own installer produces; the
+Windows and Mac lanes put the same two directories beside their executables.
+
+**One package, and the models are in it.** Debian proper would split 740 MB
+of arch-independent data into `duckling-data`; the fleet's rule is one
+package for one product, and `/usr/lib/duckling` is a private application
+directory where that data may live. The `.deb` is compressed with xz at its
+highest level, which costs minutes and saves little, because ONNX weights
+barely compress. Whether the Excelano apt host serves a file that size is
+measured on the first release, and `RELEASE.md` says what happens if it does
+not.
+
+**Three lintian overrides, the fleet's first.** pdfium is a prebuilt
+monolith with FreeType, Little CMS and OpenJPEG compiled in, and lintian
+says so as three errors. Debian has no pdfium to depend on and building one
+against the system libraries is a project of its own, so
+`packaging/debian/lintian-overrides` records the three with the reason and
+the package passes at error and warning. slipcase-desktop and segler carry
+no overrides; this one is a decision taken on 2026-09-04, and the file says
+so.
+
+**No media type of its own.** Duckling owns no format. The desktop entry
+lists fifteen of the types it reads, so a file manager offers it under Open
+With for a PDF or a Word file without making it the default for either.
+
+**What the Windows lane meets first**, recorded from here and not solved:
+the import check must decide about a `pdfium.dll` that ships inside the
+package and is loaded by name rather than imported, and whether the static
+ONNX Runtime `ort` fetches agrees with `+crt-static`. ONNX Runtime imports
+nothing; oniguruma wants a C compiler on the build machine. Not begun.
 
 ## 9. Open threads
 

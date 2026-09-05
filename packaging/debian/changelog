@@ -1,0 +1,9 @@
+duckling (0.1.0) unstable; urgency=medium
+
+  * First packaged build. A window that converts Word, PowerPoint, Excel,
+    PDF, HTML, EPUB and some forty other formats into Markdown, docling JSON,
+    a DocLang archive or LaTeX, in batches, with the output beside each file
+    or in one folder and never over an existing file. The layout, table and
+    OCR models for PDFs and scans ship in the package.
+
+ -- David M. Anderson <david.anderson@excelano.com>  Fri, 04 Sep 2026 23:30:00 -0500

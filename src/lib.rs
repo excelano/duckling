@@ -18,6 +18,48 @@ use docling::{
     ConversionStatus, DoclingDocument, DocumentConverter, InputFormat, Pipeline, SourceDocument,
 };
 
+/// Point docling.rs at the models and pdfium a package installed beside the
+/// executable, when they are there and nothing has said otherwise.
+///
+/// docling.rs looks for `.models/` and `.pdfium/lib/` under the working
+/// directory, then under `$DOCLING_RS_MODELS_DIR` and `$PDFIUM_DYNAMIC_LIB_PATH`,
+/// then beside the executable under the same dotted names. A package cannot
+/// use the dotted names: Debian wants an application's private data under
+/// `/usr/lib/duckling/` without hidden directories, and a Windows or Mac
+/// package has the same reasons to name them plainly. So a package installs
+/// `models/` and `pdfium/` beside the executable, and this names them
+/// through the two variables, which docling.rs reads before it looks beside
+/// the executable itself.
+///
+/// Called once at startup, before the worker thread exists. An environment
+/// already set, by a developer pointing at another model set, is left alone;
+/// so is a working directory carrying `.models/`, which is how a checkout
+/// runs. Returns where the models were found, for the status line.
+pub fn locate_assets() -> Option<PathBuf> {
+    if Path::new(".models").is_dir() {
+        return Some(PathBuf::from(".models"));
+    }
+    if let Some(dir) = std::env::var_os("DOCLING_RS_MODELS_DIR") {
+        return Some(PathBuf::from(dir));
+    }
+    let beside = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.canonicalize().ok())
+        .and_then(|p| p.parent().map(Path::to_path_buf))?;
+    let models = beside.join("models");
+    let pdfium = beside.join("pdfium");
+    if !models.is_dir() {
+        return None;
+    }
+    // Edition 2021: `set_var` is a safe function, and no other thread exists
+    // yet to observe the environment changing under it.
+    std::env::set_var("DOCLING_RS_MODELS_DIR", &models);
+    if pdfium.is_dir() && std::env::var_os("PDFIUM_DYNAMIC_LIB_PATH").is_none() {
+        std::env::set_var("PDFIUM_DYNAMIC_LIB_PATH", &pdfium);
+    }
+    Some(models)
+}
+
 /// Identifies a job across the window and the worker. Never reused.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct JobId(pub u64);

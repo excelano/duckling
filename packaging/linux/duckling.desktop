@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Duckling
+GenericName=Document Converter
+Comment=Convert documents to Markdown, JSON, DocLang or LaTeX
+Exec=duckling %F
+Icon=duckling
+Terminal=false
+MimeType=application/pdf;application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/msword;application/vnd.ms-powerpoint;application/vnd.ms-excel;application/vnd.oasis.opendocument.text;application/vnd.oasis.opendocument.presentation;application/vnd.oasis.opendocument.spreadsheet;application/epub+zip;application/rtf;text/html;text/markdown;text/csv;
+Categories=Office;Utility;
+Keywords=convert;markdown;docling;doclang;pdf;word;ocr;
+StartupNotify=true
+StartupWMClass=duckling

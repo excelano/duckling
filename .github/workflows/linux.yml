@@ -1,0 +1,119 @@
+# Build the Linux package on every push and put it under the checks a machine
+# can run: the package's ownership and modes, its md5sums, lintian, and the
+# desktop entry through GLib. The suite, clippy and formatting are the
+# fleet's `ci.yml` and are not repeated here.
+#
+# What is Duckling's own, against segler's `linux.yml` this is cloned from:
+# the models are fetched and cached, since the package carries them and is
+# not a package without them; and the executable is allowed to link
+# libstdc++, which ONNX Runtime needs, and nothing further. Nothing headless
+# reaches a window, so `packaging/linux/check-libraries.sh` and
+# `CHECKLIST.md` stay commands run by a person with a display. The package
+# is not uploaded as an artifact: it is most of a gigabyte and a release
+# builds it again from the tag.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
+
+name: linux
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Keyed on the fetch script, which is where every pin lives: a changed
+      # pin is a changed key, and a cache hit is a set the script verifies
+      # again before anything is packaged.
+      - name: The models, cached by their pins
+        uses: actions/cache@v4
+        with:
+          path: |
+            .models
+            .pdfium
+          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
+
+      - name: Fetch and verify the models
+        run: ./packaging/fetch-models.sh
+
+      - name: What is installed
+        run: rustc -V && cargo -V && python3 -V && dpkg-deb --version | head -1
+
+      # What the executable links at load time, recorded and bounded. The C
+      # this repository takes is stated in DESIGN.md §2; anything beyond
+      # libstdc++ here is a dependency that section does not know about.
+      - name: Build, and what it links
+        run: |
+          cargo build --release
+          target=$(cargo metadata --format-version 1 --no-deps |
+              sed -n 's/.*"target_directory":"\([^"]*\)".*/\1/p')
+          echo "linked at load time:"
+          ldd "${target}/release/duckling" | sed 's/^/  /'
+          strange=$(ldd "${target}/release/duckling" |
+              awk '{print $1}' | grep -vE '^(linux-vdso|libgcc_s|libm|libc|libstdc\+\+|/lib64/ld-linux)' || true)
+          [ -z "$strange" ] || { echo "unexpected shared libraries:"; echo "$strange"; exit 1; }
+
+      - name: Build the package
+        run: ./packaging/debian/build-deb.sh
+
+      - name: The package holds up
+        run: |
+          deb=$(ls dist/*.deb)
+          echo "checking ${deb} ($(du -h "$deb" | cut -f1))"
+
+          strange=$(dpkg-deb --contents "$deb" | awk '$2 != "root/root"')
+          [ -z "$strange" ] || { echo "not root/root:"; echo "$strange"; exit 1; }
+
+          strange=$(dpkg-deb --contents "$deb" |
+              awk '$1 !~ /^drwxr-xr-x/ && $1 !~ /^-rw-r--r--/ && $1 !~ /^-rwxr-xr-x/ && $1 !~ /^lrwxrwxrwx/')
+          [ -z "$strange" ] || { echo "unexpected modes:"; echo "$strange"; exit 1; }
+
+          dpkg-deb --ctrl-tarfile "$deb" | tar t | grep -qx './md5sums' ||
+              { echo "the package ships no md5sums" >&2; exit 1; }
+
+          tree="${RUNNER_TEMP}/tree"
+          dpkg-deb -x "$deb" "$tree"
+          dpkg-deb -e "$deb" "${tree}/DEBIAN"
+          ( cd "$tree" && md5sum -c DEBIAN/md5sums --quiet )
+
+      - name: What lintian says
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lintian
+          lintian --info --tag-display-limit 0 --fail-on error,warning dist/*.deb
+
+      # The entry is registered only on a machine that can run its Exec, so
+      # the executable is installed too; segler's first run found GLib
+      # dropping an entry whose program was not on PATH.
+      - name: The entry is ours and lists the types
+        run: |
+          sudo apt-get install -y -qq desktop-file-utils hicolor-icon-theme libglib2.0-bin
+          ./packaging/linux/install.sh
+          export PATH="${HOME}/.local/bin:${PATH}"
+          desktop-file-validate ~/.local/share/applications/duckling.desktop
+          for type in application/pdf application/vnd.openxmlformats-officedocument.wordprocessingml.document; do
+              echo "${type}:"
+              gio mime "$type" | sed 's/^/  /'
+              gio mime "$type" | grep -q 'duckling.desktop' ||
+                  { echo "duckling.desktop is not among the handlers for ${type}" >&2; exit 1; }
+          done

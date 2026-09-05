@@ -36,6 +36,8 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
     let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    // Before any thread exists; see the function's own comment.
+    let models = duckling::locate_assets();
     eframe::run_native(
         "Duckling",
         options,
@@ -44,6 +46,11 @@ fn main() -> eframe::Result {
             let ctx = cc.egui_ctx.clone();
             let worker = Worker::spawn(move || ctx.request_repaint());
             let mut app = App::new(worker);
+            if models.is_none() {
+                app.status =
+                    "No models found beside the application; PDFs and images will not convert"
+                        .to_owned();
+            }
             app.add_paths(&paths);
             Ok(Box::new(app))
         }),

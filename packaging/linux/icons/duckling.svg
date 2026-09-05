@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!--
+    Duckling: a duckling in a blue roundel. Body and head as one cream
+    shape, an ochre bill, a dark eye.
+
+    Author: David M. Anderson
+    Built with AI assistance (Claude, Anthropic)
+
+    Drawn 2026-09-04 as one of three on a sheet: a duckling in profile with
+    body, head and tail as separate shapes; a head alone with the bill; and
+    this, the rubber-duck silhouette. The profile lost its head at 16
+    pixels and the head alone read as a ball with a beak; this one keeps
+    the duck at 16, 32 and 128 on light and dark. Provisional until David
+    has chosen from the sheet, which the packaging README points at.
+
+    This comment sits inside the element rather than above it, and that is
+    a measurement rather than a style: gdk-pixbuf sniffs the first 256
+    bytes for `<svg` and refuses the file when the tag comes later, which
+    is what a header comment above the tag does. slipcase-desktop found it
+    the hard way. Keep the opening tag on the second line.
+
+    Filled shapes and no interior strokes, which is what still reads at 16
+    pixels; the roundel's 3-unit outline is the only line. The palette is
+    slipcase-desktop's blue, dark and cream, so the three Excelano
+    applications look like siblings on a launcher, plus an ochre for the
+    bill because a duckling without one is an egg.
+  -->
+  <circle cx="32" cy="32" r="28" fill="#4a6fa5" stroke="#2f3337" stroke-width="3"/>
+  <!-- Body and head, one silhouette: the breast rises into the neck at the
+       left, the head is the dome at the top right, the tail is the rise at
+       the left. -->
+  <path d="M12 38 Q10 30 18 30 L26 30 Q26 18 36 18 Q46 18 46 28 L46 32 Q54 34 52 42 Q50 50 36 50 L22 50 Q12 50 12 38 z" fill="#f2eee4"/>
+  <!-- The bill. -->
+  <path d="M46 24 L58 27 L46 31 z" fill="#c8862e"/>
+  <!-- The eye. -->
+  <circle cx="40" cy="25" r="2.4" fill="#2f3337"/>
+</svg>

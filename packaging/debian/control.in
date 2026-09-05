@@ -1,0 +1,36 @@
+Package: duckling
+Version: @VERSION@
+Architecture: @ARCH@
+Maintainer: David M. Anderson <david.anderson@excelano.com>
+Installed-Size: @SIZE@
+Section: text
+Priority: optional
+Homepage: https://github.com/excelano/duckling
+Depends: libc6, libgcc-s1, libstdc++6, libwayland-client0, libxkbcommon0, libxkbcommon-x11-0, libegl1, libvulkan1 | libgl1, libx11-6, libx11-xcb1, libxi6, libxcursor1, libxrandr2, desktop-file-utils, hicolor-icon-theme
+Description: Convert documents to Markdown, JSON, DocLang or LaTeX
+ Duckling converts Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF,
+ OpenDocument, Apple iWork, email, Visio and some forty other document
+ formats into Markdown, docling JSON, a DocLang archive or LaTeX, on the
+ machine it runs on, with nothing sent anywhere. Drop files or folders on
+ the window, choose the format and where the output goes, and press
+ Convert. The converter is docling.rs, the Rust port of IBM's Docling.
+ .
+ Scanned PDFs and images are read by layout, table-structure and OCR
+ models that this package carries under /usr/lib/duckling, so nothing is
+ downloaded after installation. That is most of the package's size.
+ .
+ The executable links libc, libgcc and libstdc++ (ONNX Runtime's) and
+ nothing else the linker records. The display stack, the graphics driver
+ loader and the keyboard map libraries are opened by name at run time, and
+ so is pdfium from the package's own directory, so Depends is written by
+ hand and packaging/linux/check-libraries.sh measures it against a running
+ window on both display backends.
+ .
+ There are two keyboard map libraries and not one, because there are two
+ display backends. A Wayland session never loads libxkbcommon-x11 and an X11
+ session panics at startup without it; nothing pulls it in behind
+ libxkbcommon0. slipcase-desktop shipped two releases without it.
+ .
+ The two tool packages at the end own the dpkg triggers that rebuild the
+ desktop and icon caches, which is why this package carries no maintainer
+ scripts.
