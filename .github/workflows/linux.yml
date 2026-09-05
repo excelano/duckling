@@ -46,7 +46,7 @@ jobs:
       # pin is a changed key, and a cache hit is a set the script verifies
       # again before anything is packaged.
       - name: The models, cached by their pins
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             .models
