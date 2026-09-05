@@ -10,8 +10,8 @@ Depends: libc6, libgcc-s1, libstdc++6, libwayland-client0, libxkbcommon0, libxkb
 Description: Convert documents to Markdown, JSON, DocLang or LaTeX
  Duckling converts Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF,
  OpenDocument, Apple iWork, email, Visio and some forty other document
- formats into DocLang, Markdown, docling JSON, a DocLang archive or LaTeX, on the
- machine it runs on, with nothing sent anywhere. Drop files or folders on
+ formats into DocLang, Markdown, docling JSON, a DocLang archive or LaTeX,
+ on the machine it runs on, with nothing sent anywhere. Drop files or folders on
  the window, choose the format and where the output goes, and press
  Convert. The converter is docling.rs, the Rust port of IBM's Docling.
  .
