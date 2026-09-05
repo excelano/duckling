@@ -162,7 +162,12 @@ Before either DocLang output, Duckling puts a break before every page after
 the first when the converter marked pages and wrote no breaks; the
 spreadsheet, slide and RTF backends write their own and are left alone.
 This is a conformance gap in docling.rs against its own reference, not
-raised upstream yet; David decides. A conversion docling.rs
+raised upstream yet; David decides. A second one surfaced the same way:
+docling.rs writes a table's `<caption>` before its four `<location>`s,
+the specification's head order puts location first, and Segler's
+validator says so on every captioned table from a PDF. Duckling passes
+the markup through as the engine writes it; a converter that rewrote the
+engine's output would be hiding what upstream needs to hear. A conversion docling.rs
 reports as partial says so beside the buttons.
 
 The **status line** counts the queue by state and carries the last thing that
