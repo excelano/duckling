@@ -1,0 +1,35 @@
+[package]
+name = "duckling"
+description = "Convert documents to Markdown, JSON, DocLang and LaTeX with docling.rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["David M. Anderson"]
+license = "MIT"
+repository = "https://github.com/excelano/duckling"
+# eframe's number, not this code's; it rises whenever egui raises its own.
+rust-version = "1.95"
+
+[[bin]]
+name = "duckling"
+path = "src/main.rs"
+
+[dependencies]
+# The converter. `pdf` is the ML pipeline (pdfium + ONNX Runtime), which is
+# the one C dependency this application takes; DESIGN.md §2 says why and what
+# it costs. The other defaults stay off: `asr` wants Whisper models this
+# application does not ship, `vlm` wants a remote endpoint, `fetch-images`
+# wants the network.
+docling = { version = "1.36", default-features = false, features = ["pdf"] }
+# Same framework as slipcase-desktop and segler on purpose: one set of
+# platform lessons for three applications. Defaults carry accesskit, kept on.
+eframe = "0.36"
+# Defaults are `xdg-portal` and `wayland`, both pure Rust. The `gtk3` feature
+# links C through gtk-sys and stays off.
+rfd = "0.17"
+# Reveal a converted file in the platform's file manager.
+opener = { version = "0.8", features = ["reveal"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The system theme on Linux; `src/system_theme.rs` is slipcase-desktop's
+# module and the reasoning is there. Already in the tree under accesskit.
+zbus = { version = "5", default-features = false, features = ["async-io", "blocking-api"] }

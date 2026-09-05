@@ -1,0 +1,13 @@
+/target
+/dist
+/dist-*
+
+# Runtime assets: the ONNX models and pdfium, fetched by
+# packaging/fetch-models.sh from pinned releases and shipped inside every
+# package. Never committed; roughly 750 MB.
+/.models
+/.pdfium
+
+/packaging/windows/identity.psd1
+/packaging/windows/SUBMITTING.local.md
+/packaging/macos/SUBMITTING.local.md
