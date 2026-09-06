@@ -107,6 +107,30 @@ and refuses a sixth. `CLAUDE.md` says a third C dependency is a decision to take
 with David; this is the fourth arriving inside the first, which is not the shape
 that rule anticipated, and taking it was still David's on 2026-09-05.
 
+**What it costs on macOS is a whole architecture, and that was measured on
+2026-09-05 on the Mac lane rather than predicted.** `RELEASE.md` sent the lane
+to build the universal binary slipcase-desktop ships. It cannot be built from
+any machine: `ort`'s dist list for macOS carries only `aarch64-apple-darwin`,
+and Microsoft's own releases, which those builds are made from, stopped
+shipping an Intel or a universal macOS library at 1.28.0, the version `ort`
+pins. Building ONNX Runtime from source for x86_64 is the same project of its
+own the Windows lane declined. So **the Mac App Store build is Apple silicon
+only**, and App Store Connect lists it that way from the binary. Apple sold its
+last Intel Mac in 2023 and has named macOS 26 the last release for them, so
+this is where every Mac application is going; this one arrives first for want
+of a library rather than by choice. The cost that bites is that David's Mac is
+Intel: the lane cross-compiles and packages a build it can never run, so
+`.github/workflows/macos.yml` on an arm64 runner is where the shipped
+architecture first converts anything, and a person's walkthrough needs a
+borrowed machine or TestFlight. An `intel-mac` feature in `Cargo.toml` builds
+the application with no ONNX Runtime in it, for measuring the window, the
+sandbox and the bundle on the machine at hand; PDFs and images fail in their
+rows and everything else converts. `packaging/macos/README.md` §1 has every
+measurement. Two smaller costs came with it: the floor is macOS 13.4, because
+that is what the library `ort` fetches was built for; and CoreML is linked in
+unasked, the DirectML story again at a fraction of the size, carried in `§9`
+under the same thread.
+
 **The framework is egui, through eframe**, the same as slipcase-desktop and
 segler, so that one set of platform lessons serves three applications and
 the packaging clones. The Linux system-theme module is slipcase-desktop's,
@@ -289,7 +313,8 @@ A checkout with `.models/` in its working directory is left alone, and so is
 an environment somebody set by hand. On Linux the layout is
 `/usr/lib/duckling/{duckling,models,pdfium}` with `/usr/bin/duckling` a
 symlink, which is the layout docling.rs's own installer produces; the
-Windows and Mac lanes put the same two directories beside their executables.
+Windows lane puts the same two directories beside its executable, and the Mac
+lane could not, for the reason below.
 
 **One package, and the models are in it.** Debian proper would split 740 MB
 of arch-independent data into `duckling-data`; the fleet's rule is one
@@ -341,6 +366,53 @@ manager for. It also means `uninstall.ps1` must not remove a `UserChoice` the
 way segler's does - segler claims its two types and Duckling claims none, so
 that key is always somebody else's decision.
 
+**The Mac lane, run 2026-09-05, on an Intel Mac that cannot run what it
+built.** Cloned from slipcase-desktop's directory of the same name, which has
+been through Mac App Store review and a rejection under Guideline 2.5.1; the
+winit pin that rejection produced is in `Cargo.toml` and the private-symbol
+check it produced is in `build-app.sh`, which found the two `CGS` symbols
+without the pin and nothing with it. `§2` has the finding that shaped the
+lane, and three more are recorded here because each is a decision.
+
+**The models are resources and pdfium is a framework.** A bundle is not a
+directory the package may fill beside the executable: `codesign` treats
+everything under `Contents/MacOS` as code, and a shared library the Store
+accepts is nested code under `Contents/Frameworks`. So the layout is
+`Contents/Resources/models`, `Contents/Frameworks/libpdfium.dylib` thinned to
+the executable's architecture, and `locate_assets` looks there after looking
+beside. Measured: 805 MB of bundle, 594 MB of package.
+
+**The sandbox grants a file, not its folder, and the application asks for the
+folder.** slipcase-desktop measured that the open panel's grant covers the
+file and not its directory, and Duckling's default writes beside its input.
+So a single dropped PDF converted beside itself would have failed at the
+write, after the models had run. `can_write_in` in `src/lib.rs` probes each
+queued file's folder with one empty entry, and for each that refuses,
+`src/main.rs` puts up the standard open panel at that folder with a message
+saying why; choosing it extends the grant for the session, which is the panel's
+purpose under the sandbox. Files whose folder is still refused stay queued and
+the status line says so, naming *Into a folder* as the other way out. A
+dropped or picked folder is granted whole and never sees the panel, and
+neither does a chosen destination. Measured 2026-09-05 on the `intel-mac` build
+signed with an Apple Development identity: the panel appears, choosing the
+folder makes the write succeed, cancelling leaves the file queued, and a file
+given as a command-line argument cannot even be read - *Operation not
+permitted* - which is the sandbox working as designed and a route no person
+takes. macOS only; on the other two platforms a folder that refuses a write is
+a permissions problem a panel would misdescribe. Taken on the lane without
+David because the alternative was a Store build whose first drop fails, and
+reversible in one function.
+
+**No document types on this platform, so no Open With.** The desktop entry and
+the MSIX association list the types Duckling reads at Alternate rank, and the
+bundle's counterpart would be `CFBundleDocumentTypes` at the same rank. It is
+not declared, because an opened document reaches a Mac application as an Apple
+Event rather than an argument, receiving one is the `unsafe` module
+slipcase-desktop carries, and `CLAUDE.md` makes that a decision to take with
+David. Declaring the types without the handler would have Finder offer
+Duckling and AppKit refuse the document with a dialog blaming it. So neither,
+and the changelog's Open With claim stays scoped to Windows. `§9`.
+
 ## 9. Open threads
 
 **The preview has no font for most of the world's scripts.** egui bundles
@@ -359,12 +431,31 @@ somebody who is not David is where the question gets answered.
 platform's package size ever matters, `§7` records what a conversion
 actually opened.
 
+**Open With on macOS.** `§8` says why the bundle declares no document types:
+the Apple Event handler that would receive the document is an `unsafe` module,
+slipcase-desktop's `src/opened_document.rs`, and adding one here is David's
+call. The cost of taking it is that module with its header changed,
+`deny(unsafe_code)` lifted for the one file, the `objc2` features it needs,
+and a list of types in `Info.plist.in`; the gain is the right-click route a
+Linux or Windows file manager already offers. Drops, the Add buttons and the
+Dock work without it.
+
+**Intel Macs.** `§2` records that no prebuilt ONNX Runtime exists for
+`x86_64-apple-darwin` at pyke or at Microsoft since 1.28. If either ships one
+again, or if a build from source is ever worth its weight, `build-app.sh`
+gains back the `--universal` its parent has and `Info.plist.in` says nothing
+about architecture, which it already does not. Until then the Store lists the
+application for Apple silicon and David's own Mac runs the `intel-mac` build.
+
 **DirectML is linked into the Windows build for nothing, and upstream should
-hear it.** Found 2026-09-05 on the Windows lane and recorded in `§2`: the
+hear it - and CoreML into the Mac build.** Found 2026-09-05 on the Windows lane and recorded in `§2`: the
 prebuilt ONNX Runtime `ort` selects for this target carries the DirectML
 execution provider, so `directml.dll` is a hard import and 18.5 MB of DLL ships
 in the package, while docling.rs runs the CPU provider and this application
-never selects another. The question is `ort`'s or docling.rs's rather than this
-repository's - whether a dist without it can be asked for - and it is the same
-shape as the two docling.rs conformance findings in `§4`: measured here, not
-worked around here, and David decides when it goes.
+never selects another. The Mac lane found the same shape on 2026-09-05: the
+one dist `ort` offers for Apple silicon is `+coreml`, so `CoreML.framework` is
+imported and the provider's objects are in the executable for nothing. The
+question is `ort`'s or docling.rs's rather than this repository's - whether a
+dist without either can be asked for - and it is the same shape as the two
+docling.rs conformance findings in `§4`: measured here, not worked around
+here, and David decides when it goes.

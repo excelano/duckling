@@ -66,6 +66,36 @@ moniker, which takes arguments:
 does the whole of that properly. The same caveat holds as on Linux: it proves a
 code path draws and does not stand in for David's walkthrough.
 
+## On the Mac
+
+    ./packaging/fetch-models.sh
+    MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
+    ./packaging/macos/build-app.sh --store ~/Downloads/Duckling_Mac_App_Store.provisionprofile
+
+`RELEASE.md` has the rest of the lane and `packaging/macos/README.md` has every
+measurement behind it. Three things to know before touching anything there.
+**The build is Apple silicon only**: no prebuilt ONNX Runtime exists for an
+Intel Mac, and David's Mac is one, so the lane packages what it cannot run and
+`macos.yml` on an arm64 runner is where the shipped build converts anything.
+**On that Mac every `cargo` command needs `--features intel-mac`**, which
+builds the application with no ONNX Runtime in it; without the feature
+`ort-sys` refuses at once, with it PDFs and images fail in their rows and
+everything else works. **The floor is 13.4** and is the library's, not ours.
+
+**Seeing the window from here** is the `intel-mac` bundle signed with the
+Apple Development identity, which is sandboxed and so is where the folder
+panel and every other sandbox behaviour get measured:
+`cargo build --release --features intel-mac`, then `build-app.sh --binary
+target/release/duckling --outdir dist-intel --sign "Apple Development: David
+Anderson (Y79D796839)"`, then `open -a dist-intel/Duckling.app`. Add files
+through the button: a file given as an argument to a sandboxed application
+cannot be read, which is the sandbox and not a defect. Accessibility is
+granted to the terminal, so `osascript` keystrokes and a CGEvent click reach
+the window, and `packaging/macos/window-probe.swift` asks the window server
+whether it drew. The same caveat holds as on the other two: it proves a code
+path draws and does not stand in for David's walkthrough, which on this
+platform happens on an Apple silicon Mac against the TestFlight build.
+
 ---
 
 ## Rules
@@ -84,7 +114,8 @@ taken name and it is tested; nothing writes around it.
 download at run time and no code for one. DESIGN.md §2.
 
 **C is taken here, deliberately and once.** ONNX Runtime and pdfium are the
-whole of it on Linux, and `DESIGN.md` §2 records what they cost. The fleet's
+whole of it on Linux, and `DESIGN.md` §2 records what they cost, on Linux, on
+Windows, and on macOS, where the cost is Intel Macs. The fleet's
 stance is in `~/notes/pure_rust_preference.md`; adding another C dependency is
 a decision to take with David.
 
@@ -100,7 +131,8 @@ rather than a list to add a name to.
 **Unsafe has no home.** `src/lib.rs` is `forbid`; `src/main.rs` is `deny`,
 which a platform arm may lift for one module the way slipcase-desktop's
 document-open handler on macOS does. Adding one is a decision to take with
-David.
+David, and it is the decision that would give the Mac bundle Open With;
+`DESIGN.md` §9 holds it.
 
 ---
 

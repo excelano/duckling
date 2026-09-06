@@ -35,6 +35,25 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 # The content hash in an asset's name, computed the way the exporter does.
 sha2 = "0.11"
 
+[features]
+# A build with no ONNX Runtime in it, for the one Mac none is built for.
+#
+# `ort` links a prebuilt ONNX Runtime and has none for `x86_64-apple-darwin`:
+# pyke's dist list carries only the Apple silicon build, and Microsoft's own
+# releases stopped shipping an Intel or a universal macOS library at 1.28, the
+# version `ort` pins. So a Mac App Store build is Apple silicon only, measured
+# on 2026-09-05 and recorded in DESIGN.md §2, and an Intel Mac - which is the
+# Mac this application is developed on - cannot link the release build at all.
+#
+# This feature turns `ort`'s `load-dynamic` on, which links nothing and looks
+# for a `libonnxruntime.dylib` at run time that no Intel Mac has. Everything
+# docling.rs converts without a model still converts; a PDF or an image fails
+# in its own row with the loader's message. That is enough to run the window,
+# the sandbox, the bundle and Launch Services on the machine David has, which
+# is what `packaging/macos/README.md` uses it for. It is never a release build
+# and `build-app.sh` refuses to sign one for the Store.
+intel-mac = ["dep:ort"]
+
 [target.'cfg(target_os = "windows")'.dependencies]
 # Reading the window's icon out of the `.ico` the MSIX and install.ps1 also
 # carry. Windows takes a window icon from a resource compiled into the
@@ -45,7 +64,33 @@ sha2 = "0.11"
 # line for the same reason.
 ico = "0.5"
 
+[target.'cfg(all(target_os = "macos", target_arch = "x86_64"))'.dependencies]
+# Named only so that `intel-mac` above can reach its feature. The version is
+# the one docling.rs already resolves, so this adds nothing to the tree, and
+# it is optional so that a default build on any platform never sees it.
+ort = { version = "2.0.0-rc.13", optional = true, default-features = false, features = ["load-dynamic"] }
+
 [target.'cfg(target_os = "linux")'.dependencies]
 # The system theme on Linux; `src/system_theme.rs` is slipcase-desktop's
 # module and the reasoning is there. Already in the tree under accesskit.
 zbus = { version = "5", default-features = false, features = ["async-io", "blocking-api"] }
+
+# A Mac App Store submission of slipcase-desktop was refused on 2026-08-31 under
+# Guideline 2.5.1 for referencing `_CGSSetWindowBackgroundBlurRadius`, a private
+# CoreGraphics symbol nothing there or here calls. `winit` 0.30.13 declares it in
+# `platform_impl/macos/ffi.rs` and calls it from `WindowDelegate::set_blur`,
+# behind neither a feature nor a `cfg`, and review reads the symbol table rather
+# than the call graph; fat LTO with `-dead_strip` still carries it. Upstream put
+# it behind a `private-apple-apis` feature in winit#4541 on 2026-07-23 and no
+# published release has that yet. This is slipcase-desktop's pin of that change
+# on the `v0.30.13` tag, taken unchanged so that the three applications carry
+# one fix. `packaging/macos/build-app.sh` refuses a binary that imports any
+# symbol a framework's public headers do not declare, which is what notices if
+# this pin is dropped too early. **Delete it when a winit release carries the
+# gate.**
+#
+# slipcase-desktop's copy of this comment says the pin moves `dpi` in its
+# lockfile by one line; here it does not, measured: `dpi` stays at 0.1.2 and
+# only winit's source line changes.
+[patch.crates-io]
+winit = { git = "https://github.com/excelano/winit", rev = "3cfd905679da3ca241b97dea723211b580620a27" }

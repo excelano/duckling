@@ -1,0 +1,166 @@
+# The macOS checks a machine can run, on the only kind of machine the release
+# build runs on.
+#
+# Every other lane in this repository can run what it builds. This one cannot:
+# the Mac lane is an Intel machine, `ort` has no prebuilt ONNX Runtime for
+# `x86_64-apple-darwin` and neither does Microsoft since 1.28, so the release
+# build is Apple silicon only and the machine that packages it never executes
+# it. `packaging/macos/README.md` §1 has the measurement. An arm64 runner is
+# therefore not a convenience here - until a person sits at an Apple silicon
+# Mac with the bundle, it is the only place the shipped architecture converts
+# anything at all.
+#
+# So this fetches the models, runs the suite - which since 2026-09-05 converts
+# the demo documents, a scanned PDF through the OCR models among them -
+# assembles the bundle with the private-symbol check that slipcase-desktop's
+# rejection under Guideline 2.5.1 produced, opens it with a document as an
+# argument, and asks the window server whether a window appeared.
+#
+# What it does not reach: the sandbox, which needs a signing identity no runner
+# has; the folder panel `src/main.rs` shows under it; the icon as a person sees
+# it; the Store package, which needs the profile. `CHECKLIST.md` holds those
+# and a green run here does not stand in for one.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
+
+name: macos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  arm64:
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The architecture is the whole reason this workflow exists, and a label
+      # is a promise rather than a fact: `macos-13` is Intel and `macos-14`
+      # onwards is Apple silicon, which is a mapping GitHub can change.
+      - name: The runner is Apple silicon
+        run: |
+          arch=$(uname -m)
+          echo "runner reports ${arch}"
+          [ "$arch" = arm64 ] || {
+            echo "this workflow exists to run the arm64 build and the runner is ${arch}" >&2
+            exit 1
+          }
+
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Keyed on the fetch script, which is where every pin lives.
+      - name: The models, cached by their pins
+        uses: actions/cache@v6
+        with:
+          path: |
+            .models
+            .pdfium
+          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
+
+      - name: Fetch and verify the models
+        run: ./packaging/fetch-models.sh
+
+      - name: What is installed
+        run: rustc -V && cargo -V && sw_vers && xcodebuild -version | head -1
+
+      # `ort` downloads its prebuilt ONNX Runtime here and `onig_sys` compiles
+      # oniguruma with the clang a runner already has. The deployment target is
+      # the bundle's floor, so that what this runs is what ships.
+      - name: Build
+        run: cargo build --all-targets
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "13.4"
+
+      # The demo documents go through the worker here, models and all. This is
+      # the release architecture converting a scanned page through OCR, which
+      # nothing on the Mac lane can do.
+      - name: Test
+        run: cargo test
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "13.4"
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Formatting
+        run: cargo fmt --check
+
+      # The bundle is the unit, and `build-app.sh` is where the private-symbol
+      # check lives: for every symbol the executable and pdfium import from a
+      # system framework, does that framework's public headers declare it?
+      # Built from the debug binary the steps above already produced, because
+      # a release build here would cost minutes to answer a question that does
+      # not depend on optimisation - and the symbol table it is asked about is
+      # the same either way.
+      - name: Assemble the bundle, and no private symbol is in it
+        run: |
+          target=$(cargo metadata --format-version 1 --no-deps |
+              sed -n 's/.*"target_directory":"\([^"]*\)".*/\1/p')
+          ./packaging/macos/build-app.sh --binary "${target}/debug/duckling"
+          du -sh dist/Duckling.app
+          lipo -archs dist/Duckling.app/Contents/MacOS/duckling
+          ls dist/Duckling.app/Contents/Frameworks dist/Duckling.app/Contents/Resources
+
+      # `open --args` is the path a command-line launch takes, and the one that
+      # exists on this platform: Duckling claims no document type here, so
+      # `open -a Duckling file.pdf` would be refused by AppKit for want of a
+      # handler. The window server is then asked rather than a screenshot
+      # taken, for the reason `packaging/macos/window-probe.swift` gives.
+      - name: A document opens, and a window appears
+        run: |
+          swiftc -O packaging/macos/window-probe.swift -o "${RUNNER_TEMP}/window-probe"
+          open -a "$PWD/dist/Duckling.app" --args "$PWD/packaging/demo/documents/field-notes.docx"
+
+          # Cold launch, a window server, and a first frame. Polled rather than
+          # slept at, so a fast answer is fast and a slow one still gets its
+          # chance.
+          for _ in $(seq 1 15); do
+            sleep 2
+            "${RUNNER_TEMP}/window-probe" Duckling >/dev/null 2>&1 && break
+          done
+
+          set +e
+          "${RUNNER_TEMP}/window-probe" Duckling
+          verdict=$?
+          set -e
+          case "$verdict" in
+            0) echo "the arm64 bundle drew a window" ;;
+            2)
+              echo "::error::The window server listed nothing, so this run answered nothing about the window. Decide whether this runner can host one at all before trusting a green tick here."
+              exit 1
+              ;;
+            *)
+              echo "::error::No window appeared for the arm64 bundle launched with a document."
+              exit 1
+              ;;
+          esac
+
+      # For eyes, not for the verdict.
+      - name: Photograph it, for a person
+        if: always()
+        run: |
+          screencapture -x "${RUNNER_TEMP}/screen.png" || true
+          ls -l "${RUNNER_TEMP}/screen.png" || true
+
+      - name: Keep the photograph
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm64-window
+          path: ${{ runner.temp }}/screen.png
+          if-no-files-found: warn

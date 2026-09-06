@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The bundle's property list. `build-app.sh` substitutes @VERSION@ and @BUILD@
+  from Cargo.toml, the way `packaging/debian/control.in` is substituted.
+
+  `com.excelano.duckling` is the reverse-DNS of `APP_ID` in `src/main.rs`, so
+  the binary, the Linux desktop entry's basename and this bundle all say
+  `duckling` and only the product name differs.
+
+  No `CFBundleDocumentTypes` and no `UTExportedTypeDeclarations`. Duckling
+  owns no format, and on this platform it claims none either - not because it
+  could not (an `LSHandlerRank` of Alternate is what the desktop entry and the
+  MSIX association say here), but because a document opened through Open With
+  arrives as an Apple Event and not as an argument, and receiving one needs
+  the `unsafe` module slipcase-desktop carries for it. Both halves or neither;
+  DESIGN.md 8 says why it is neither in this release, and README.md beside
+  this what it costs a person.
+
+  `LSApplicationCategoryType` is required by App Store Connect and is refused
+  at upload without one. Productivity is the honest fit: this turns documents
+  into other documents, which is what that category's word processors and
+  note-takers do, where Utilities is for tools about the machine itself.
+
+  `LSMinimumSystemVersion` is 13.4 because that is what the ONNX Runtime `ort`
+  links was built for, read off `libonnxruntime.a` with `otool -l` on
+  2026-09-05; pdfium says 13.0 and nothing else in the bundle asks for more
+  than 11. It is a measured floor rather than a guess, and `build-app.sh`
+  refuses a Store bundle whose executable disagrees with it.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>duckling</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.excelano.duckling</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<!--
+	  "Duckling" rather than the crate name, which is DESIGN.md 1's naming
+	  rule and the same choice `eframe::run_native` already makes for the
+	  window title.
+	-->
+	<key>CFBundleName</key>
+	<string>Duckling</string>
+	<key>CFBundleDisplayName</key>
+	<string>Duckling</string>
+
+	<key>CFBundleShortVersionString</key>
+	<string>@VERSION@</string>
+	<!--
+	  Not @VERSION@. App Store Connect deduplicates uploads by this key: it must
+	  increase on every upload of a bundle, including a rejected one resubmitted
+	  with nothing changed. The release version cannot do that, so this is the
+	  commit count, which only rises. `packaging/version.sh --build` is where it
+	  comes from and says why.
+	-->
+	<key>CFBundleVersion</key>
+	<string>@BUILD@</string>
+	<key>CFBundleIconFile</key>
+	<string>duckling</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.4</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+
+	<!--
+	  Answers the export compliance question in the bundle rather than in a
+	  web form, so it is asked once here instead of on every upload. Without
+	  it App Store Connect marks each build "Missing Compliance" and holds it
+	  out of TestFlight until somebody clicks through a dialog.
+
+	  `false` is the honest answer and not a convenience. Duckling makes no
+	  network connection of any kind and offers no cryptographic feature: the
+	  one hash it computes names an image asset by its content. What the
+	  dependency tree carries beyond that is standard and never reached - the
+	  zip reader docling.rs uses can decrypt a password-protected archive,
+	  and this application never has a password to give it.
+	-->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

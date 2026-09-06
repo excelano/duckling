@@ -1,9 +1,15 @@
 //! The worker end to end: a request in, a file on disk and an event out.
 //! Fixtures are the docling.rs conformance corpus, which lives in a clone
 //! beside this repository on David's machine and nowhere in CI; every test
-//! here skips, loudly, when it is absent. The PDF test also needs the
-//! models under `.models/` and pdfium under `.pdfium/`, which
+//! drawing on it skips, loudly, when it is absent. The PDF tests also need
+//! the models under `.models/` and pdfium under `.pdfium/`, which
 //! `packaging/fetch-models.sh` puts there.
+//!
+//! The tests at the end draw on `packaging/demo/documents` instead, which is
+//! in the tree, so they run wherever the models are - and on the Apple
+//! silicon runner they are the only conversion the release architecture ever
+//! gets before a person walks it through, since the Mac lane is an Intel
+//! machine the release build cannot run on.
 //!
 //! Author: David M. Anderson
 //! Built with AI assistance (Claude, Anthropic)
@@ -126,8 +132,7 @@ fn pdf_through_the_pipeline_finds_headings() {
         eprintln!("skipped: no docling.rs corpus");
         return;
     };
-    if !Path::new(".models/layout_heron_int8.onnx").exists() {
-        eprintln!("skipped: models not fetched");
+    if !pipeline_available() {
         return;
     }
     let out = fresh_dir("pdf");
@@ -151,8 +156,7 @@ fn pdf_to_archive_carries_one_page_image_per_page() {
         eprintln!("skipped: no docling.rs corpus");
         return;
     };
-    if !Path::new(".models/layout_heron_int8.onnx").exists() {
-        eprintln!("skipped: models not fetched");
+    if !pipeline_available() {
         return;
     }
     let out = fresh_dir("pdf-dclx");
@@ -225,4 +229,79 @@ fn zip_names(bytes: &[u8]) -> Vec<String> {
         }
     }
     names
+}
+
+/// The invented documents under `packaging/demo`, which are in the tree.
+fn demo() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("packaging/demo/documents")
+}
+
+/// Whether the PDF pipeline can run here: the models fetched, and an ONNX
+/// Runtime in the binary to run them, which the `intel-mac` build has not.
+fn pipeline_available() -> bool {
+    if cfg!(feature = "intel-mac") {
+        eprintln!("skipped: built without ONNX Runtime");
+        return false;
+    }
+    let fetched = Path::new(".models/layout_heron_int8.onnx").exists();
+    if !fetched {
+        eprintln!("skipped: models not fetched");
+    }
+    fetched
+}
+
+#[test]
+fn demo_word_file_converts_with_its_table() {
+    let out = fresh_dir("demo-docx");
+    let outcome = convert(
+        &demo().join("field-notes.docx"),
+        OutputFormat::Markdown,
+        &out,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&outcome.output).unwrap();
+    assert!(text.contains('|'), "no table in the Markdown:\n{text}");
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+#[test]
+fn demo_digital_pdf_converts_through_the_layout_model() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("demo-pdf");
+    let outcome = convert(
+        &demo().join("site-survey-report.pdf"),
+        OutputFormat::Markdown,
+        &out,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&outcome.output).unwrap();
+    assert!(text.contains("## "), "no headings:\n{text}");
+    assert!(text.contains('|'), "no table:\n{text}");
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// The one document in the set that proves the models are there: no text
+/// layer, so it comes back through OCR or not at all.
+#[test]
+fn demo_scanned_pdf_comes_back_through_ocr() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("demo-scan");
+    let outcome = convert(
+        &demo().join("scanned-notice.pdf"),
+        OutputFormat::Markdown,
+        &out,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&outcome.output)
+        .unwrap()
+        .to_lowercase();
+    assert!(
+        text.contains("gauge board") && text.contains("meadow gate"),
+        "the notice did not come back through OCR:\n{text}"
+    );
+    std::fs::remove_dir_all(&out).unwrap();
 }

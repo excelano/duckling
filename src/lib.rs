@@ -33,6 +33,15 @@ use docling::{
 /// through the two variables, which docling.rs reads before it looks beside
 /// the executable itself.
 ///
+/// A Mac bundle is the one layout where "beside" is not a directory the
+/// package may fill. `codesign` treats everything under `Contents/MacOS` as
+/// code to be signed, so 735 MB of model weights cannot sit there, and a
+/// shared library the Store will accept has to be nested code under
+/// `Contents/Frameworks`. So the second place looked is the bundle's:
+/// `../Resources/models` and `../Frameworks`, where `build-app.sh` puts them.
+/// docling.rs takes the pdfium variable as a directory holding the library
+/// under its platform name, which `Frameworks/libpdfium.dylib` is.
+///
 /// Called once at startup, before the worker thread exists. An environment
 /// already set, by a developer pointing at another model set, is left alone;
 /// so is a working directory carrying `.models/`, which is how a checkout
@@ -48,11 +57,18 @@ pub fn locate_assets() -> Option<PathBuf> {
         .ok()
         .and_then(|p| p.canonicalize().ok())
         .and_then(|p| p.parent().map(Path::to_path_buf))?;
-    let models = beside.join("models");
-    let pdfium = beside.join("pdfium");
-    if !models.is_dir() {
-        return None;
-    }
+    let flat = (beside.join("models"), beside.join("pdfium"));
+    let bundle = beside.parent().map(|contents| {
+        (
+            contents.join("Resources").join("models"),
+            contents.join("Frameworks"),
+        )
+    });
+    let (models, pdfium) = if flat.0.is_dir() {
+        flat
+    } else {
+        bundle.filter(|(models, _)| models.is_dir())?
+    };
     // Edition 2021: `set_var` is a safe function, and no other thread exists
     // yet to observe the environment changing under it.
     std::env::set_var("DOCLING_RS_MODELS_DIR", &models);
@@ -60,6 +76,31 @@ pub fn locate_assets() -> Option<PathBuf> {
         std::env::set_var("PDFIUM_DYNAMIC_LIB_PATH", &pdfium);
     }
     Some(models)
+}
+
+/// Whether this process may create a file in `dir` right now, learnt by
+/// creating one and removing it.
+///
+/// Asked before a conversion is sent to be written beside its source, and
+/// asked at all because of the macOS sandbox: a file a person drops or picks
+/// on its own is granted on its own, and its folder is not, so the write
+/// beside it fails after the conversion rather than before. A folder a
+/// person dropped or picked is granted whole. The probe is the write the
+/// conversion is about to make, one directory entry long, under a name
+/// nothing else uses and with `create_new` so it can never touch a file that
+/// exists. Anything that stops the probe stops the conversion, so a `false`
+/// here is a `false` however it came about.
+pub fn can_write_in(dir: &Path) -> bool {
+    let probe = dir.join(format!(".duckling-probe-{}", std::process::id()));
+    let created = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&probe)
+        .is_ok();
+    if created {
+        let _ = std::fs::remove_file(&probe);
+    }
+    created
 }
 
 /// Identifies a job across the window and the worker. Never reused.
@@ -617,6 +658,17 @@ mod tests {
             })
             .collect();
         assert_eq!(names, ["a.docx", "z.md", "a-sub/m.html", "b-sub/n.pdf"]);
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn the_write_probe_leaves_nothing_behind() {
+        let dir = std::env::temp_dir().join(format!("duckling-test-probe-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        assert!(can_write_in(&dir));
+        assert_eq!(std::fs::read_dir(&dir).unwrap().count(), 0);
+        assert!(!can_write_in(&dir.join("absent")));
         std::fs::remove_dir_all(&dir).unwrap();
     }
 

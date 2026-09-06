@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  What a development build is signed with; `build-app.sh` generates the Store
+  build's from these plus the two identifiers the profile grants. The App
+  Sandbox is mandatory on the Mac App Store, and these two are the whole of
+  what this application needs.
+
+  `files.user-selected.read-write` is the grant a person gives by dropping a
+  file or a folder on the window, picking one in the Add dialogs, or choosing
+  a destination folder. Nothing else is asked for: no network, no Downloads
+  folder, no temporary exception. What that grant does not cover is the folder
+  around a file that arrived on its own, which is why `src/main.rs` asks for
+  that folder before writing beside such a file; DESIGN.md 8.
+
+  The entitlement does nothing until it is inside a signature. An unsigned
+  bundle carrying this file is not sandboxed, which is why every sandbox
+  measurement in CHECKLIST.md is made against a signed one, and why an Apple
+  Development certificate is enough to make them.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+</dict>
+</plist>

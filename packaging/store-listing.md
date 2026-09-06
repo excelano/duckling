@@ -23,22 +23,29 @@ Limits, so a later edit does not overrun them:
 ## App name
 
     Microsoft Store   Duckling
-    Mac App Store     not yet reserved
+    Mac App Store     not yet reserved - David creates the record; SUBMITTING.local.md
 
 The Microsoft Store reservation is the bare name, taken before the survey in
 `DESIGN.md` §3, and Product identity assigned `Excelano.Duckling` under it. App
 Store Connect has not been asked; if it refuses the bare name, the fallback is
-"Duckling Converter".
+"Duckling Converter", and this line records which was taken.
 
 ## The download size, which the listing has to say
 
 **605 MB**, measured on the Windows lane 2026-09-05 against
-`Duckling-0.1.0.0-x64.msix`. `RELEASE.md` said the listing should say it and
-this is where that is kept true: three quarters of the package is ONNX weights
-that barely compress, and a person deciding whether to install should meet the
-number in the description rather than in the progress bar. It appears twice
-below, in the short description and in HOW IT WORKS, and both are written to
-survive the number changing by a few tens of megabytes without becoming wrong.
+`Duckling-0.1.0.0-x64.msix`, and **594 MB** on the Mac lane the same day
+against an unsigned `productbuild` of the arm64 bundle, whose installed size
+is 805 MB. `RELEASE.md` said the listing should say it and this is where that
+is kept true: three quarters of the package is ONNX weights that barely
+compress, and a person deciding whether to install should meet the number in
+the description rather than in the progress bar. It appears twice below, in
+the short description and in HOW IT WORKS, and both are written to survive
+the number changing by a few tens of megabytes without becoming wrong.
+
+**The Mac App Store lists the application for Apple silicon**, and does so
+from the binary rather than from anything written here; `DESIGN.md` §2 says
+why there is no Intel build. Nothing below says "Apple silicon" because the
+Store says it in its own place, and the Windows text is the same text.
 
 ## Subtitle (Mac App Store, 30)
 
@@ -144,6 +151,21 @@ default and the thing no competitor has, but it previews as markup carrying four
 `<location>` elements per node - correct, and dense to look at. So: DocLang
 selected in the queue shot, where the preview is not the subject, and **Markdown
 in the shot with the preview open**, which is also the word people searched for.
+
+## Screenshots (Mac App Store)
+
+**Not taken yet, and they cannot be taken on the Mac lane.** App Store Connect
+accepts 1280x800, 1440x900, 2560x1600 and 2880x1800, and
+`packaging/macos/screenshot.sh` takes 1440x900 by default, by window id with
+the pointer parked, from a bundle launched with the documents as arguments.
+The bundle has to be the arm64 one signed with a Developer ID or Apple
+Development identity from the commit being released - a Store package cannot
+be launched off the Store - and that bundle runs only on an Apple silicon Mac.
+The `intel-mac` build on the lane machine draws the same window and fails
+every PDF row, which for a listing whose second shot is a scanned PDF
+converted is a picture of the wrong thing. So the two shots below are taken
+where the walkthrough is, with the same twelve documents and the same two
+states, and this section records which commit they came from once they exist.
 
 ## The recipe, so the Mac lane can match
 

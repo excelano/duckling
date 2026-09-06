@@ -30,3 +30,7 @@ The first packaged build.
 - On Windows, Duckling appears under Open With for the document types it
   reads and becomes the default for none of them: a PDF still opens with
   whatever opened it before.
+- On macOS, Duckling needs a Mac with Apple silicon. Converting beside a file
+  that was added on its own asks for its folder first, because the App
+  Sandbox grants the file alone; a folder added whole, or a destination
+  folder, is never asked about.

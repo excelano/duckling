@@ -104,6 +104,15 @@ fn main() -> eframe::Result {
                         .to_owned();
             }
             app.add_paths(&paths);
+            // The build `Cargo.toml` describes under `intel-mac`, and this is
+            // the one place it shows: the models may well be there, and
+            // nothing can run them. After the paths, so that it is what a
+            // person sees rather than what the count overwrote.
+            #[cfg(feature = "intel-mac")]
+            {
+                app.status =
+                    "Built without ONNX Runtime: PDFs and images will not convert".to_owned();
+            }
             Ok(Box::new(app))
         }),
     );
@@ -235,12 +244,26 @@ impl App {
     }
 
     fn convert_queued(&mut self) {
+        #[cfg(target_os = "macos")]
+        let withheld = self.folders_without_access();
+        #[cfg(not(target_os = "macos"))]
+        let withheld: Vec<PathBuf> = Vec::new();
+
         let mut sent = 0usize;
+        let mut waiting = 0usize;
         for job in self
             .jobs
             .iter()
             .filter(|j| matches!(j.state, JobState::Queued))
         {
+            if job
+                .source
+                .parent()
+                .is_some_and(|dir| withheld.iter().any(|w| w == dir))
+            {
+                waiting += 1;
+                continue;
+            }
             self.worker.submit(Request {
                 id: job.id,
                 source: job.source.clone(),
@@ -249,7 +272,58 @@ impl App {
             });
             sent += 1;
         }
-        self.status = format!("Converting {sent} to {}", self.format.label());
+        self.status = match (sent, waiting) {
+            (_, 0) => format!("Converting {sent} to {}", self.format.label()),
+            (0, n) => {
+                format!("{n} left queued until their folder is allowed, or choose Into a folder")
+            }
+            (_, n) => format!(
+                "Converting {sent} to {}; {n} left queued until their folder is allowed, \
+                 or choose Into a folder",
+                self.format.label()
+            ),
+        };
+    }
+
+    /// The folders of queued files that this process may not write into,
+    /// after asking the person for each one once.
+    ///
+    /// The App Sandbox grants a file that was dropped or picked on its own,
+    /// and not the folder around it, so a conversion written beside such a
+    /// file fails at the write. A folder that was dropped or picked is
+    /// granted whole and never reaches the panel. The panel is the sandbox's
+    /// own way of extending a grant: choosing the folder in it makes the
+    /// folder writable for the rest of the session. The person may choose
+    /// somewhere else or cancel, and the probe is asked again afterwards
+    /// rather than the answer trusted, so what comes back is what is still
+    /// not writable and those files stay queued rather than fail.
+    /// `DESIGN.md` §8 records the measurement this rests on.
+    #[cfg(target_os = "macos")]
+    fn folders_without_access(&mut self) -> Vec<PathBuf> {
+        if !matches!(self.destination, Destination::BesideSource) {
+            return Vec::new();
+        }
+        let mut folders: Vec<PathBuf> = self
+            .jobs
+            .iter()
+            .filter(|j| matches!(j.state, JobState::Queued))
+            .filter_map(|j| j.source.parent().map(Path::to_path_buf))
+            .collect();
+        folders.sort();
+        folders.dedup();
+        folders.retain(|dir| !duckling::can_write_in(dir));
+        for dir in &folders {
+            rfd::FileDialog::new()
+                .set_title(format!(
+                    "Allow Duckling to write beside the files in {}: choose that folder",
+                    dir.display()
+                ))
+                .set_directory(dir)
+                .set_can_create_directories(false)
+                .pick_folder();
+        }
+        folders.retain(|dir| !duckling::can_write_in(dir));
+        folders
     }
 
     fn apply_events(&mut self) {

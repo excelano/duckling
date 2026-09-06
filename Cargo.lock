@@ -1438,6 +1438,7 @@ dependencies = [
  "ico",
  "image",
  "opener",
+ "ort",
  "rfd",
  "sha2 0.11.0",
  "zbus",
@@ -3623,6 +3624,7 @@ version = "2.0.0-rc.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4336a1e2b38848325241c72889086886004e589b7c74f335e60a8e8db5138a0b"
 dependencies = [
+ "libloading 0.9.0",
  "ndarray",
  "ort-sys",
  "smallvec",
@@ -6412,8 +6414,7 @@ checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
 [[package]]
 name = "winit"
 version = "0.30.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d"
+source = "git+https://github.com/excelano/winit?rev=3cfd905679da3ca241b97dea723211b580620a27#3cfd905679da3ca241b97dea723211b580620a27"
 dependencies = [
  "ahash",
  "android-activity",

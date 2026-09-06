@@ -17,9 +17,11 @@ unless the file says otherwise.
 The executable, and beside it `models/` and `pdfium/`: about 740 MB that are
 the PDF and image pipeline. The application finds them by looking beside its
 own executable (`locate_assets` in `src/lib.rs`), so every platform's package
-puts them in the same place relative to it: `/usr/lib/duckling/` on Linux
-with a symlink on `PATH`, the application directory in an MSIX, `Contents/MacOS`
-in a bundle. There is no download at run time and no code for one.
+puts them where it looks: `/usr/lib/duckling/` on Linux with a symlink on
+`PATH`, the application directory in an MSIX, and in a bundle
+`Contents/Resources/models` and `Contents/Frameworks`, the two places a signed
+bundle allows and the second place `locate_assets` looks. There is no download
+at run time and no code for one.
 
 ## linux
 
@@ -86,9 +88,10 @@ of three shapes and then three colours; the file's own comment records what
 the others cost. Checked at 16,
 32 and 128 pixels on light and dark grounds before committing, and any
 change should be. The SVG is the source for every platform: macOS wants
-`.icns` and Windows `.ico`, both converted from it, and
-`windows/make-ico` is the converter for the second - segler's tool with two
-of its three drawings removed, because Duckling has no file types to draw.
+`.icns` and Windows `.ico`, both converted from it. `macos/build-app.sh`
+renders the first with `sips` at build time, and `windows/make-ico` is the
+converter for the second - segler's tool with two of its three drawings
+removed, because Duckling has no file types to draw.
 It also writes the four PNGs the MSIX manifest names and the Store listing
 logo, and `windows.yml` rebuilds all of it on every push and refuses a
 difference, because those are committed artifacts in a tree that otherwise
@@ -120,6 +123,26 @@ DLLs, and both install routes use it so that they cannot ship different sets.
 
 ## macos
 
-Not here yet. It is cloned from segler's directory of the same name by the lane
-that can build and test it, and `RELEASE.md` says what that lane needs to know
-before starting, which for Duckling is more than a rename.
+The application bundle the Mac App Store distributes:
+
+    ./packaging/fetch-models.sh
+    MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
+    ./packaging/macos/build-app.sh                         # dist/Duckling.app, unsigned
+    ./packaging/macos/build-app.sh --store PROFILE         # dist/Duckling.pkg, what is uploaded
+
+Cloned from slipcase-desktop's directory of the same name on 2026-09-05 and
+then changed in ways that are Duckling's own, each with its own section in
+`packaging/macos/README.md`. **The build is Apple silicon only**, because no
+prebuilt ONNX Runtime exists for an Intel Mac, and the lane machine is one:
+it packages what it cannot run, `macos.yml` runs it, and an `intel-mac` feature
+builds a runtime-less application for measuring the rest here. **The models
+are resources and pdfium is a framework** - `Contents/Resources/models` and
+`Contents/Frameworks/libpdfium.dylib` - because a signed bundle will not carry
+them beside the executable, and `locate_assets` looks there second. **The
+sandbox grants a file and not its folder**, so the application asks for the
+folder before writing beside a file that arrived alone. **No document types**,
+so no Open With on this platform, for the reason `DESIGN.md` §8 gives.
+
+`check-install.sh` asks an installed bundle what it is on the machine it is on,
+and `screenshot.sh` photographs the window at a size App Store Connect
+accepts; both want an Apple silicon Mac to say anything about a conversion.

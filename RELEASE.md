@@ -16,7 +16,8 @@ same and has an `identity.psd1.example` beside it.
 
 1. **Linux**, which needs no other machine and where most shared work lands.
 2. **Windows**, on the Windows lane.
-3. **macOS**, on the Mac lane.
+3. **macOS**, on the Mac lane, which packages a build it cannot run;
+   `macos.yml` and TestFlight are where that build runs.
 4. **Back on Linux**, for the readiness review across all three.
 
 Nothing is submitted to a store until step 4. apt is the exception, taken
@@ -54,11 +55,16 @@ link the ONNX Runtime this application uses. That section says what it costs.
 
 pdfium is per platform, and the fetch script pins all three: docling.rs's
 own Linux x64 build, and bblanchon's prebuilts at `chromium/8035` for
-Windows x64 (`pdfium.dll`) and macOS (`libpdfium.dylib`, universal), each by
-the archive's hash. On Windows the script runs under Git Bash, which has
-the `tar` and `sha256sum` it needs. The Linux hash was verified by a run;
-the other two were hashed on Linux from the archives and are first
-exercised on their lanes.
+Windows x64 (`pdfium.dll`) and macOS (`libpdfium.dylib`, universal, thinned to
+the executable's architecture when bundled), each by the archive's hash. On
+Windows the script runs under Git Bash, which has the `tar` and `sha256sum`
+it needs; macOS has both. All three hashes have been verified by a run on
+their lanes.
+
+The Mac lane, run the same day, found a third reason, and it is the largest:
+**the Mac build is Apple silicon only**, because no prebuilt ONNX Runtime
+exists for an Intel Mac, and the lane machine is one. That section says what
+follows from it.
 
 ## Linux
 
@@ -179,20 +185,91 @@ holds it and is not committed.
 
 ## macOS
 
-Cloned from `segler/packaging/macos` by the Mac lane. What carries over:
-`build-app.sh`, the entitlements, the universal binary, `CFBundleVersion`
-from `version.sh --build`. What is new: `models/` and `pdfium/` under
-`Contents/MacOS` (or `Contents/Resources` with `locate_assets` taught the
-second place; decide on the lane), `libpdfium.dylib` universal from
-bblanchon, signed with the bundle, and the sandbox entitlements unchanged
-since the application opens nothing but the files it is given. No document
-type declarations: Duckling owns no format. The winit patch for Guideline
-2.5.1 applies here as it does to segler until a winit release carries the
-gate.
+Cloned from `slipcase-desktop/packaging/macos` on 2026-09-05, on the Mac lane,
+which is an Intel Mac. The lane has been run once as far as an Intel Mac can
+run it; what follows is the process, and `packaging/macos/README.md` is where
+the measurements behind it live.
 
-No App Store Connect record exists yet. The bare name is the first ask and
-"Duckling Converter" the fallback; `packaging/store-listing.md` says which
-was taken once one is.
+    ./packaging/fetch-models.sh
+    MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
+    ./packaging/macos/build-app.sh --store ~/Downloads/Duckling_Mac_App_Store.provisionprofile
+    ./packaging/macos/check-install.sh dist/Duckling.app
+
+`--store` produces what a submission is: the bundle carrying the profile as
+`embedded.provisionprofile`, signed for distribution inside out - pdfium first,
+then the bundle - wrapped by `productbuild --component` into a signed `.pkg`.
+Nothing account-specific is written down: the team and application identifier
+are read out of the profile. It refuses before it builds on a missing, invalid
+or expired profile, on an application identifier that does not match
+`CFBundleIdentifier`, on anything but exactly one matching signing identity of
+each kind, on an x86_64 executable, on one with no ONNX Runtime linked in, on
+an executable whose floor disagrees with the property list's, and on a file
+still marked with quarantine, which is the rejection slipcase-desktop's build
+165 met by email. It also refuses, on any build, an executable or a pdfium
+that imports a symbol from a system framework which that framework's public
+headers do not declare - Guideline 2.5.1, the review cycle slipcase-desktop
+lost, and the reason `Cargo.toml` carries a winit pin.
+
+Then validate without submitting, and upload; the two commands are printed by
+the script and `packaging/macos/SUBMITTING.local.md` holds the key and the
+account half.
+
+**What the lane found, and the first is the one that shapes the rest.**
+`DESIGN.md` §2 carries the reasoning and this is the short form:
+
+- **The build is Apple silicon only.** `ort` has no prebuilt ONNX Runtime for
+  `x86_64-apple-darwin` and neither has Microsoft since 1.28.0, so the
+  universal binary this section once asked for cannot be built from any
+  machine. The Store lists the application for Apple silicon from the binary.
+- **The lane machine cannot run the build.** David's Mac is Intel. The
+  release build cross-compiles here in four minutes; nothing here executes
+  it. `.github/workflows/macos.yml` runs the suite, the demo conversions and
+  the window probe on an arm64 runner, and the walkthrough in `CHECKLIST.md`
+  is done against the TestFlight build on an Apple silicon Mac. The
+  `intel-mac` feature builds the application with no ONNX Runtime in it for
+  measuring everything else here; on this Mac every `cargo` command needs
+  `--features intel-mac` or `ort-sys` refuses at once.
+- **The floor is macOS 13.4**, ONNX Runtime's, read off the library. So
+  `MACOSX_DEPLOYMENT_TARGET=13.4` on the release build, and `--store` checks it.
+- **The models are resources and pdfium is a framework**, because a bundle
+  cannot carry 734 MB under `Contents/MacOS`; `locate_assets` learnt the
+  second place. 805 MB of bundle, 594 MB of package.
+- **The sandbox grants a file and not its folder**, so `src/main.rs` asks for
+  the folder before writing beside a file that arrived alone. Measured on the
+  `intel-mac` build under a real sandbox; `packaging/macos/README.md` §3.
+- **No document types**, so no Open With on this platform, because receiving
+  an opened document needs the `unsafe` module `CLAUDE.md` reserves for David.
+  `DESIGN.md` §9.
+- **CoreML is linked in unasked**, the DirectML story again, carried in the
+  same `§9` thread.
+
+**The signing identities, whose names differ from the portal's labels:**
+
+    Apple Distribution: Excelano LLC (9K6W5PMFYP)
+    3rd Party Mac Developer Installer: Excelano LLC (9K6W5PMFYP)
+    Developer ID Application: Excelano LLC (9K6W5PMFYP)
+
+The middle one is what the portal calls *Mac Installer Distribution*; it signs
+packages rather than code, so it does not appear under `security find-identity
+-p codesigning` and its absence there is correct. All three are on the lane
+machine.
+
+**Three things exist only once David makes them in a browser**, in this order,
+and `SUBMITTING.local.md` has the clicks: the App ID `com.excelano.duckling`,
+the Mac App Store provisioning profile against it, and the App Store Connect
+record. The bare name **Duckling** is the first ask and "Duckling Converter"
+the fallback; `packaging/store-listing.md` says which was taken once one is.
+The support and privacy pages on `excelano.com` are the fourth thing, and a
+submission blocker.
+
+**A Store-signed build cannot be launched off the Store**, and this one could
+not be launched here anyway. Screenshots therefore need an Apple silicon Mac
+and a bundle signed with another identity from the same commit, and the
+walkthrough against the real article goes through TestFlight.
+
+**A rejection can arrive only by email.** An upload can answer *UPLOAD
+SUCCEEDED with no errors* and be refused afterwards with nothing in the web
+interface saying so. Check mail after every upload.
 
 ## Step 4: the readiness review
 

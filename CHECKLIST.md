@@ -8,7 +8,8 @@ It is the list, not the log. What each run found is in `git log`. A finding
 earns a place here only when it changes how you run the list.
 
 Run against the packaged application, not a developer build: on Linux the
-`.deb` installed with `apt`, on Windows the MSIX, on macOS the bundle.
+`.deb` installed with `apt`, on Windows the MSIX, on macOS the TestFlight
+build, since a Store-signed bundle cannot be launched anywhere else.
 Several items are properties of the package rather than the code, and the
 first one is the whole reason the package is as large as it is.
 
@@ -109,6 +110,39 @@ that arrangement is really tested. `DESIGN.md` §2 and
     whatever opened it before. Run it with the MSIX installed as well: the two
     coexist, and removing the script install leaves the package's Open With
     entry alone.
+
+## macOS: the package
+
+The release build is Apple silicon only and the lane machine is Intel, so
+this section is run on a different machine from the one that built the
+package, against the TestFlight build, and the first item is the reason the
+package is as large as it is. `packaging/macos/README.md` §1 and §3.
+
+19. **Convert a single file beside itself, having dropped it alone.** The
+    open panel appears at the file's folder with the message *Allow Duckling
+    to write beside the files in ...: choose that folder*. Choose it: the row
+    goes to Wrote and the file is beside its source. Then a second file from a
+    second folder, and cancel the panel: the row stays Queued and the status
+    line says so. Then drop a *folder* and convert beside: no panel. Measured
+    2026-09-05 on the `intel-mac` build under a real sandbox on the lane
+    machine, and not yet on the arm64 build; this is the item that would
+    notice if the two differed.
+20. **Add files through the button, not the command line.** A file given as
+    an argument to a sandboxed application cannot be read - *Operation not
+    permitted* - which is the sandbox and not a defect; the argument route is
+    for the unsandboxed bundles CI and the lane use. Nothing a person does
+    reaches it, and this item is here so nobody files it.
+21. **`check-install.sh` on the installed bundle** reports arm64, ONNX
+    Runtime linked in, the models in `Contents/Resources/models`, pdfium in
+    `Contents/Frameworks` signed by the team, and a sandbox container after
+    the first launch. It is a command rather than eyes, and the eyes are the
+    two items above and the icon in the Dock.
+22. **No Open With.** Right-click a PDF: Duckling is not offered, and that is
+    the recorded state rather than a defect; `DESIGN.md` §9 holds it. Item 8
+    does not apply on this platform.
+23. **The layout at 2x.** Every Mac this application has been drawn on so far
+    is a 1x display over VNC. A Retina display is where egui's text and the
+    preview pane's wrapping get looked at for the first time.
 
 ## What earlier runs cost
 
