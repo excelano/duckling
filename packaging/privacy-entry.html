@@ -1,0 +1,47 @@
+<!--
+  The privacy section for excelano.com/legal/#duckling.
+
+  Written to be pasted into `~/excelano.com/legal/index.html` under
+  Applications, whose structure and voice it follows: what it is, the short
+  version, what stays, what leaves, what it does not collect, how to check,
+  and the one thing outside the application's control. Not committed to the
+  website from here, because that repository is not this one's to push.
+
+  Every claim is checkable against this repository at the commit that shipped
+  the release the section describes. The stores' Privacy Policy URL is
+  https://excelano.com/legal/#duckling.
+
+  Author: David M. Anderson
+  Built with AI assistance (Claude, Anthropic)
+-->
+<h3 id="duckling">Duckling (macOS, Windows, Linux) — Privacy</h3>
+<p>Duckling is an open-source desktop application that converts documents: Word, PowerPoint, Excel, PDF, HTML, EPUB and some forty other formats, into DocLang, Markdown, docling JSON, a DocLang archive or LaTeX. The converter is docling.rs, the open-source Rust port of IBM's Docling, and Duckling is the window around it. It makes no network connection of any kind. This section is the canonical statement of what Duckling does and does not do with your data. The application is open source so that every claim here is independently verifiable, and the claims are enforced by how the code is built rather than by a policy that depends on the developer behaving well. The repository is at <a href="https://github.com/excelano/duckling" rel="noopener noreferrer">github.com/excelano/duckling</a>.</p>
+
+<h4>The short version</h4>
+<p>Duckling talks to nothing. There is no server behind it, no account to create, no analytics, no telemetry, no crash reporting, and no third-party service. It reads the files you give it and writes the converted result where you tell it to. The layout, table and text-recognition models that read a scanned page ship inside the package, which is why the download is large and why nothing is fetched afterwards: a scanned page is read on your own machine. On the stores its App Privacy declaration is &ldquo;Data Not Collected,&rdquo; because the developer collects nothing and has nowhere to put it.</p>
+
+<h4>What stays on your device</h4>
+<p><strong>Nothing between runs.</strong> Duckling keeps no settings file, no history of what you converted, no recent-files list and no remembered folder. Close the window and the only trace of a session is the output you asked for. It writes nothing to a temporary directory either: a conversion goes from the source file to the result in memory.</p>
+<p><strong>What it writes is the result, where you said.</strong> Beside each source file, or into one folder you chose. A bare DocLang document gets its pictures in an <code>assets</code> folder beside it, and a DocLang archive carries them inside. Duckling never replaces an existing file: a name already taken gets a number, so a second <code>report.md</code> becomes <code>report (1).md</code> and the first is untouched.</p>
+
+<h4>What leaves your device</h4>
+<p><strong>Nothing.</strong> Duckling makes no network request. It has no update check, no license check, no analytics service, no crash reporter, and no remote logging. The converter library's dependency tree does contain a way to download models over HTTP, and Duckling compiles it out: the models come in the package, and the built application carries no HTTP client. On Windows this was checked against the packaged executable, whose import table names no networking library.</p>
+<p><strong>Except what you hand to another application.</strong> The preview pane's Open button passes a converted file to whatever your computer has registered for that kind of file, and Show in folder reveals it in your file manager. From that moment the file is in that application's hands and subject to that application's behaviour, not to this one's. That is the point of the buttons, and Duckling does nothing else with them.</p>
+
+<h4>What Duckling does not collect</h4>
+<p>Duckling does not collect the contents of your documents, the text the models read off a scanned page, the names of your files, what you converted, when you converted it, how often, which buttons you pressed, screen views, crash reports, performance metrics, diagnostic logs, device identifiers, advertising identifiers, installation identifiers, or anything else. It has no way to, because it makes no network connection. This section and the open-source repository are the substance behind the &ldquo;Data Not Collected&rdquo; label.</p>
+
+<h4>One thing outside the application's control</h4>
+<p>Both stores collect their own figures about installs and, on Apple's platforms, aggregate anonymous crash logs from devices where <strong>Share With App Developers</strong> is turned on. Duckling neither collects that data nor contains any code that touches it, but the store may still show the developer account aggregate, anonymised numbers regardless of what the application does. On macOS the control is at <strong>System Settings &gt; Privacy &amp; Security &gt; Analytics &amp; Improvements &gt; Share With Mac Developers</strong>; on Windows, under <strong>Settings &gt; Privacy &amp; security &gt; Diagnostics &amp; feedback</strong>. Either applies to every application, not only this one. A copy installed from the Excelano apt repository or built from source involves no store at all.</p>
+
+<h4>How to verify the claims yourself</h4>
+<p>The full source is at <a href="https://github.com/excelano/duckling" rel="noopener noreferrer">github.com/excelano/duckling</a>. To check the claims here independently:</p>
+<ol class="legal-steps">
+    <li>Search the project for anything that opens a network connection. There is nothing: no HTTP client, no TCP or UDP socket, and no URL is contacted. <code>cargo tree</code> on the repository lists what is compiled in, and the inference library's download feature is not among it. On Linux, <code>lsof -i</code> against the running application lists nothing at all. What it does open are local sockets, to the display server and to the session message bus, which is how the file dialog is shown and how Duckling asks whether the desktop is set to light or dark. Both stay on this machine, and what goes over them is a dialog and a display setting, never your files.</li>
+    <li>Search for analytics and crash-reporter names: Firebase, Sentry, Crashlytics, Mixpanel, Amplitude, Segment, GoogleAnalytics. None appears.</li>
+    <li>Search for what is written to disk. One thing: the converted output, with its <code>assets</code> folder where a format has one, at the destination you chose. There is no configuration file, no cache and no temporary file.</li>
+    <li>Confirm there is no server component in the repository. There is nothing to self-host, because Duckling has no backend by design.</li>
+</ol>
+
+<h4>Updates to this section</h4>
+<p>This section changes as the application changes. The change history is the git log of <code>packaging/privacy-entry.html</code> in the Duckling source repository, which is where this text is maintained.</p>
