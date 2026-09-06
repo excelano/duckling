@@ -23,12 +23,15 @@ Limits, so a later edit does not overrun them:
 ## App name
 
     Microsoft Store   Duckling
-    Mac App Store     not yet reserved - David creates the record; SUBMITTING.local.md
+    Mac App Store     Duckling Converter
 
 The Microsoft Store reservation is the bare name, taken before the survey in
 `DESIGN.md` §3, and Product identity assigned `Excelano.Duckling` under it. App
-Store Connect has not been asked; if it refuses the bare name, the fallback is
-"Duckling Converter", and this line records which was taken.
+Store Connect refused the bare name when David created the record on
+2026-09-05, and the fallback was taken: the Mac App Store lists the
+application as **Duckling Converter**. The bundle, the window title and every
+other surface still say Duckling; only the store's listing name differs, and
+the support page says so where it names the stores.
 
 ## The download size, which the listing has to say
 
