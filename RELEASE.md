@@ -24,6 +24,14 @@ Nothing is submitted to a store until step 4. apt is the exception, taken
 deliberately: it is our own repository, publishing is one command and
 unpublishing is a prune.
 
+**0.1.0 ships from steps 1, 2 and 4 with step 3 unfinished.** Decided
+2026-09-06. The Mac lane has run as far as an Intel Mac can run it and its
+build has not yet been run by a person, because that takes an Apple silicon Mac
+and a TestFlight build. apt and the Microsoft Store do not wait on that. The
+Mac submission comes from the same tag when the walkthrough has happened, which
+the version scheme allows because `CFBundleVersion` counts commits rather than
+uploads, and it gets its own step 4.
+
 ## One number, three spellings
 
 `Cargo.toml` holds the version and nothing else should. `packaging/version.sh`

@@ -114,9 +114,9 @@ Duckling is open source under the MIT licence, the same as the converter it is b
 
 ## Screenshots
 
-Not taken yet. Each lane takes its own with its platform's script, against the
-packaged application, light theme first because both platforms ship light by
-default, with the pointer parked off the window and the window photographed by
+Taken on Windows 2026-09-05; the Mac's are in their own section below. Each
+lane takes its own with its platform's script, against the packaged
+application, light theme first because both platforms ship light by default, with the pointer parked off the window and the window photographed by
 its id. The queue should show a mix of formats with a PDF mid-conversion in one
 shot and a finished batch with the preview open in another.
 
