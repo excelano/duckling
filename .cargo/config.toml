@@ -1,8 +1,41 @@
-# The Visual C++ runtime is not part of Windows; a binary that imports
-# VCRUNTIME140.dll installs on a clean machine and will not start, which is
-# how slipcase-desktop 0.1.1 failed Microsoft Store policy 10.2.4.1. Linking
-# the runtime in removes the dependency rather than declaring it. Whether the
-# ONNX Runtime this application links agrees with a static CRT is the Windows
-# lane's first question; DESIGN.md §2.
-[target.x86_64-pc-windows-msvc]
-rustflags = ["-C", "target-feature=+crt-static"]
+# **There is deliberately no `+crt-static` here, and this file exists to say so.**
+#
+# Every other repository in the fleet carries
+#
+#     [target.x86_64-pc-windows-msvc]
+#     rustflags = ["-C", "target-feature=+crt-static"]
+#
+# and carries it for a good reason: the Visual C++ runtime is not part of
+# Windows, a binary that imports VCRUNTIME140.dll installs on a clean machine
+# and will not start, and that is how slipcase-desktop 0.1.1 failed Microsoft
+# Store policy 10.2.4.1 on 2026-08-29. Linking the runtime in removes the
+# dependency rather than declaring it.
+#
+# Duckling cannot do that, measured on the Windows lane on 2026-09-05, which is
+# the question `RELEASE.md` sent this lane to answer. The prebuilt ONNX Runtime
+# `ort` fetches for `x86_64-pc-windows-msvc` - `ms@1.28.0`, from pyke's CDN - was
+# compiled against the *dynamic* CRT, so its objects reach the C library through
+# `__imp_` import thunks that the static CRT does not define. The link fails with
+# 63 unresolved externals, every one of them an ordinary C function: `strtoll`,
+# `erff`, `nearbyintf`, `fopen_s`. It is not a flag that can be argued with; the
+# library on the other side of it was built the other way.
+#
+# So the rule is kept by the other route DESIGN.md 2 already uses for pdfium:
+# **the runtime ships inside the package, beside the executable.**
+# `packaging/windows/build-msix.ps1` stages `vcruntime140.dll`,
+# `vcruntime140_1.dll`, `msvcp140.dll` and `msvcp140_1.dll` next to
+# `duckling.exe`, `install.ps1` does the same for the side-loaded route, and
+# `packaging/windows/check-imports.ps1` is the guard: it knows which DLLs are
+# in-box and which are ours to ship, and it refuses anything that is neither.
+# Slipcase's rejection was for a DLL *outside* the package. These are inside it.
+#
+# The same paragraph covers DirectML, which arrives in the same library and is
+# staged the same way; `packaging/windows/README.md` has that measurement.
+#
+# **Do not add `+crt-static` back without rerunning the link.** If a later
+# `ort` ships a static-CRT build for this target, the flag comes back, four
+# DLLs leave the package, and this comment becomes history in `git log` where
+# it belongs.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)

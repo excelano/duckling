@@ -48,6 +48,10 @@ and verifies them by hash; each lane's build script copies them next to the
 executable as `models/` and `pdfium/`. The Linux script is the reference for
 the layout.
 
+The Windows lane, run 2026-09-05, found a second reason: it ships five more
+DLLs than any other application in the fleet, because `+crt-static` will not
+link the ONNX Runtime this application uses. That section says what it costs.
+
 pdfium is per platform, and the fetch script pins all three: docling.rs's
 own Linux x64 build, and bblanchon's prebuilts at `chromium/8035` for
 Windows x64 (`pdfium.dll`) and macOS (`libpdfium.dylib`, universal), each by
@@ -87,30 +91,91 @@ apt entry waits.
 
 ## Windows
 
-Cloned from `segler/packaging/windows` by the Windows lane, which clones it
-from slipcase-desktop's. What carries over: `.cargo/config.toml`, already
-here, linking the CRT in; `build-msix.ps1`'s refusals; `make-ico` from the
-SVG. What is new, and each is a measurement before it is a step:
+Cloned from `segler/packaging/windows` on 2026-09-05, which clones it from
+slipcase-desktop's. The lane has been run once; what follows is the process,
+and `packaging/windows/README.md` is where the measurements behind it live.
 
-- **`pdfium.dll` ships inside the package**, in the application directory
-  beside `duckling.exe`, under `pdfium\`. `check-imports.ps1` refuses any
-  import that does not ship with Windows; pdfium is loaded by name at run
-  time and is not in the import table, so the check may pass as written.
-  If it does not, the allowlist gains one entry with this paragraph as its
-  reason. Whether the Store's software-dependency policy is satisfied by a
-  DLL inside the package is what certification will say; slipcase-desktop's
-  rejection was for a DLL *outside* it.
-- **ONNX Runtime is a static library and `+crt-static` is set.** Whether
-  the prebuilt `ort` fetches for `x86_64-pc-windows-msvc` links against the
-  static CRT without conflict is the lane's first build. If it does not, the
-  choice is between dropping `+crt-static` and declaring the VC runtime
-  framework dependency, or building ONNX Runtime against the static CRT,
-  and `DESIGN.md` §2 wants the reasoning either way.
-- **The package is 700 MB.** The Store allows it; the listing should say it.
-- **A C compiler is a build requirement on this lane**, for oniguruma under
-  the tokenizer docling.rs carries. Visual Studio's is fine.
+The build machine needs Visual Studio - a C compiler for oniguruma under the
+tokenizer docling.rs carries, the Windows 10/11 SDK for `makeappx`, `makepri`
+and `signtool`, and the redistributable directory the four runtime DLLs are
+taken from - and Git for Windows, whose Git Bash is what `fetch-models.sh`
+runs under and whose `sh` is what `build-msix.ps1` asks for the version.
 
-The Partner Center reservation is **Duckling**.
+    ./packaging/fetch-models.sh                      # in Git Bash
+    cargo build --release
+    powershell -ExecutionPolicy Bypass -File packaging\windows\check-imports.ps1
+    powershell -ExecutionPolicy Bypass -File packaging\windows\build-msix.ps1 -SelfSign
+
+Then, from an **elevated** prompt, the certification kit, which is the one step
+here that needs administrator and so is David's:
+
+    powershell -ExecutionPolicy Bypass -File packaging\windows\build-msix.ps1 -SelfSign -Certify
+
+and to install the signed copy and walk `CHECKLIST.md` against it:
+
+    Get-AppxPackage Excelano.Duckling | Remove-AppxPackage    # if rebuilding
+    Add-AppxPackage dist\Duckling-X.Y.Z.0-x64.msix
+
+The copy that goes to Partner Center is the **unsigned** one: rerun
+`build-msix.ps1` without `-SelfSign` from the same release binary, with no
+rebuild between, because a rebuild of identical source produces a different
+file.
+
+**What the lane found, because two of the three were not the expected
+answers.** `DESIGN.md` §2 carries the reasoning and this is the short form:
+
+- **`+crt-static` cannot be used.** The prebuilt ONNX Runtime is a
+  dynamic-CRT build and the link fails with 63 unresolved externals. The
+  four Visual C++ runtime DLLs ship inside the package instead, beside the
+  executable. `.cargo/config.toml` is now a file of comments with no settings
+  in it, saying why the flag every other repository in the fleet carries is
+  absent here.
+- **DirectML is linked in unasked**, so its DLL ships too - 18.5 MB, the copy
+  pyke ships beside the library actually linked rather than whatever the
+  machine has. `DESIGN.md` §9 holds the upstream question.
+- **`pdfium.dll` ships inside the package** and is loaded by name at run time,
+  so it never enters the import table and `check-imports.ps1` passes as
+  written. This was the one prediction that held.
+- **The package is 605 MB**, packed from 821 MB staged. The Store allows it and
+  `packaging/store-listing.md` says it.
+- **The certification kit passed 23 of its 24 tests**, run 2026-09-05.
+  `DPIAwarenessValidation` passed on the first build, which is the test
+  slipcase-desktop failed until it had a `build.rs`. The one failure is
+  `Blocked executables`, optional on a Centennial package, and all 58 of its
+  messages were traced before any of it was baselined.
+
+**That last bullet is not a new decision, and the fleet has already taken it
+once.** slipcase-desktop met the same failing test, traced it to the same two
+real causes - the Rust standard library's spawn path, and `ShellExecuteW` under
+`opener` doing what the Open button exists to do - and David decided on
+2026-08-28 to submit with it failing. That application's 0.1.2 passed
+certification and was published on 2026-08-30 with the test failing exactly as
+it fails here; its rejection, the one that produced `check-imports.ps1`, was
+policy 10.2.4.1 over VCRUNTIME140.dll and unrelated.
+
+So the question here is only whether anything about Duckling changes that
+answer, and the honest report is that one thing might: **volume.**
+slipcase-desktop's finding was six messages and this one is fifty-eight,
+because 734 MB of model weights plus pdfium and DirectML give the kit's
+three-letter scan far more bytes to find itself in. The kind of finding is
+identical and none of it is removable short of dropping the Open and Show in
+folder buttons; the length of the list a reviewer reads is not.
+`packaging/windows/SUBMITTING.local.md` carries the paragraph to paste into
+Notes for certification, and it leads with the model files for that reason.
+
+**Run the kit directly rather than through `-Certify` if the disk is tight.**
+That switch implies `-SelfSign`, so it re-stages 821 MB and re-packs 605 MB
+before testing anything. `appcert.exe` against the existing package followed by
+`build-msix.ps1 -ReadReport` reaches the same gate and costs nothing.
+
+`check-imports.ps1` now asks two questions rather than one - in-box, or shipped
+in the package - and the five shipped names are spelled in three files that
+`windows.yml` compares against each other on every push.
+
+The Partner Center reservation is **Duckling**, and Product identity assigned
+`Excelano.Duckling` with the Excelano account's publisher, which is the same
+X.500 string segler and slipcase-desktop carry. `packaging/windows/identity.psd1`
+holds it and is not committed.
 
 ## macOS
 

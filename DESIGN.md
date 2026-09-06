@@ -66,6 +66,47 @@ files the pipeline opened converting a four-page digital PDF with tables are
 recorded in `§7`; trimming to that set is available if a platform's package
 size ever matters, and is not done now.
 
+**What that costs on Windows is more than it costs on Linux, and it was
+measured on 2026-09-05 rather than predicted.** Two of the three findings were
+open questions in `RELEASE.md` and the third was not foreseen at all.
+
+The first: **`+crt-static` cannot be used.** Every other application in the
+fleet links the Visual C++ runtime into the executable, because that runtime is
+not part of Windows and a binary that imports it installs on a clean machine and
+will not start - which is how slipcase-desktop 0.1.1 failed Microsoft Store
+policy 10.2.4.1. The prebuilt ONNX Runtime `ort` fetches for
+`x86_64-pc-windows-msvc` was compiled against the dynamic CRT, so its objects
+reach the C library through `__imp_` import thunks the static CRT does not
+define, and the link fails with 63 unresolved externals - `strtoll`, `erff`,
+`nearbyintf`, `fopen_s`. The alternatives were building ONNX Runtime from source
+against the static CRT, which is a project of its own and a second thing
+downloaded at build time replaced by a heavier one, and declaring the VCLibs
+framework dependency, which the Store resolves but which leaves the side-loaded
+route uncovered. David chose the third on 2026-09-05: **the runtime ships inside
+the package**, four DLLs of 0.73 MB together, beside the executable where the
+loader finds them first, exactly as pdfium already does. Slipcase's rejection
+was for a DLL *outside* the package.
+
+The second: **DirectML arrives whether it is wanted or not.** The Windows dist
+`ort` selects is `ms@1.28.0/x86_64-pc-windows-msvc+directml`, so the DirectML
+execution provider is linked in and `directml.dll` becomes a hard import,
+although docling.rs runs the CPU provider and this application never selects
+another. In-box DirectML began at Windows 10 10.0.18362 and the package declares
+a floor of 10.0.17763, and the copy on the lane machine is 1.0.200713 against
+the 1.15.4 that pyke ships beside the library actually linked. So the dist's own
+copy ships too, 18.5 MB, which pairs the library with the DLL it was built
+against. That it is linked at all is cost for nothing, and `§9` carries it as a
+thread to take upstream.
+
+The third is not a finding but what the first two do to the paragraph above.
+The C in this application was ONNX Runtime, pdfium and oniguruma; on Windows it
+is those three **and DirectML**, and the executable needs five DLLs beside it
+rather than none. `packaging/windows/README.md` holds every measurement and
+`packaging/windows/check-imports.ps1` is the guard that keeps the list at five
+and refuses a sixth. `CLAUDE.md` says a third C dependency is a decision to take
+with David; this is the fourth arriving inside the first, which is not the shape
+that rule anticipated, and taking it was still David's on 2026-09-05.
+
 **The framework is egui, through eframe**, the same as slipcase-desktop and
 segler, so that one set of platform lessons serves three applications and
 the packaging clones. The Linux system-theme module is slipcase-desktop's,
@@ -272,11 +313,33 @@ so.
 lists fifteen of the types it reads, so a file manager offers it under Open
 With for a PDF or a Word file without making it the default for either.
 
-**What the Windows lane meets first**, recorded from here and not solved:
-the import check must decide about a `pdfium.dll` that ships inside the
-package and is loaded by name rather than imported, and whether the static
-ONNX Runtime `ort` fetches agrees with `+crt-static`. ONNX Runtime imports
-nothing; oniguruma wants a C compiler on the build machine. Not begun.
+**The Windows lane, run 2026-09-05.** What was recorded here as unsolved is
+solved, and two of the three answers were not the expected ones. `+crt-static`
+cannot be used and four Visual C++ runtime DLLs ship in the package instead;
+DirectML is linked in unasked and its own DLL ships too; `pdfium.dll` is loaded
+by name and never appears in the import table, so the import check passes as
+written, which was the one prediction that held. `§2` has the reasoning and
+`packaging/windows/README.md` has every measurement.
+
+The package is 605 MB packed from 821 MB staged, and `models/` and `pdfium/`
+sit beside `duckling.exe` in the application directory, which is the layout
+`locate_assets` already wanted. Installed from that package and launched from
+the apps folder, a PDF converted: layout ran, headings and picture regions came
+back, bare DocLang was written with its `assets/` beside it.
+
+**Duckling claims no file type on Windows either, and both install routes were
+measured saying so.** The MSIX declares one `uap:FileTypeAssociation` over
+seventeen extensions - the fifteen media types the desktop entry lists, with
+`.htm` and `.markdown` as second spellings - with no `DisplayName` and no
+`Logo`, because every one of those types is somebody else's to name and to
+draw. The side-loaded scripts write `Applications\duckling.exe` with
+`SupportedTypes` and an `OpenWithList` entry per extension. Neither writes an
+extension's default value, and neither can: a packaged association only ever
+joins `OpenWithProgids`. So a person gets Duckling under Open With for a PDF and
+keeps whatever opens their PDFs, which is what the desktop entry asks a file
+manager for. It also means `uninstall.ps1` must not remove a `UserChoice` the
+way segler's does - segler claims its two types and Duckling claims none, so
+that key is always somebody else's decision.
 
 ## 9. Open threads
 
@@ -295,3 +358,13 @@ somebody who is not David is where the question gets answered.
 **Trimming the model set.** `§2` ships docling.rs's default set. If a
 platform's package size ever matters, `§7` records what a conversion
 actually opened.
+
+**DirectML is linked into the Windows build for nothing, and upstream should
+hear it.** Found 2026-09-05 on the Windows lane and recorded in `§2`: the
+prebuilt ONNX Runtime `ort` selects for this target carries the DirectML
+execution provider, so `directml.dll` is a hard import and 18.5 MB of DLL ships
+in the package, while docling.rs runs the CPU provider and this application
+never selects another. The question is `ort`'s or docling.rs's rather than this
+repository's - whether a dist without it can be asked for - and it is the same
+shape as the two docling.rs conformance findings in `§4`: measured here, not
+worked around here, and David decides when it goes.

@@ -2,6 +2,12 @@
 /dist
 /dist-*
 
+# `make-ico` is its own package rather than part of this crate, so it has its
+# own build directory and the rule above does not reach it. Its Cargo.lock is
+# committed and its output - the `.ico`, `assets/` and `listing/` - is committed
+# too, because nothing on Windows rasterizes an SVG.
+/packaging/windows/make-ico/target
+
 # Runtime assets: the ONNX models and pdfium, fetched by
 # packaging/fetch-models.sh from pinned releases and shipped inside every
 # package. Never committed; roughly 750 MB.

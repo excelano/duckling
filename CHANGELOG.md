@@ -23,6 +23,10 @@ The first packaged build.
 - Output beside each source or into one folder, and never over an existing
   file: a second `report.md` becomes `report (1).md`.
 - Scanned PDFs and images read by layout, table-structure and OCR models
-  that ship inside the package. Nothing is downloaded after installing.
+  that ship inside the package. Nothing is downloaded after installing, and
+  the models are why the download is about 600 MB.
 - A preview of each result, with Open and Show in folder.
 - No network connection of any kind. No account, no telemetry.
+- On Windows, Duckling appears under Open With for the document types it
+  reads and becomes the default for none of them: a PDF still opens with
+  whatever opened it before.

@@ -43,6 +43,29 @@ directory is the shared one in `~/.cargo/config.toml`, not `target/`. That
 proves a code path draws; it does not stand in for David's keyboard
 walkthrough, which every slice that touches the window gets.
 
+## On the Windows VM
+
+    ./packaging/fetch-models.sh                   # in Git Bash, not PowerShell
+    cargo build --release
+    powershell -File packaging\windows\check-imports.ps1
+    powershell -File packaging\windows\build-msix.ps1 -SelfSign
+
+`RELEASE.md` has the rest of the lane and `packaging/windows/README.md` has
+every measurement behind it. Two things to know before touching anything there:
+`+crt-static` is deliberately absent and must not be added back without
+rerunning the link, and Duckling claims no file type, so nothing in that
+directory may write an extension's default value or remove a `UserChoice`.
+
+**Seeing the window from here** is the packaged application, not a developer
+build, and the executable under `C:\Program Files\WindowsApps` cannot be run
+directly - `Start-Process` on it is *Access is denied*. Use the apps folder
+moniker, which takes arguments:
+`Start-Process "shell:AppsFolder\Excelano.Duckling_nbxmgv0sk86m4!Duckling"
+-ArgumentList '"C:\path\file.pdf"'`. Capture it by its window handle with
+`DwmGetWindowAttribute` for the visible frame; `packaging/windows/screenshot.ps1`
+does the whole of that properly. The same caveat holds as on Linux: it proves a
+code path draws and does not stand in for David's walkthrough.
+
 ---
 
 ## Rules
@@ -61,9 +84,18 @@ taken name and it is tested; nothing writes around it.
 download at run time and no code for one. DESIGN.md §2.
 
 **C is taken here, deliberately and once.** ONNX Runtime and pdfium are the
-whole of it, and `DESIGN.md` §2 records what they cost. The fleet's stance is
-in `~/notes/pure_rust_preference.md`; adding a third C dependency is a
-decision to take with David.
+whole of it on Linux, and `DESIGN.md` §2 records what they cost. The fleet's
+stance is in `~/notes/pure_rust_preference.md`; adding another C dependency is
+a decision to take with David.
+
+**On Windows it is not once.** The ONNX Runtime `ort` fetches for that target
+brings DirectML with it and cannot be linked with `+crt-static`, so five DLLs
+ship inside the package beside the executable: four Visual C++ runtime files
+and DirectML. That was measured on 2026-09-05 and decided the same day;
+`DESIGN.md` §2, `.cargo/config.toml`, and `packaging/windows/README.md` §1 and
+§2 are the three places it is written down. `packaging/windows/check-imports.ps1`
+is what keeps the number at five, and it refusing is a thing to bring to David
+rather than a list to add a name to.
 
 **Unsafe has no home.** `src/lib.rs` is `forbid`; `src/main.rs` is `deny`,
 which a platform arm may lift for one module the way slipcase-desktop's

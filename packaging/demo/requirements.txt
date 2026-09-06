@@ -1,0 +1,16 @@
+# What `make-demo-docs.py` needs, pinned to what the six committed documents
+# were built with on 2026-09-05.
+#
+# Nothing in the build, the test suite or CI installs any of this. It is here so
+# that regenerating the documents produces the same documents rather than
+# whatever this month's libraries produce, which matters because the generated
+# files are committed and a diff in them should mean somebody changed the
+# script.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
+reportlab==5.0.1
+python-docx==1.2.0
+openpyxl==3.1.5
+python-pptx==1.0.2
+pillow==12.3.0

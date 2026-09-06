@@ -1,0 +1,168 @@
+# The Windows checks a machine can run: that the tree builds and passes on this
+# platform, that the shipped binary imports nothing that is neither in-box nor
+# in the package, and that the committed icons still match the drawing they were
+# generated from.
+#
+# The shape is segler's `windows.yml`, which is slipcase-desktop's, and
+# `linux.yml` beside this is its counterpart. The suite, clippy and formatting
+# are also the fleet's `ci.yml`; they are repeated here because `ci.yml` runs on
+# Linux and four things in this repository are compiled only for this target -
+# `build.rs`'s manifest arm, the `ico` dependency, the window icon
+# `include_bytes!` reaches, and the `windows_subsystem` attribute. A cross-check
+# with `cargo check --target` would compile them; it would not read the import
+# table of the result.
+#
+# What this reaches and what it does not, stated because a green tick invites
+# more faith than it has earned.
+#
+# Nothing here reaches the window, the installer scripts, an MSIX package, an
+# Open With entry, the certification kit, or the icon as a person sees it at any
+# size. `CHECKLIST.md` holds those and a green run here does not stand in for
+# one. `build-msix.ps1` is not run either: it needs the Windows SDK and the
+# package identity, and the identity is not committed.
+#
+# The end-to-end tests are absent for the reason `CLAUDE.md` gives - they need a
+# clone of docling.rs for its corpus, which nothing here has, and they skip
+# without it.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
+
+name: windows
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        run: rustup toolchain install stable --profile minimal
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: What is installed
+        run: rustc -V; cargo -V
+
+      # `ort` downloads a prebuilt ONNX Runtime here and `onig_sys` compiles
+      # oniguruma from C source, so this step needs the network and the C
+      # compiler a runner already has. DESIGN.md 2 says what both cost.
+      - name: Build
+        run: cargo build --all-targets
+
+      - name: Test
+        run: cargo test
+
+      # `CLAUDE.md` says clippy must be silent, so a warning is an error here.
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Formatting
+        run: cargo fmt --check
+
+      # The check Slipcase 0.1.1 needed and did not have. It was packaged,
+      # certified by the Windows App Certification Kit, submitted, and failed
+      # Store policy 10.2.4.1 because it imported VCRUNTIME140.dll from the
+      # Visual C++ Redistributable - so on the tester's clean machine it
+      # installed and then would not start. Nothing else in this file could
+      # catch it: a GitHub runner has Visual Studio, exactly like every machine
+      # this project has ever built on.
+      #
+      # Duckling cannot answer it the way that repository did. `+crt-static`
+      # will not link the prebuilt ONNX Runtime - measured 2026-09-05, and
+      # `.cargo/config.toml` carries the whole of it - so five DLLs ship inside
+      # the package instead, and this script's job is to hold the line at
+      # *those five and no others*. A dependency added on any of the three
+      # platforms can pull in a sixth without anybody here noticing, and the day
+      # that happens is the day this step has to be the thing that says so.
+      #
+      # The release binary rather than the debug one, because the release binary
+      # is what ships and is the only one whose import table is the artefact's.
+      - name: Every import is in-box or ships in the package
+        run: |
+          cargo build --release
+          powershell -ExecutionPolicy Bypass -File packaging/windows/check-imports.ps1
+
+      # The release binary is also the only place two other properties exist. The
+      # GUI subsystem comes from an attribute that is off under
+      # `debug_assertions`, and a console-subsystem build puts a console window
+      # behind the application when a file manager launches it. The DPI
+      # declaration comes from `build.rs` handing the linker a manifest, and the
+      # certification kit reads it out of the binary rather than out of the
+      # running process. `build-msix.ps1` refuses on the first and the kit
+      # reports the second, and neither of those runs here - so both are read
+      # straight out of the artefact instead.
+      - name: The shipped binary is a GUI subsystem one and declares its DPI awareness
+        shell: pwsh
+        run: |
+          $meta = cargo metadata --format-version 1 --no-deps | ConvertFrom-Json
+          $exe = Join-Path $meta.target_directory 'release\duckling.exe'
+          $bytes = [System.IO.File]::ReadAllBytes($exe)
+          $pe = [BitConverter]::ToInt32($bytes, 0x3C)
+          $subsystem = [BitConverter]::ToUInt16($bytes, $pe + 92)
+          if ($subsystem -ne 2) {
+            throw "subsystem $subsystem, and a shipped build must be 2 (Windows GUI)"
+          }
+          $text = [System.Text.Encoding]::UTF8.GetString($bytes)
+          if (-not $text.Contains('PerMonitorV2')) {
+            throw 'no PerMonitorV2 in the binary - build.rs did not embed the application manifest'
+          }
+          Write-Host 'subsystem 2, and the application manifest is embedded'
+
+      # The five DLLs the package ships are named in three places -
+      # `check-imports.ps1` lets them through, `runtime-files.ps1` finds them,
+      # and `uninstall.ps1` removes them - and a set that differed between any
+      # two of them is an application that starts one way and not another. The
+      # lists are compared here because nothing else compares them: the two
+      # scripts that use `runtime-files.ps1` both need the Windows SDK or an
+      # install directory, and neither runs on a runner.
+      - name: The three lists of shipped DLLs agree
+        shell: pwsh
+        run: |
+          function Names($path, $pattern) {
+            (Select-String -Path $path -Pattern $pattern -AllMatches).Matches |
+              ForEach-Object { $_.Value.ToLowerInvariant() } | Sort-Object -Unique
+          }
+          $dll = "(?i)\b(vcruntime140(_1)?|msvcp140(_1)?|directml)\.dll\b"
+          $check   = Names 'packaging/windows/check-imports.ps1' $dll
+          $runtime = Names 'packaging/windows/runtime-files.ps1' $dll
+          $remove  = Names 'packaging/windows/uninstall.ps1' $dll
+          Write-Host "check-imports:  $($check -join ', ')"
+          Write-Host "runtime-files:  $($runtime -join ', ')"
+          Write-Host "uninstall:      $($remove -join ', ')"
+          if (Compare-Object $check $runtime) { throw 'check-imports.ps1 and runtime-files.ps1 name different DLLs' }
+          if (Compare-Object $check $remove)  { throw 'check-imports.ps1 and uninstall.ps1 name different DLLs' }
+          Write-Host 'all three name the same five'
+
+      # The `.ico` file is a committed artifact rather than a build product,
+      # because `rc.exe` and `windres` are both tools this build keeps out. A
+      # committed artifact can fall out of step with the source it was generated
+      # from and nothing would say so, so the generator is run and its output
+      # compared against what is in the tree.
+      #
+      # The same generator writes the four PNGs `AppxManifest.xml` names and the
+      # listing logo, for the same reason and with the same exposure: nothing on
+      # Windows rasterizes an SVG, so those are committed too. The comparison is
+      # over the whole of each directory rather than one file, because an asset
+      # that drifted from the drawing would otherwise reach a store listing with
+      # nothing having looked at it.
+      - name: The committed icon and Store assets still match their generator
+        run: |
+          cd packaging/windows/make-ico
+          cargo run --release
+          cd ../../..
+          git diff --exit-code -- packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing

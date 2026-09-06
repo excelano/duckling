@@ -50,6 +50,66 @@ tables, a scanned PDF, a Markdown file, and something in a non-Latin script.
 12. `packaging/linux/check-libraries.sh` passes on both backends. It is a
     command and not part of CI because it needs a display.
 
+## Windows: the package
+
+The first item is the one this lane exists for. Five DLLs ship inside the
+package because `+crt-static` will not link the ONNX Runtime this application
+uses, and a machine that has never had Visual Studio on it is the only place
+that arrangement is really tested. `DESIGN.md` §2 and
+`packaging/windows/README.md` §1.
+
+13. **A machine with no Visual C++ Redistributable installed.** Install the
+    MSIX and start it. It starts. This is what slipcase-desktop 0.1.1 failed
+    certification for, on a tester's clean machine and not on a developer's.
+    A fresh VM or Windows Sandbox is the check; the developer machines all
+    have Visual Studio.
+
+    **Do the cheap version first, because it proves more.** On any machine,
+    including one that has the redistributable, run the installed package and
+    read `Get-Process duckling | Select-Object -Expand Modules`: every shipped
+    DLL should resolve to the package directory and none to `System32`. A
+    clean machine can only show that the application started; this shows which
+    file it used, with a `System32` copy present to be preferred if the loader
+    were going to prefer it. Done 2026-09-05, all five from the package.
+    This item is then about what nobody predicted rather than about the DLLs.
+
+    Getting a genuinely clean machine is harder than it sounds: an old laptop
+    has usually had Office or a game on it and so has the redistributable
+    already. Check `Test-Path C:\Windows\System32\vcruntime140.dll` **before**
+    concluding anything from a machine that started the application.
+14. **Convert a PDF from the packaged application.** The models and pdfium
+    resolve inside `C:\Program Files\WindowsApps`, which is the only place
+    the packaged layout differs from every other. Item 1 covers the network
+    being off; this one is that the package's own paths work.
+15. **Right-click a PDF and a Word file.** Duckling is under Open With, and
+    choosing it opens the window with the file queued. Then check that it did
+    not become the default: double-clicking the same PDF still opens whatever
+    opened it before. Both routes claim nothing, and this is the item that
+    would notice if one started to.
+
+    **Do this before launching Duckling any other way, and say how long it
+    took.** On an old Surface on 2026-09-05, the first Open With after
+    installing the package did nothing at all - no window, no error - and it
+    began working only after the application had once been started from the
+    Start menu. Whether that is the shell not yet having picked the
+    association up, or a first-run activation timing out while 64 MB of
+    executable pages in from a cold disk, is not established. It is the kind
+    of thing only a slow machine shows, so a fast one passing this item proves
+    less than it looks.
+16. `build-msix.ps1 -SelfSign -Certify` from an elevated prompt. The kit's
+    findings match `$KNOWN_FINDINGS`, which is empty until the first run puts
+    something in it - so the first run is read rather than passed, and what it
+    says goes into that list with a traced reason or nowhere.
+17. **The taskbar and the Start menu.** The icon is the duckling unplated,
+    not on an accent-coloured square. That is `resources.pri` and the
+    `altform-unplated` assets doing their job, and slipcase-desktop shipped a
+    package where they were present and inert.
+18. `install.ps1`, then `uninstall.ps1`. The install directory is gone
+    afterwards, Settings > Apps has no leftover row, and a PDF still opens with
+    whatever opened it before. Run it with the MSIX installed as well: the two
+    coexist, and removing the script install leaves the package's Open With
+    entry alone.
+
 ## What earlier runs cost
 
 **Walk through the first usable slice, not the fourth.** Segler built four

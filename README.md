@@ -18,10 +18,18 @@ no conversion logic of its own.
 cargo build --release
 ```
 
-A Rust toolchain builds the application. The PDF pipeline links ONNX Runtime,
-which arrives as a prebuilt static library, and loads pdfium at run time from
-`.pdfium/lib` beside the working directory or the executable. `DESIGN.md` §2
-says what that dependency costs and why it is taken.
+A Rust toolchain and a C compiler build the application: the PDF pipeline
+links ONNX Runtime, which arrives as a prebuilt static library, and compiles
+oniguruma from source under the tokenizer docling.rs carries. pdfium is loaded
+at run time from `.pdfium/lib` beside the working directory or the executable.
+`DESIGN.md` §2 says what those dependencies cost and why they are taken.
+
+On Windows, `fetch-models.sh` runs under the Git Bash that Git for Windows
+installs, and the packaged application carries five DLLs beside the executable
+that no other platform needs — four Visual C++ runtime files, because the
+prebuilt ONNX Runtime cannot be linked against the static CRT, and DirectML,
+which that library brings whether or not anything asks for it.
+`packaging/windows/README.md` is the whole of it.
 
 ## Run
 

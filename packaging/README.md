@@ -86,11 +86,40 @@ of three shapes and then three colours; the file's own comment records what
 the others cost. Checked at 16,
 32 and 128 pixels on light and dark grounds before committing, and any
 change should be. The SVG is the source for every platform: macOS wants
-`.icns` and Windows `.ico`, both converted from it, and slipcase-desktop's
-`make-ico` is the converter for the second.
+`.icns` and Windows `.ico`, both converted from it, and
+`windows/make-ico` is the converter for the second - segler's tool with two
+of its three drawings removed, because Duckling has no file types to draw.
+It also writes the four PNGs the MSIX manifest names and the Store listing
+logo, and `windows.yml` rebuilds all of it on every push and refuses a
+difference, because those are committed artifacts in a tree that otherwise
+holds only sources.
 
-## windows, macos
+## windows
 
-Not here yet. Each is cloned from segler's directory of the same name by the
-lane that can build and test it, and `RELEASE.md` says what each lane needs
-to know before starting, which for Duckling is more than a rename.
+The MSIX the Microsoft Store distributes, and a script pair that installs the
+same application without one:
+
+    ./packaging/fetch-models.sh                      # in Git Bash
+    cargo build --release
+    powershell -ExecutionPolicy Bypass -File packaging\windows\build-msix.ps1 -SelfSign
+    powershell -ExecutionPolicy Bypass -File packaging\windows\install.ps1
+
+Cloned from segler's directory of the same name on 2026-09-05 and then changed
+in three ways that are Duckling's own, each with its own section in
+`packaging/windows/README.md`. **Five DLLs ship inside the package** beside the
+executable, because `+crt-static` will not link the prebuilt ONNX Runtime -
+four Visual C++ runtime files and DirectML, which arrives in that library
+unasked. `check-imports.ps1` therefore asks two questions where every other
+copy of it asks one: in-box, or shipped here. And **Duckling claims no file
+type**, so the manifest's one association carries no display name and no logo,
+the scripts never write an extension's default value, and `uninstall.ps1` never
+removes a `UserChoice` - segler's does, and segler owns its two types.
+
+`runtime-files.ps1` is the shared half of the first of those: it finds the five
+DLLs, and both install routes use it so that they cannot ship different sets.
+
+## macos
+
+Not here yet. It is cloned from segler's directory of the same name by the lane
+that can build and test it, and `RELEASE.md` says what that lane needs to know
+before starting, which for Duckling is more than a rename.

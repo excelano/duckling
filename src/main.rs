@@ -11,6 +11,14 @@
 //! Built with AI assistance (Claude, Anthropic)
 
 #![deny(unsafe_code)]
+// Without this, Windows gives a GUI application a console window behind it,
+// which a file manager launching Duckling would put on the screen. The
+// certification kit does not object and a person does, and
+// `packaging/windows/build-msix.ps1` refuses a binary that lacks it rather than
+// wait to be told again. The attribute is ignored everywhere else, and it is
+// off in a debug build because that is where a panic message still has
+// somewhere to go.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod system_theme;
 
@@ -26,19 +34,63 @@ use eframe::egui::{self, Align2, Color32, FontId, RichText};
 /// class a Wayland compositor matches an icon against.
 const APP_ID: &str = "duckling";
 
+/// The window's icon on Windows, which has no `.desktop` entry to find one in.
+///
+/// `APP_ID` above is how Linux answers this question and it does nothing here:
+/// `with_app_id` is Wayland's `xdg_toplevel.set_app_id`, and neither egui,
+/// eframe nor winit turns it into anything on Windows. Windows takes a window's
+/// icon from a resource compiled into the executable, and compiling one needs
+/// `rc.exe` or `windres`, which `packaging/windows/README.md` keeps out of the
+/// build. So the icon is carried as bytes and handed to the window at run time,
+/// which needs no build step at all. slipcase-desktop measured all of this; the
+/// file is built from the same drawing every platform's icon comes from.
+#[cfg(target_os = "windows")]
+const WINDOW_ICON: &[u8] = include_bytes!("../packaging/windows/duckling.ico");
+
+/// The icon at the largest size the drawing carries without being upscaled.
+///
+/// A window gets one image and Windows scales it to 16 in the title bar and 32
+/// in the task bar, doubling both at 200%. 64 is a whole multiple of those
+/// four, so each is an integer downsample of the same drawing. It is not a
+/// whole multiple of what the intermediate scalings ask for - 125% wants 20 and
+/// 40, 150% wants 24 and 48 - and those are resampled; slipcase-desktop looked
+/// at both and the cost is nothing a person notices, which is why 64 stays the
+/// choice: it is the largest entry no scaling has to enlarge.
+#[cfg(target_os = "windows")]
+fn window_icon() -> Option<egui::IconData> {
+    let directory = ico::IconDir::read(std::io::Cursor::new(WINDOW_ICON)).ok()?;
+    let entry = directory.entries().iter().find(|e| e.width() == 64)?;
+    let image = entry.decode().ok()?;
+    Some(egui::IconData {
+        rgba: image.rgba_data().to_vec(),
+        width: image.width(),
+        height: image.height(),
+    })
+}
+
 fn main() -> eframe::Result {
+    let viewport = egui::ViewportBuilder::default()
+        .with_app_id(APP_ID)
+        .with_title("Duckling")
+        .with_inner_size([1100.0, 700.0])
+        .with_min_inner_size([720.0, 420.0]);
+
+    // Shadowed rather than made mutable, so that no platform without an icon to
+    // set carries an unused `mut`.
+    #[cfg(target_os = "windows")]
+    let viewport = match window_icon() {
+        Some(icon) => viewport.with_icon(icon),
+        None => viewport,
+    };
+
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_app_id(APP_ID)
-            .with_title("Duckling")
-            .with_inner_size([1100.0, 700.0])
-            .with_min_inner_size([720.0, 420.0]),
+        viewport,
         ..Default::default()
     };
     let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
     // Before any thread exists; see the function's own comment.
     let models = duckling::locate_assets();
-    eframe::run_native(
+    let result = eframe::run_native(
         "Duckling",
         options,
         Box::new(move |cc| {
@@ -54,7 +106,38 @@ fn main() -> eframe::Result {
             app.add_paths(&paths);
             Ok(Box::new(app))
         }),
-    )
+    );
+
+    // **A window that fails to open must say so, and until 2026-09-05 this one
+    // did not.** `windows_subsystem = "windows"` above means the process has no
+    // console, so returning the error from `main` prints it to a stderr that
+    // does not exist: the application starts, fails, and vanishes with nothing
+    // on the screen and nothing in a log. David met exactly that on an old
+    // Surface, and the report was "no error, just no app" - which is the worst
+    // possible bug report to receive and was entirely our fault for making it
+    // the only one available.
+    //
+    // `rfd` is already a dependency, for the Add files dialog, and its message
+    // dialog needs no feature and no unsafe. It is used only here: every other
+    // failure in this application has a row in the queue or the status line to
+    // land in, and this is the one that happens before either exists.
+    //
+    // Printed as well as shown, because on Linux and macOS a terminal is often
+    // where this is being read from, and a dialog there is the redundant half
+    // rather than the useless one.
+    if let Err(e) = &result {
+        eprintln!("duckling: the window could not be opened: {e}");
+        rfd::MessageDialog::new()
+            .set_level(rfd::MessageLevel::Error)
+            .set_title("Duckling could not start")
+            .set_description(format!(
+                "The window could not be opened.\n\n{e}\n\nThis is usually a graphics driver \
+                 the window system could not use. Duckling needs no particular graphics card, \
+                 but it does need one the system can talk to."
+            ))
+            .show();
+    }
+    result
 }
 
 struct App {

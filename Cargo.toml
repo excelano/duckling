@@ -35,6 +35,16 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 # The content hash in an asset's name, computed the way the exporter does.
 sha2 = "0.11"
 
+[target.'cfg(target_os = "windows")'.dependencies]
+# Reading the window's icon out of the `.ico` the MSIX and install.ps1 also
+# carry. Windows takes a window icon from a resource compiled into the
+# executable, and a resource compiler is exactly what
+# `packaging/windows/README.md` keeps out of the build, so the icon is embedded
+# as bytes and decoded at startup instead. Pure Rust; its `png` is for the large
+# entries, which are stored that way. segler and slipcase-desktop carry the same
+# line for the same reason.
+ico = "0.5"
+
 [target.'cfg(target_os = "linux")'.dependencies]
 # The system theme on Linux; `src/system_theme.rs` is slipcase-desktop's
 # module and the reasoning is there. Already in the tree under accesskit.

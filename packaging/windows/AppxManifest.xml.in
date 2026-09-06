@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The MSIX package manifest, templated the way `control.in` and the manual page
+  are. `build-msix.ps1` substitutes the placeholders below; nothing here is
+  meant to be edited per build.
+
+  WHAT MUST COME FROM PARTNER CENTER, AND WHY IT CANNOT BE GUESSED
+
+  @IDENTITY_NAME@, @PUBLISHER@ and @PUBLISHER_DISPLAY_NAME@ are assigned when
+  the name is reserved. A package whose identity disagrees with the reservation
+  is rejected at upload rather than at review, so there is no way to find out
+  you guessed wrong except by trying. @PUBLISHER@ in particular is a full X.500
+  string - `CN=` with a GUID - and not the display name. The Duckling
+  reservation was taken on 2026-09-04; `identity.psd1` holds what it assigned.
+
+  @VERSION_APPX@ is what `packaging/version.sh` prints when asked for the appx
+  spelling: four parts with the fourth always 0, which the Store requires. It is
+  a different shape from the crate version and from what macOS wants, which is
+  why one script answers all three.
+
+  WHAT IS DECIDED HERE
+
+  **One file-type association listing fifteen extensions, and it carries no
+  DisplayName and no Logo.** That is the whole difference from segler's copy,
+  and it follows from DESIGN.md 8: *Duckling owns no format. It reads other
+  people's.* Segler has two associations because DocLang has two file kinds that
+  are Segler's to name and to draw; every type below is somebody else's, already
+  named and already drawn by whatever owns it on the machine. A `uap:DisplayName`
+  here would put Duckling's words in Explorer's Type column for a PDF the day
+  Duckling ever became its default, and a `uap:Logo` would put Duckling's face
+  on it. Neither is Duckling's to supply, so neither is here, and the four
+  images `make-ico` writes are the application's own.
+
+  What the association *does* buy is the Windows counterpart of the fifteen
+  `MimeType=` entries in `packaging/linux/duckling.desktop`: a person can
+  right-click a PDF or a Word file and find Duckling under Open With.
+  CHECKLIST.md item 8 is that check. It cannot take a type over: a packaged
+  association only ever adds itself to `OpenWithProgids` and never claims the
+  extension's default, which segler's `packaging/windows/README.md` measured on
+  2026-09-04 - there in the course of finding that a *script* install does claim
+  it. The two files say the same fifteen types for the same reason the Linux
+  entry and the Debian package must agree about anything.
+
+  One `uap:Extension` and not fifteen. The schema allows a single
+  `FileTypeAssociation` child per extension, which is why segler needs two
+  elements for its two kinds - but one `FileTypeAssociation` may list as many
+  `uap:FileType` children as it likes, and these fifteen want identical
+  treatment. The `Name` is the shell's key for the registration and is what an
+  upgrade matches on, so it is as fixed as the list it stands for.
+
+  The extensions are the spellings of the media types the desktop entry lists,
+  and the two files are meant to be read side by side. `.htm` and `.markdown`
+  are second spellings of `text/html` and `text/markdown` rather than types the
+  entry does not have; Linux needs no such line because a media type there is
+  matched by content and by a glob the shared MIME database already carries.
+
+  No capabilities beyond `runFullTrust`. This application makes no network call
+  of any kind - the models are in the package and there is no code to fetch
+  anything - needs no broad filesystem access beyond the files it is given and
+  the directory a person points the output at, and asks for no device. A
+  capability requested and unused is a question at certification with no good
+  answer, and it is what a person reads on the store page before installing.
+
+  Author: David M. Anderson
+  Built with AI assistance (Claude, Anthropic)
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="@IDENTITY_NAME@"
+    Publisher="@PUBLISHER@"
+    Version="@VERSION_APPX@"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Duckling</DisplayName>
+    <PublisherDisplayName>@PUBLISHER_DISPLAY_NAME@</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Convert Word, PowerPoint, Excel, PDF and forty other formats into DocLang, Markdown, JSON or LaTeX. The layout, table and OCR models ship inside the app, so it works offline and nothing you convert leaves your machine.</Description>
+  </Properties>
+
+  <Dependencies>
+    <!-- 10.0.17763 is the oldest Windows 10 that supports the packaging
+         features used here. Raising it excludes machines for nothing; lowering
+         it is not possible. -->
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.17763.0"
+      MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-gb" />
+  </Resources>
+
+  <Applications>
+    <Application
+      Id="Duckling"
+      Executable="duckling.exe"
+      EntryPoint="Windows.FullTrustApplication">
+
+      <uap:VisualElements
+        DisplayName="Duckling"
+        Description="Convert documents to DocLang, Markdown, JSON or LaTeX."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="documents">
+            <uap:SupportedFileTypes>
+              <!-- The fifteen media types packaging/linux/duckling.desktop
+                   lists, in the same order, spelled as the extensions Windows
+                   identifies them by. -->
+              <uap:FileType ContentType="application/pdf">.pdf</uap:FileType>
+              <uap:FileType ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document">.docx</uap:FileType>
+              <uap:FileType ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation">.pptx</uap:FileType>
+              <uap:FileType ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">.xlsx</uap:FileType>
+              <uap:FileType ContentType="application/msword">.doc</uap:FileType>
+              <uap:FileType ContentType="application/vnd.ms-powerpoint">.ppt</uap:FileType>
+              <uap:FileType ContentType="application/vnd.ms-excel">.xls</uap:FileType>
+              <uap:FileType ContentType="application/vnd.oasis.opendocument.text">.odt</uap:FileType>
+              <uap:FileType ContentType="application/vnd.oasis.opendocument.presentation">.odp</uap:FileType>
+              <uap:FileType ContentType="application/vnd.oasis.opendocument.spreadsheet">.ods</uap:FileType>
+              <uap:FileType ContentType="application/epub+zip">.epub</uap:FileType>
+              <uap:FileType ContentType="application/rtf">.rtf</uap:FileType>
+              <uap:FileType ContentType="text/html">.html</uap:FileType>
+              <uap:FileType ContentType="text/html">.htm</uap:FileType>
+              <uap:FileType ContentType="text/markdown">.md</uap:FileType>
+              <uap:FileType ContentType="text/markdown">.markdown</uap:FileType>
+              <uap:FileType ContentType="text/csv">.csv</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- A packaged desktop application needs this and nothing else. See the
+         comment at the top of this file. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
