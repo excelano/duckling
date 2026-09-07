@@ -52,7 +52,7 @@ Store says it in its own place, and the Windows text is the same text.
 
 ## Subtitle (Mac App Store, 30)
 
-Documents to Markdown, offline
+Documents to DocLang, offline
 
 ## Promotional text (Mac App Store, 170)
 
