@@ -95,13 +95,16 @@ Then tag, release, and ship:
 
 amd64 only, and say so wherever the install is written.
 
-**The package is most of a gigabyte, and that is a question for apt before
-it is a question for anything else.** The Excelano apt repository has
-shipped packages of a few megabytes. Whether the host serves a 700 MB file
-comfortably, and whether `rebuild.sh` and the mirror steps in
-`~/notes/excelano_apt.md` handle it, is measured on the first release rather
-than assumed. If it does not, the `.deb` lives on the GitHub release and the
-apt entry waits.
+**The package is most of a gigabyte, and apt handles it.** Measured on the
+first release, 2026-09-06: the Excelano apt repository had shipped packages of
+a few megabytes, and 0.1.0's 510 MB `.deb` went through `apt-ship` unchanged,
+one download from the GitHub release and one rsync to the host, which serves it
+whole with byte ranges and the checksum the signed index carries. The host had
+907 GB free. What the same day did find was the network between here and
+GitHub: ssh to port 22 stalled on and off all afternoon while HTTPS answered, so
+the tag and the release went over HTTPS with `gh` as the credential helper. If
+apt ever refuses a package, the fallback stands: the `.deb` lives on the GitHub
+release and the apt entry waits.
 
 ## Windows
 
