@@ -99,8 +99,12 @@
          slipcase-desktop's manifest and argued for nowhere. It shows in
          Partner Center's Packages panel and must match `build-msix.ps1`'s
          makepri `/dq`, or the index has no default language and fails
-         silently. The Store *listing* language is a separate choice, made on
-         the Store listings page; this line does not control it. -->
+         silently. this is the tag Partner Center opens a *new*
+         submission's Store listing under, which is how a package language
+         becomes a listing language. It cannot rename a listing that already
+         exists - that one is deleted and a new one added on the Store
+         listings page. slipcase-desktop's `RELEASE.md` recorded this first,
+         on 2026-08-31. -->
     <Resource Language="en-us" />
   </Resources>
 
