@@ -105,6 +105,37 @@ OPEN SOURCE
 
 Duckling is open source under the MIT licence, the same as the converter it is built on: github.com/excelano/duckling.
 
+## URLs
+
+Both forms ask for the same three, and both lanes take them from here:
+
+| Field | URL |
+| --- | --- |
+| Privacy policy | https://excelano.com/legal/#duckling |
+| Support | https://excelano.com/duckling/#support |
+| Marketing / website | https://excelano.com/duckling/ |
+
+The page at `excelano.com/duckling/` is the support and marketing URL both, the
+way segler's and slipcase-desktop's are; its *Support* heading is the anchor
+and it offers an address and the GitHub issues. Both pages were read back on
+2026-09-06 and both carry their section: the legal page's Duckling privacy
+section is `packaging/privacy-entry.html` as pasted, and it is the answer to
+the Store's privacy question.
+
+**A reviewer needs documents, and they are in the repository.** Duckling claims
+no file type, so unlike segler there is nothing a tester must be handed before
+the window does anything - any Word file or PDF they already have will do. If
+they would rather have ours, the twelve the screenshots use are at
+`github.com/excelano/duckling/tree/v0.1.0/packaging/demo/documents`, invented
+for the purpose and MIT like the rest.
+
+## The two short fields, and what goes in them
+
+    Copyright and trademark   Excelano LLC
+    Additional licence terms  blank - the application is MIT and the
+                              repository carries the licence
+    Short title               blank - the product name is already one word
+
 ## Keywords
 
 **Mac App Store** (100 characters, comma-separated, no spaces after commas):
