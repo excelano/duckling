@@ -115,8 +115,20 @@ that arrangement is really tested. `DESIGN.md` §2 and
 
 The release build is Apple silicon only and the lane machine is Intel, so
 this section is run on a different machine from the one that built the
-package, against the TestFlight build, and the first item is the reason the
-package is as large as it is. `packaging/macos/README.md` §1 and §3.
+package, and the first item is the reason the package is as large as it is.
+`packaging/macos/README.md` §1 and §3.
+
+**Run 2026-09-07 on a rented Mac mini M1** under macOS 26.6.1, against the
+arm64 bundle signed with the Apple Development identity rather than the
+TestFlight build: the same code and the same entitlements, the sandbox real,
+and no Apple ID on a machine that belongs to somebody else. TestFlight was set
+up through the API and then skipped, decided the same evening, because what it
+would have added is Apple's signature over the same bytes. David drove the
+window over VNC; the install check, the screenshots and the display mode came
+in over ssh. Item 1 held on this machine too: a scanned page came back as text
+through the bundled models, with the network refused by the entitlements
+rather than by a pulled cable. Item 2 held as well, the window following the
+desktop live from light to dark and back.
 
 19. **Convert a single file beside itself, having dropped it alone.** The
     open panel appears at the file's folder with the message *Allow Duckling
@@ -125,8 +137,13 @@ package is as large as it is. `packaging/macos/README.md` §1 and §3.
     second folder, and cancel the panel: the row stays Queued and the status
     line says so. Then drop a *folder* and convert beside: no panel. Measured
     2026-09-05 on the `intel-mac` build under a real sandbox on the lane
-    machine, and not yet on the arm64 build; this is the item that would
-    notice if the two differed.
+    machine, and 2026-09-07 on the arm64 build, where all three passes matched
+    it, the quarantine attribute on the written file included. The folder pass
+    also showed two things that are the recorded rules rather than defects: a
+    path whose row is already done is queued again, which `src/main.rs` says
+    beside `add_paths`, and Duckling's own `.dclg` output in that folder was
+    read as DocLang and converted to a numbered sibling, the way item 4's
+    Markdown is.
 20. **Add files through the button, not the command line.** A file given as
     an argument to a sandboxed application cannot be read - *Operation not
     permitted* - which is the sandbox and not a defect; the argument route is
@@ -136,13 +153,20 @@ package is as large as it is. `packaging/macos/README.md` §1 and §3.
     Runtime linked in, the models in `Contents/Resources/models`, pdfium in
     `Contents/Frameworks` signed by the team, and a sandbox container after
     the first launch. It is a command rather than eyes, and the eyes are the
-    two items above and the icon in the Dock.
+    two items above and the icon in the Dock. Passed 2026-09-07: native ARM64,
+    the container `com.excelano.duckling` after the first launch, and nothing
+    mechanical wrong.
 22. **No Open With.** Right-click a PDF: Duckling is not offered, and that is
     the recorded state rather than a defect; `DESIGN.md` §9 holds it. Item 8
-    does not apply on this platform.
-23. **The layout at 2x.** Every Mac this application has been drawn on so far
-    is a 1x display over VNC. A Retina display is where egui's text and the
-    preview pane's wrapping get looked at for the first time.
+    does not apply on this platform. Confirmed 2026-09-07 by asking Launch
+    Services, which holds no claim for the bundle.
+23. **The layout at 2x.** Every Mac this application had been drawn on was a
+    1x display over VNC, and a Retina display is where egui's text and the
+    preview pane's wrapping get looked at for the first time. Looked at
+    2026-09-07 on the rented mini's virtual display switched to its HiDPI mode
+    with `packaging/macos/display-mode.swift`, 1920 by 1080 points at 3840 by
+    2160 pixels: the text is crisp, the columns hold, the preview wraps inside
+    its pane and nothing clips.
 
 ## What earlier runs cost
 

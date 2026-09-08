@@ -230,9 +230,14 @@ This is a conformance gap in docling.rs against its own reference, not
 raised upstream yet; David decides. A second one surfaced the same way:
 docling.rs writes a table's `<caption>` before its four `<location>`s,
 the specification's head order puts location first, and Segler's
-validator says so on every captioned table from a PDF. Duckling passes
-the markup through as the engine writes it; a converter that rewrote the
-engine's output would be hiding what upstream needs to hear. A conversion docling.rs
+validator says so on every captioned table from a PDF. A third surfaced on
+2026-09-07 when a folder holding Duckling's own output was converted again:
+docling.rs reads DocLang, and a table read from DocLang and written back
+loses the `<text>` around each cell's inline content, 150 bytes off a 2 KB
+file. To check against docling.rs's current tree before filing, since the
+crate moves quickly, and after the release. Duckling passes the markup
+through as the engine writes it; a converter that rewrote the engine's
+output would be hiding what upstream needs to hear. A conversion docling.rs
 reports as partial says so beside the buttons.
 
 The **status line** counts the queue by state and carries the last thing that

@@ -25,12 +25,14 @@ deliberately: it is our own repository, publishing is one command and
 unpublishing is a prune.
 
 **0.1.0 ships from steps 1, 2 and 4 with step 3 unfinished.** Decided
-2026-09-06. The Mac lane has run as far as an Intel Mac can run it and its
-build has not yet been run by a person, because that takes an Apple silicon Mac
-and a TestFlight build. apt and the Microsoft Store do not wait on that. The
-Mac submission comes from the same tag when the walkthrough has happened, which
-the version scheme allows because `CFBundleVersion` counts commits rather than
-uploads, and it gets its own step 4.
+2026-09-06. The Mac lane had run as far as an Intel Mac can run it and its
+build had not yet been run by a person, because that takes an Apple silicon
+Mac. apt and the Microsoft Store did not wait on that. The walkthrough
+happened on 2026-09-07 on a rented Apple silicon Mac, against the arm64 bundle
+signed for development rather than TestFlight; `CHECKLIST.md`'s macOS section
+says why. The Mac submission comes from the same tag, which the version scheme
+allows because `CFBundleVersion` counts commits rather than uploads, and it
+gets its own step 4.
 
 ## One number, three spellings
 
@@ -236,7 +238,7 @@ account half.
   release build cross-compiles here in four minutes; nothing here executes
   it. `.github/workflows/macos.yml` runs the suite, the demo conversions and
   the window probe on an arm64 runner, and the walkthrough in `CHECKLIST.md`
-  is done against the TestFlight build on an Apple silicon Mac. The
+  was done on 2026-09-07 on a rented Apple silicon Mac. The
   `intel-mac` feature builds the application with no ONNX Runtime in it for
   measuring everything else here; on this Mac every `cargo` command needs
   `--features intel-mac` or `ort-sys` refuses at once.

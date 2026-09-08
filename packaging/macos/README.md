@@ -157,8 +157,9 @@ folder* is granted by the same panel and needs no second one. And a file
 given as a command-line argument - `open --args` - cannot even be read,
 *Operation not permitted*, because an argument grants nothing; that is the
 sandbox working, it reaches no person, and CI's unsandboxed bundle is the
-only place the argument route is used. What is not yet measured is the same
-on the arm64 build, which is `CHECKLIST.md` item 19.
+only place the argument route is used. The same was measured on the arm64
+build on 2026-09-07, on a rented Mac mini M1 under macOS 26.6.1, and matched
+in every particular; `CHECKLIST.md` item 19.
 
 ## 4. No document types, and what that costs a person
 
@@ -227,16 +228,21 @@ the Store accepts; `check-install.sh` asks for the bundle's own team on it.
 
 ## 7. What is not yet measured, and where it gets measured
 
-- **The Store package**, which needs the provisioning profile no lane can
-  make: `RELEASE.md` says what David creates and `SUBMITTING.local.md`, which
-  is not committed, names the account half. An unsigned `productbuild` of the
-  bundle here comes to the size recorded in `packaging/store-listing.md`.
+- **The Store package** was built on 2026-09-05 from the provisioning profile
+  David made, verified on 2026-09-06 with every command the submission notes list, and
+  uploaded the same day as build 14; `SUBMITTING.local.md`, which is not
+  committed, has the record and the account half.
 - **A conversion on arm64**, which `macos.yml` does on every push through the
-  demo documents, and which a person does on an Apple silicon Mac against the
-  TestFlight build. `CHECKLIST.md`.
-- **The folder panel on the arm64 build**, §3 having measured it on the
-  Intel one; the code is the same and the sandbox is the same, and the
-  walkthrough is where that gets said rather than assumed.
+  demo documents, was done by a person on 2026-09-07 on a rented Mac mini M1,
+  the scanned page among the sixteen. `CHECKLIST.md`'s macOS section says how,
+  and why it was the development-signed bundle rather than TestFlight.
+- **The folder panel on the arm64 build** was measured the same day and
+  matched §3, so the code being the same and the sandbox being the same is
+  now said rather than assumed.
+- **The Store-signed bytes launching** is what remains, and only Apple's
+  review runs those: a Store-signed bundle launches nowhere else, and
+  TestFlight, the one place it would have, was skipped for the reason
+  `CHECKLIST.md` gives.
 
 ## The icon
 

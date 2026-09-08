@@ -94,7 +94,8 @@ granted to the terminal, so `osascript` keystrokes and a CGEvent click reach
 the window, and `packaging/macos/window-probe.swift` asks the window server
 whether it drew. The same caveat holds as on the other two: it proves a code
 path draws and does not stand in for David's walkthrough, which on this
-platform happens on an Apple silicon Mac against the TestFlight build.
+platform happens on an Apple silicon Mac; `CHECKLIST.md` records the rented
+one, and `packaging/macos/display-mode.swift` is how it got a 2x display.
 
 ---
 
