@@ -14,25 +14,35 @@ same and has an `identity.psd1.example` beside it.
 
 ## The order
 
-1. **Linux**, which needs no other machine and where most shared work lands.
-2. **Windows**, on the Windows lane.
-3. **macOS**, on the Mac lane, which packages a build it cannot run;
-   `macos.yml` and TestFlight are where that build runs.
-4. **Back on Linux**, for the readiness review across all three.
+1. **Debian first.** Linux needs no other machine, most shared work lands
+   there, and apt is our own repository: publishing is one command,
+   unpublishing is a prune, and nothing sits in anybody's review queue. The
+   release is cut here, from `preflight.sh` green: the tag, the GitHub
+   release, the crate, and apt.
+2. **Then each store when its platform is ready**, in whichever order the
+   lanes are available: Windows on the Windows lane; macOS on the Mac lane,
+   which packages a build it cannot run, so `macos.yml` and TestFlight are
+   where that build runs. A submission goes in when that platform's readiness
+   review passes, and it does not wait for the other platform.
 
-Nothing is submitted to a store until step 4. apt is the exception, taken
-deliberately: it is our own repository, publishing is one command and
-unpublishing is a prune.
+**Amended 2026-09-08**, with slipcase-desktop's, whose loop this is. The order
+was Linux, Windows, macOS, and back on Linux for one readiness review across
+all three, with nothing submitted until then. The paragraph below was the
+first exception to it, and by 2026-09-08 there were three across the fleet;
+slipcase-desktop's `RELEASE.md` names them. What the old rule bought is kept: a
+person reads the listing against the built artefact before it enters a queue,
+now per platform, at that platform's submission. apt may be ahead of a store
+for a while, and that is a stated fact rather than an exception.
 
-**0.1.0 ships from steps 1, 2 and 4 with step 3 unfinished.** Decided
-2026-09-06. The Mac lane had run as far as an Intel Mac can run it and its
-build had not yet been run by a person, because that takes an Apple silicon
-Mac. apt and the Microsoft Store did not wait on that. The walkthrough
-happened on 2026-09-07 on a rented Apple silicon Mac, against the arm64 bundle
-signed for development rather than TestFlight; `CHECKLIST.md`'s macOS section
-says why. The Mac submission comes from the same tag, which the version scheme
-allows because `CFBundleVersion` counts commits rather than uploads, and it
-gets its own step 4.
+**0.1.0 shipped to apt and the Microsoft Store with the Mac unfinished.**
+Decided 2026-09-06 as an exception; it is the rule now. The Mac lane had run
+as far as an Intel Mac can run it and its build had not yet been run by a
+person, because that takes an Apple silicon Mac. The walkthrough happened on
+2026-09-07 on a rented Apple silicon Mac, against the arm64 bundle signed for
+development rather than TestFlight; `CHECKLIST.md`'s macOS section says why.
+The Mac submission comes from the same tag, which the version scheme allows
+because `CFBundleVersion` counts commits rather than uploads, and it gets its
+own readiness review.
 
 ## One number, three spellings
 
@@ -284,17 +294,18 @@ walkthrough against the real article goes through TestFlight.
 SUCCEEDED with no errors* and be refused afterwards with nothing in the web
 interface saying so. Check mail after every upload.
 
-## Step 4: the readiness review
+## The readiness review, per platform
 
-Before either store submission, on Linux, with all three artefacts built from
-one tagged commit:
+Before a platform's submission, against that platform's artefact built from
+the tagged commit, on whichever machine has it. It was one review across all
+three platforms, on Linux, until 2026-09-08; *The order* says why it is not.
 
 - `packaging/store-listing.md` agrees with `CHANGELOG.md`, claim by claim,
   against the built application and not against memory.
-- The version is the same in every spelling, and `CFBundleVersion` is higher
-  than the last upload's.
-- `CHECKLIST.md` has been run on each platform against the packaged
+- The version is the same in the spellings that platform reads, and on macOS
+  `CFBundleVersion` is higher than the last upload's.
+- `CHECKLIST.md` has been run on that platform against the packaged
   application, not a developer build, with the network off for its first
   item.
-- apt is serving the version the stores are about to be given, or the
-  `.deb` is on the release and the apt entry is a recorded exception.
+- apt is serving the tag being submitted, or a later one whose difference is
+  understood.
