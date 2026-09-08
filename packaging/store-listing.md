@@ -188,7 +188,16 @@ in the shot with the preview open**, which is also the word people searched for.
 
 ## Screenshots (Mac App Store)
 
-**Not taken yet, and they cannot be taken on the Mac lane.** App Store Connect
+**Taken 2026-09-07 on the rented Mac mini M1**, from the `v0.1.0` tag's arm64
+bundle signed for development, the same two states as Windows: `01-converting`
+with seven done, the scanned PDF spinning and four queued, `field-notes.docx`
+selected in DocLang; `02-converted` in Markdown with `site-survey-report.pdf`
+selected and `species-list (1).md` in row eleven. 2880x1800 each, the window
+at 1440 by 900 points on the display's HiDPI mode (`display-mode.swift`), four
+zoom steps, pointer parked, the twelve documents in `/Users/m1/Documents/Alder
+Creek`. Uploaded to the en-US desktop screenshot set through the API the same
+evening. The sandbox blocks the script's argument route, so the folder went in
+through Add folder by hand and the rest was driven over ssh. App Store Connect
 accepts 1280x800, 1440x900, 2560x1600 and 2880x1800, and
 `packaging/macos/screenshot.sh` takes 1440x900 by default, by window id with
 the pointer parked, from a bundle launched with the documents as arguments.
