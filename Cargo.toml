@@ -6,7 +6,7 @@
 # `x-ray` and installs as `xray`. RELEASE.md says what that costs a release.
 name = "duckling-converter"
 description = "Convert documents to Markdown, JSON, DocLang and LaTeX with docling.rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["David M. Anderson"]
 license = "MIT"

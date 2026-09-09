@@ -6,7 +6,7 @@ every claim here is checked against the built application rather than
 remembered. `git log` is the record of why the code is the way it is; this is
 not that.
 
-## [Unreleased]
+## [0.1.2] - 2026-09-09
 
 - **German.** Duckling comes up in German on a machine set to German — the
   toolbar, the queue, the preview and every line the status bar shows. Nothing

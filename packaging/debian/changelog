@@ -1,3 +1,15 @@
+duckling (0.1.2) unstable; urgency=medium
+
+  * German. Duckling comes up in German on a machine set to German — the
+    toolbar, the queue, the preview and every line the status bar shows —
+    reading the language the desktop already knows, with nothing to choose and
+    English for any other. What a file is stays as the file says it: the format
+    a row was read as, the extensions docling.rs does not read, and the names
+    of most output formats are not translated, DOCX and JSON being DOCX and
+    JSON in any language.
+
+ -- David M. Anderson <david.anderson@excelano.com>  Wed, 09 Sep 2026 23:40:00 -0500
+
 duckling (0.1.1) unstable; urgency=medium
 
   * Writes ODT and DOCX as well, through waddle: a plain, well-structured
