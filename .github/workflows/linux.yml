@@ -9,8 +9,20 @@
 # libstdc++, which ONNX Runtime needs, and nothing further. Nothing headless
 # reaches a window, so `packaging/linux/check-libraries.sh` and
 # `CHECKLIST.md` stay commands run by a person with a display. The package
-# is not uploaded as an artifact: it is most of a gigabyte and a release
-# builds it again from the tag.
+# is not uploaded as an artifact: it is most of a gigabyte, and on a release
+# it goes straight to the release page from the job that built it rather than
+# through an artifact and back down again.
+#
+# On a push this is a check. On a published release it is also where the
+# package comes from, which until 2026-09-09 was this VM: build-deb.sh run by
+# hand, and the 510 MB result uploaded from a home connection.
+#
+# **amd64 alone, and that is a limitation rather than a decision.**
+# `packaging/fetch-models.sh` pins pdfium for Linux x86_64, macOS universal
+# and Windows x64, and exits on anything else, so an arm64 runner cannot get
+# as far as a build. An arm64 package needs a pinned `pdfium-linux-arm64`
+# with its hash, and ONNX Runtime checked on that architecture. Segler and
+# Flyleaf, which carry neither dependency, build both here.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
@@ -22,6 +34,18 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Fires when a person publishes the release, which on this loop is what
+  # happens: nothing else creates it. A release created by a workflow using
+  # the default GITHUB_TOKEN fires no event at all, so the dispatch below is
+  # the fallback for that case.
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build the package for (e.g. v0.1.2)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -33,9 +57,18 @@ concurrency:
 jobs:
   package:
     runs-on: ubuntu-latest
+    # Wanted by one step, which runs only for a release. The alternative was
+    # an artifact and a second job to attach it, which is the shape segler and
+    # flyleaf use and the right one when the package is measured in megabytes.
+    # This package is measured in hundreds of them, and pushing it twice to
+    # keep a token narrower on runs that never use it is the worse trade.
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
 
       - name: Install Rust
         run: rustup toolchain install stable --profile minimal
@@ -117,3 +150,49 @@ jobs:
               gio mime "$type" | grep -q 'duckling.desktop' ||
                   { echo "duckling.desktop is not among the handlers for ${type}" >&2; exit 1; }
           done
+
+      # Last, because it installs the package system-wide and the step above
+      # asks GLib which handlers are registered — an installed copy in
+      # /usr/bin would change the question it is answering.
+      #
+      # Duckling ships one executable and it is the application, so there is
+      # nothing here to run to completion: it opens a window from `main`.
+      # What can be asked without a display is whether the loader takes it —
+      # everything it links resolving once the package's dependencies are in,
+      # libstdc++ for ONNX Runtime included — and that is read from how it
+      # fails rather than whether it does. Reaching a window is
+      # `packaging/linux/check-libraries.sh`, on a machine with one.
+      - name: It installs, and the executable loads
+        run: |
+          set -eu
+          deb=$(ls dist/*.deb)
+          sudo apt-get install -y "./${deb#./}"
+
+          command -v duckling
+          file -L "$(command -v duckling)"
+
+          missing=$(ldd "$(command -v duckling)" | grep 'not found' || true)
+          [ -z "$missing" ] || { echo "the package installed but does not resolve:"; echo "$missing"; exit 1; }
+
+          out=$(timeout 30 duckling 2>&1 || true)
+          printf '%s\n' "$out" | sed 's/^/  /'
+          case "$out" in
+              *'error while loading shared libraries'*)
+                  echo "the loader refused the executable" >&2; exit 1 ;;
+              *'cannot execute binary file'*|*'Exec format error'*)
+                  echo "the executable is not this machine's architecture" >&2; exit 1 ;;
+          esac
+
+      # Straight to the release from the job that built it. `--clobber` so a
+      # dispatched re-run replaces the package rather than refusing.
+      - name: Attach the package to the release
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -eu
+          ls -l dist/*.deb
+          gh release upload \
+            "${{ github.event.release.tag_name || inputs.tag }}" \
+            dist/*.deb --clobber

@@ -112,13 +112,33 @@ follows from it.
     ./packaging/fetch-models.sh
     cargo build --release
     ./packaging/linux/check-libraries.sh          # both display backends
-    ./packaging/debian/build-deb.sh
     ./packaging/preflight.sh --ci
 
 `preflight.sh` is the gate: a clean tree, nothing unpushed, both changelogs
 naming the version, a version the Appx spelling can represent, the models
 present and verified, silent clippy, a formatted tree, a passing suite, and
 CI green on `HEAD`. It refuses and never repairs.
+
+**The package comes from CI, not from this machine.** Publishing the release
+fires `linux.yml`, which builds it from the tag, puts it through the checks a
+push gets, installs it and asks whether the loader takes the executable, and
+attaches it to the release. `apt-ship` reads what the release carries, so it
+waits for that run. Before 2026-09-09 the 510 MB package was built here and
+uploaded from a home connection.
+
+`build-deb.sh` still works and is what the workflow calls; running it locally
+is for looking at a package, not for shipping one — which is why it is no
+longer in the list above.
+
+**amd64 alone, and that is a limitation rather than a decision.**
+`packaging/fetch-models.sh` pins pdfium for Linux x86_64, macOS universal and
+Windows x64 and exits on anything else, so an arm64 runner cannot reach a
+build. An arm64 package needs a pinned `pdfium-linux-arm64` with its hash —
+bblanchon publishes one — and ONNX Runtime checked on that architecture.
+Until then the arm64 half of the apt repository has no Duckling in it, and
+`release.conf` says `deb_arches=amd64` so nothing reports that as a package
+that went missing. Segler and Flyleaf carry neither dependency and build both
+architectures in CI.
 
 Then tag, release, and ship:
 
