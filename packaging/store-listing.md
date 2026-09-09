@@ -15,10 +15,20 @@ Limits, so a later edit does not overrun them:
 | --- | --- | --- |
 | App name | unmeasured | 30 |
 | Description | 10,000 | 4,000 |
-| Short description | 1,000 | — |
+| Short description | 500 | — |
 | Subtitle | — | 30 |
 | Promotional text | — | 170 |
 | Keywords | 7 terms | 100 characters |
+| Release notes | unmeasured | unmeasured |
+
+**The API's limit is not the form's, and the API's is the one that binds now.**
+Partner Center's form takes 1,000 characters of short description and 0.1.0 went
+up with 867. The submission API refuses anything over 500 - *The length of
+ShortDescription must be 500 or less* - and it refuses it while copying the
+**published** listing into the new draft, so the old text blocked the upload
+before the new text was ever sent. Measured 2026-09-09 on this product's first
+API submission. Once a product goes up that way its short description lives at
+500, and the number in the table above is the API's.
 
 ## App name
 
@@ -56,20 +66,20 @@ Documents to DocLang, offline
 
 ## Promotional text (Mac App Store, 170)
 
-Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get Markdown, JSON, DocLang or LaTeX back, on your own machine, with nothing sent anywhere.
+Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markdown, JSON, LaTeX, ODT or DOCX back, on your own machine, with nothing sent anywhere.
 
-## Short description (Microsoft Store, 1,000)
+## Short description (Microsoft Store, 500)
 
-Duckling converts documents into the plain, structured text that language models, search indexes and version control want: DocLang, Markdown, docling JSON, a DocLang archive or LaTeX. Drop in Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty other formats, choose what to convert to and where to put it, and press Convert.
+Duckling converts documents into the plain, structured text that language models and search indexes want: DocLang, Markdown, docling JSON, a DocLang archive, LaTeX, ODT or DOCX. In go Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, email and forty more formats.
 
-Scanned PDFs and images are read by layout, table and OCR models that ship inside the app, so it works offline from the first launch and nothing you convert leaves your machine. Those models are most of a large download - about 600 MB - and they are why there is nothing to fetch afterwards. Output goes beside each file or into one folder, and an existing file is never overwritten.
+Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of a download of about 600 MB.
 
-The converter is docling.rs, the open-source Rust port of IBM's Docling. Duckling is the window around it.
+The converter is docling.rs, the Rust port of IBM's Docling.
 
 ## App features (Microsoft Store, up to 20 bullets of 200 characters)
 
     Reads Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio, and some forty formats in all.
-    Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX.
+    Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT and DOCX, a plain office document with the pictures inside it.
     Converts in batches: drop files or a whole folder, choose once, press Convert.
     Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.
     Output beside each file or into one folder, and never over an existing file.
@@ -87,7 +97,7 @@ Word, PowerPoint and Excel, current and legacy. PDF, digital or scanned. HTML, E
 
 WHAT COMES OUT
 
-DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX.
+DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX. Or an ODT or DOCX office document, plain and well structured, with the pictures inside the file; what that format cannot hold is listed on the result rather than dropped in silence.
 
 HOW IT WORKS
 
@@ -104,6 +114,21 @@ It does not edit. Duckling converts; correcting what a model got wrong is Segler
 OPEN SOURCE
 
 Duckling is open source under the MIT licence, the same as the converter it is built on: github.com/excelano/duckling.
+
+## Release notes
+
+*What's new in this version* on the Microsoft Store and *What's New* on the Mac
+App Store, one version's text each, written from `CHANGELOG.md` the way
+everything else here is and kept latest first. 0.1.0 has none and gets none:
+nobody had the application from either store when it went up, so there was
+nobody to tell. Neither field's limit has been measured, and the text below is
+short enough that it has not had to be.
+
+### 0.1.1
+
+Duckling writes ODT and DOCX now, alongside DocLang, Markdown, docling JSON and LaTeX: a plain, well-structured office document made from what the converter read, with the pictures inside the file. What that format cannot hold - a page header, a picture with no image of its own - is listed on the result rather than dropped in silence, and the preview of a package shows the document as Markdown.
+
+Documents are read by docling.rs 1.37.
 
 ## URLs
 
@@ -126,7 +151,7 @@ the Store's privacy question.
 no file type, so unlike segler there is nothing a tester must be handed before
 the window does anything - any Word file or PDF they already have will do. If
 they would rather have ours, the twelve the screenshots use are at
-`github.com/excelano/duckling/tree/v0.1.0/packaging/demo/documents`, invented
+`github.com/excelano/duckling/tree/v0.1.1/packaging/demo/documents`, invented
 for the purpose and MIT like the rest.
 
 ## The two short fields, and what goes in them
@@ -140,7 +165,7 @@ for the purpose and MIT like the rest.
 
 **Mac App Store** (100 characters, comma-separated, no spaces after commas):
 
-    markdown,convert,pdf,word,docx,ocr,docling,doclang,json,latex
+    markdown,convert,pdf,word,docx,odt,ocr,docling,doclang,json,latex
 
 **Microsoft Store** (seven terms):
 
