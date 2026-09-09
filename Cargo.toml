@@ -14,6 +14,15 @@ repository = "https://github.com/excelano/duckling"
 # eframe's number, not this code's; it rises whenever egui raises its own.
 rust-version = "1.95"
 
+# The library keeps the name the code imports. `src/main.rs` and
+# `tests/convert.rs` say `use duckling::...`, and without this the library
+# takes its name from the package — `duckling_converter` — and every one of
+# those imports stops resolving. The package name is a crates.io coordinate
+# and nothing else; it is not a rename of this code.
+[lib]
+name = "duckling"
+path = "src/lib.rs"
+
 [[bin]]
 name = "duckling"
 path = "src/main.rs"
