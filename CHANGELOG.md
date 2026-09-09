@@ -6,11 +6,14 @@ every claim here is checked against the built application rather than
 remembered. `git log` is the record of why the code is the way it is; this is
 not that.
 
-## [Unreleased]
+## [0.1.1] - 2026-09-08
 
 - Writes ODT and DOCX as well, through waddle: a plain, well-structured
-  office document from what docling.rs read, pictures inside the package.
-  What the package cannot hold is listed on the result.
+  office document from what docling.rs read, with the pictures inside the
+  package. What the package could not hold, a page header or a picture
+  without its image, is listed on the result. The preview of a package
+  shows the document as Markdown.
+- Reads with docling.rs 1.37.
 
 ## [0.1.0] - 2026-09-06
 

@@ -1,3 +1,12 @@
+duckling (0.1.1) unstable; urgency=medium
+
+  * Writes ODT and DOCX as well, through waddle: a plain, well-structured
+    office document from what docling.rs read, with the pictures inside the
+    package. What the package could not hold is listed on the result.
+  * Reads with docling.rs 1.37.
+
+ -- David M. Anderson <david.anderson@excelano.com>  Tue, 08 Sep 2026 22:12:34 -0500
+
 duckling (0.1.0) unstable; urgency=medium
 
   * First packaged build. A window that converts Word, PowerPoint, Excel,
