@@ -37,6 +37,8 @@ down here.
     cargo clippy --all-targets -- -D warnings # must be silent
     cargo fmt --check
     cargo run -- [FILE|FOLDER ...]
+    ./po/update-po.sh                         # after changing any sentence a person reads
+    ./po/pseudo.sh                            # then a debug build with POTEXT_LANG=en-x-pseudo
 
 **Seeing the window from here.** Launch under XWayland and capture its own
 window: `env -u WAYLAND_DISPLAY DISPLAY=:0 setsid target/debug/duckling DIR &`,
@@ -106,7 +108,10 @@ one, and `packaging/macos/display-mode.swift` is how it got a 2x display.
 
 **The UI is a renderer.** The queue, the worker, the output rules and the
 collision rule live in `src/lib.rs`, which does not know egui exists. Logic in
-`src/main.rs` that another front-end would need is in the wrong file.
+`src/main.rs` that another front-end would need is in the wrong file. The same
+rule decides where the German lives: the catalogue is declared in `src/main.rs`,
+because every sentence a person reads is produced there and the library says
+nothing to anybody. `DESIGN.md` §9.
 
 **Never overwrite.** A converter that writes beside its source is one wrong
 extension away from replacing somebody's file. `available_path` numbers a

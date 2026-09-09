@@ -43,6 +43,29 @@ tables, a scanned PDF, a Markdown file, and something in a non-Latin script.
 9. **The non-Latin file.** The written file is right when opened in an
    editor; the preview may show boxes, which DESIGN.md §9 holds.
 
+## Every platform: the language the window comes up in
+
+Added 2026-09-09 with German. Two runs, and the second needs no German.
+
+**In the pseudolocale, first.** `./po/pseudo.sh`, then a debug build with
+`POTEXT_LANG=en-x-pseudo`. Every string this application owns comes back
+bracketed, accented and 40% long: a sentence still in plain English never went
+through `t`, one with no brackets is a message the catalogue never saw, and a
+label with its end cut off is a layout built to the width of English.
+
+**A screenshot proves only the paths that drew.** The toolbar, the queue, the
+preview and the status bar were checked that way on 2026-09-09 with one file
+queued. What that cannot reach is everything a conversion says: run one to the
+end and read the status line, run one that fails, and on macOS let the folder
+panel appear. The two startup states — no models beside the application, and an
+`intel-mac` build — are each a single sentence written before the window opens,
+and the dialog for a window that will not open at all is reachable only by
+breaking the graphics stack.
+
+**Then in German.** The file's own words stay English on purpose and that is not
+a miss: the format a row was read as, an extension in the skipped list, and most
+format names in the picker. `DESIGN.md` §9 says which and why.
+
 ## Linux: the package
 
 10. `sudo apt install ./dist/duckling_X.Y.Z_amd64.deb` installs with no

@@ -22,6 +22,26 @@
 
 mod system_theme;
 
+/// The messages this window draws, in the language the desktop asks for.
+///
+/// Declared here and not in `src/lib.rs`, because every sentence a person
+/// reads is produced in this file: the library holds the queue, the worker and
+/// the output rules, and says nothing to anybody.
+mod i18n {
+    potext::catalog!();
+}
+use i18n::t;
+use potext::fill;
+
+/// Every language this application is translated into.
+const CATALOGUES: &[(&str, &str)] = &[
+    ("de", include_str!("../po/de.po")),
+    // Debug builds alone, so a release carries nothing of it. `po/pseudo.sh`
+    // says what it finds and why it is run before any German rather than after.
+    #[cfg(debug_assertions)]
+    ("en-x-pseudo", include_str!("../po/en-x-pseudo.po")),
+];
+
 use std::path::{Path, PathBuf};
 
 use duckling::{
@@ -68,7 +88,32 @@ fn window_icon() -> Option<egui::IconData> {
     })
 }
 
+/// What an output format is called in the language the window is drawn in.
+///
+/// `duckling::OutputFormat::label` stays the canonical English: it is the
+/// library's name for a format and the library draws nothing. Most of these are
+/// the names of formats and a name is not translated — a German window says
+/// DOCX and JSON too — but they go through the catalogue anyway so that the one
+/// with an ordinary noun in it, *DocLang archive*, can be German without a
+/// special case, and so a translator decides rather than this function.
+fn format_label(format: OutputFormat) -> &'static str {
+    match format {
+        OutputFormat::Doclang => t("DocLang"),
+        OutputFormat::Markdown => t("Markdown"),
+        OutputFormat::Json => t("JSON"),
+        OutputFormat::DoclangArchive => t("DocLang archive"),
+        OutputFormat::Latex => t("LaTeX"),
+        OutputFormat::Odt => t("ODT"),
+        OutputFormat::Docx => t("DOCX"),
+    }
+}
+
 fn main() -> eframe::Result {
+    // Before anything that could put a sentence in front of somebody, which
+    // here includes the dialog at the bottom of this function: a window that
+    // will not open has to say so in the language the desktop asked for.
+    i18n::activate(CATALOGUES);
+
     let viewport = egui::ViewportBuilder::default()
         .with_app_id(APP_ID)
         .with_title("Duckling")
@@ -100,7 +145,7 @@ fn main() -> eframe::Result {
             let mut app = App::new(worker);
             if models.is_none() {
                 app.status =
-                    "No models found beside the application; PDFs and images will not convert"
+                    t("No models found beside the application; PDFs and images will not convert")
                         .to_owned();
             }
             app.add_paths(&paths);
@@ -111,7 +156,7 @@ fn main() -> eframe::Result {
             #[cfg(feature = "intel-mac")]
             {
                 app.status =
-                    "Built without ONNX Runtime: PDFs and images will not convert".to_owned();
+                    t("Built without ONNX Runtime: PDFs and images will not convert").to_owned();
             }
             Ok(Box::new(app))
         }),
@@ -138,11 +183,10 @@ fn main() -> eframe::Result {
         eprintln!("duckling: the window could not be opened: {e}");
         rfd::MessageDialog::new()
             .set_level(rfd::MessageLevel::Error)
-            .set_title("Duckling could not start")
-            .set_description(format!(
-                "The window could not be opened.\n\n{e}\n\nThis is usually a graphics driver \
-                 the window system could not use. Duckling needs no particular graphics card, \
-                 but it does need one the system can talk to."
+            .set_title(t("Duckling could not start"))
+            .set_description(fill(
+                t("The window could not be opened.\n\n{reason}\n\nThis is usually a graphics driver the window system could not use. Duckling needs no particular graphics card, but it does need one the system can talk to."),
+                &[("reason", &e.to_string())],
             ))
             .show();
     }
@@ -195,8 +239,8 @@ impl App {
             }
         }
         self.status = match (added, rejected.len()) {
-            (0, 0) => "Nothing to add".to_owned(),
-            (n, 0) => format!("Added {n}"),
+            (0, 0) => t("Nothing to add").to_owned(),
+            (n, 0) => fill(t("Added {n}"), &[("n", &n.to_string())]),
             (n, k) => {
                 let mut exts: Vec<String> = rejected
                     .iter()
@@ -207,14 +251,24 @@ impl App {
                     .collect();
                 exts.sort();
                 exts.dedup();
-                format!(
-                    "Added {n}; skipped {k} docling.rs does not read{}",
-                    if exts.is_empty() {
-                        String::new()
-                    } else {
-                        format!(" ({})", exts.join(", "))
-                    }
-                )
+                // Two whole sentences rather than a suffix spliced onto one:
+                // a translator given a fragment cannot place it, and German
+                // would not put the list where English does.
+                if exts.is_empty() {
+                    fill(
+                        t("Added {n}; skipped {k} docling.rs does not read"),
+                        &[("n", &n.to_string()), ("k", &k.to_string())],
+                    )
+                } else {
+                    fill(
+                        t("Added {n}; skipped {k} docling.rs does not read ({extensions})"),
+                        &[
+                            ("n", &n.to_string()),
+                            ("k", &k.to_string()),
+                            ("extensions", &exts.join(", ")),
+                        ],
+                    )
+                }
             }
         };
     }
@@ -273,14 +327,21 @@ impl App {
             sent += 1;
         }
         self.status = match (sent, waiting) {
-            (_, 0) => format!("Converting {sent} to {}", self.format.label()),
-            (0, n) => {
-                format!("{n} left queued until their folder is allowed, or choose Into a folder")
-            }
-            (_, n) => format!(
-                "Converting {sent} to {}; {n} left queued until their folder is allowed, \
-                 or choose Into a folder",
-                self.format.label()
+            (_, 0) => fill(
+                t("Converting {count} to {format}"),
+                &[("count", &sent.to_string()), ("format", format_label(self.format))],
+            ),
+            (0, n) => fill(
+                t("{n} left queued until their folder is allowed, or choose Into a folder"),
+                &[("n", &n.to_string())],
+            ),
+            (_, n) => fill(
+                t("Converting {count} to {format}; {n} left queued until their folder is allowed, or choose Into a folder"),
+                &[
+                    ("count", &sent.to_string()),
+                    ("format", format_label(self.format)),
+                    ("n", &n.to_string()),
+                ],
             ),
         };
     }
@@ -314,9 +375,9 @@ impl App {
         folders.retain(|dir| !duckling::can_write_in(dir));
         for dir in &folders {
             rfd::FileDialog::new()
-                .set_title(format!(
-                    "Allow Duckling to write beside the files in {}: choose that folder",
-                    dir.display()
+                .set_title(fill(
+                    t("Allow Duckling to write beside the files in {folder}: choose that folder"),
+                    &[("folder", &dir.display().to_string())],
                 ))
                 .set_directory(dir)
                 .set_can_create_directories(false)
@@ -348,12 +409,18 @@ impl App {
                     },
                 ),
                 Event::Finished(id, Ok(outcome)) => {
-                    self.status = format!("Wrote {}", outcome.output.display());
+                    self.status = fill(
+                        t("Wrote {file}"),
+                        &[("file", &outcome.output.display().to_string())],
+                    );
                     self.set_state(id, JobState::Done(outcome));
                 }
                 Event::Finished(id, Err(message)) => {
                     if let Some(job) = self.jobs.iter().find(|j| j.id == id) {
-                        self.status = format!("{}: {message}", job.file_name());
+                        self.status = fill(
+                            t("{file}: {reason}"),
+                            &[("file", &job.file_name()), ("reason", &message)],
+                        );
                     }
                     self.set_state(id, JobState::Failed(message));
                 }
@@ -392,27 +459,27 @@ impl App {
 
     fn toolbar(&mut self, ui: &mut egui::Ui) {
         ui.horizontal_wrapped(|ui| {
-            if ui.button("Add files…").clicked() {
+            if ui.button(t("Add files…")).clicked() {
                 self.pick_files();
             }
-            if ui.button("Add folder…").clicked() {
+            if ui.button(t("Add folder…")).clicked() {
                 self.pick_folder_to_add();
             }
             ui.separator();
-            ui.label("Convert to");
+            ui.label(t("Convert to"));
             egui::ComboBox::from_id_salt("format")
-                .selected_text(self.format.label())
+                .selected_text(format_label(self.format))
                 .show_ui(ui, |ui| {
                     for format in OutputFormat::ALL {
-                        ui.selectable_value(&mut self.format, format, format.label());
+                        ui.selectable_value(&mut self.format, format, format_label(format));
                     }
                 });
             ui.separator();
             let beside = matches!(self.destination, Destination::BesideSource);
-            if ui.radio(beside, "Beside each file").clicked() {
+            if ui.radio(beside, t("Beside each file")).clicked() {
                 self.destination = Destination::BesideSource;
             }
-            if ui.radio(!beside, "Into a folder").clicked() {
+            if ui.radio(!beside, t("Into a folder")).clicked() {
                 match &self.folder {
                     Some(dir) => self.destination = Destination::Folder(dir.clone()),
                     None => self.pick_destination_folder(),
@@ -422,7 +489,7 @@ impl App {
                 let shown = dir.display().to_string();
                 if ui
                     .button(RichText::new(&shown).monospace())
-                    .on_hover_text("Choose another folder")
+                    .on_hover_text(t("Choose another folder"))
                     .clicked()
                 {
                     self.pick_destination_folder();
@@ -434,7 +501,7 @@ impl App {
                 .iter()
                 .filter(|j| matches!(j.state, JobState::Queued))
                 .count();
-            let convert = egui::Button::new(RichText::new("Convert").strong());
+            let convert = egui::Button::new(RichText::new(t("Convert")).strong());
             if ui.add_enabled(queued > 0, convert).clicked() {
                 self.convert_queued();
             }
@@ -443,7 +510,7 @@ impl App {
                 .iter()
                 .any(|j| matches!(j.state, JobState::Done(_) | JobState::Failed(_)));
             if ui
-                .add_enabled(finished, egui::Button::new("Clear finished"))
+                .add_enabled(finished, egui::Button::new(t("Clear finished")))
                 .clicked()
             {
                 self.jobs
@@ -462,7 +529,7 @@ impl App {
         if self.jobs.is_empty() {
             ui.centered_and_justified(|ui| {
                 ui.label(
-                    RichText::new("Drop files or folders here, or use Add files.")
+                    RichText::new(t("Drop files or folders here, or use Add files."))
                         .size(18.0)
                         .weak(),
                 );
@@ -477,9 +544,9 @@ impl App {
                     .striped(true)
                     .spacing([16.0, 6.0])
                     .show(ui, |ui| {
-                        ui.label(RichText::new("File").strong());
-                        ui.label(RichText::new("Read as").strong());
-                        ui.label(RichText::new("Status").strong());
+                        ui.label(RichText::new(t("File")).strong());
+                        ui.label(RichText::new(t("Read as")).strong());
+                        ui.label(RichText::new(t("Status")).strong());
                         ui.end_row();
                         let mut select = None;
                         for job in &self.jobs {
@@ -494,7 +561,7 @@ impl App {
                             ui.label(job.format.as_str());
                             match &job.state {
                                 JobState::Queued => {
-                                    ui.label(RichText::new("Queued").weak());
+                                    ui.label(RichText::new(t("Queued")).weak());
                                 }
                                 JobState::Converting {
                                     pages_done,
@@ -504,7 +571,13 @@ impl App {
                                         let frac = *pages_done as f32 / *pages_total as f32;
                                         ui.add(
                                             egui::ProgressBar::new(frac).desired_width(160.0).text(
-                                                format!("{pages_done} of {pages_total} pages"),
+                                                fill(
+                                                    t("{done} of {total} pages"),
+                                                    &[
+                                                        ("done", &pages_done.to_string()),
+                                                        ("total", &pages_total.to_string()),
+                                                    ],
+                                                ),
                                             ),
                                         );
                                     } else {
@@ -518,13 +591,14 @@ impl App {
                                         .map(|n| n.to_string_lossy().into_owned())
                                         .unwrap_or_default();
                                     ui.label(
-                                        RichText::new(format!("Wrote {name}"))
+                                        RichText::new(fill(t("Wrote {file}"), &[("file", &name)]))
                                             .color(ui.visuals().strong_text_color()),
                                     );
                                 }
                                 JobState::Failed(message) => {
                                     ui.label(
-                                        RichText::new("Failed").color(ui.visuals().error_fg_color),
+                                        RichText::new(t("Failed"))
+                                            .color(ui.visuals().error_fg_color),
                                     )
                                     .on_hover_text(message);
                                 }
@@ -544,7 +618,7 @@ impl App {
             .and_then(|id| self.jobs.iter().find(|j| j.id == id))
         else {
             ui.centered_and_justified(|ui| {
-                ui.label(RichText::new("Select a file to see its result.").weak());
+                ui.label(RichText::new(t("Select a file to see its result.")).weak());
             });
             return;
         };
@@ -557,12 +631,12 @@ impl App {
         ui.add_space(6.0);
         match &job.state {
             JobState::Queued => {
-                ui.label("Queued. Press Convert.");
+                ui.label(t("Queued. Press Convert."));
             }
             JobState::Converting { .. } => {
                 ui.horizontal(|ui| {
                     ui.spinner();
-                    ui.label("Converting…");
+                    ui.label(t("Converting…"));
                 });
             }
             JobState::Failed(message) => {
@@ -579,19 +653,21 @@ impl App {
                     ui.label(RichText::new(output.display().to_string()).monospace());
                 });
                 ui.horizontal(|ui| {
-                    if ui.button("Open").clicked() {
+                    if ui.button(t("Open")).clicked() {
                         if let Err(e) = opener::open(&output) {
-                            self.status = format!("Could not open: {e}");
+                            self.status =
+                                fill(t("Could not open: {reason}"), &[("reason", &e.to_string())]);
                         }
                     }
-                    if ui.button("Show in folder").clicked() {
+                    if ui.button(t("Show in folder")).clicked() {
                         if let Err(e) = opener::reveal(&output) {
-                            self.status = format!("Could not show: {e}");
+                            self.status =
+                                fill(t("Could not show: {reason}"), &[("reason", &e.to_string())]);
                         }
                     }
                     if outcome.status == docling::ConversionStatus::PartialSuccess {
                         ui.label(
-                            RichText::new("Converted with parts skipped")
+                            RichText::new(t("Converted with parts skipped"))
                                 .color(ui.visuals().warn_fg_color),
                         );
                     }
@@ -601,7 +677,7 @@ impl App {
                 }
                 if outcome.preview_truncated {
                     ui.label(
-                        RichText::new("Preview shows the beginning; the file has the rest.")
+                        RichText::new(t("Preview shows the beginning; the file has the rest."))
                             .weak()
                             .small(),
                     );
@@ -644,8 +720,14 @@ impl App {
             let done = count(|s| matches!(s, JobState::Done(_)));
             let failed = count(|s| matches!(s, JobState::Failed(_)));
             ui.label(
-                RichText::new(format!(
-                    "{queued} queued · {converting} converting · {done} done · {failed} failed"
+                RichText::new(fill(
+                    t("{queued} queued · {converting} converting · {done} done · {failed} failed"),
+                    &[
+                        ("queued", &queued.to_string()),
+                        ("converting", &converting.to_string()),
+                        ("done", &done.to_string()),
+                        ("failed", &failed.to_string()),
+                    ],
                 ))
                 .weak(),
             );
@@ -666,7 +748,7 @@ impl App {
             painter.text(
                 rect.center(),
                 Align2::CENTER_CENTER,
-                "Drop to add",
+                t("Drop to add"),
                 FontId::proportional(28.0),
                 Color32::WHITE,
             );

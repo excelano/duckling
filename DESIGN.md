@@ -438,7 +438,47 @@ David. Declaring the types without the handler would have Finder offer
 Duckling and AppKit refuse the document with a dialog blaming it. So neither,
 and the changelog's Open With claim stays scoped to Windows. `§9`.
 
-## 9. Open threads
+## 9. The language a person reads
+
+German where the desktop asks for German, English everywhere else, through the
+`potext` crate and the catalogues in `po/`. `po/update-po.sh` is the only way
+they move and `po/pseudo.sh` writes the pseudolocale that finds a string which
+never went through `t`.
+
+**A message is looked up by its English text, never by a key**, so a call site
+reads as the sentence a person sees and an untranslated one is the original
+rather than a placeholder. **A translation that has gone stale is not shown:**
+`msgmerge` marks a reworded message `#, fuzzy`, `potext` refuses to load one,
+and the window falls back to English until somebody has read the new sentence.
+
+**The catalogue is declared in `src/main.rs` and not in `src/lib.rs`**, which is
+§4's rule about the interface being a renderer holding for language too: every
+sentence a person reads is produced in the window, and the library — the queue,
+the worker, the output rules — says nothing to anybody. A second front end would
+translate its own words rather than inherit these.
+
+**What the file says stays as the file says it.** The format a row was read as
+is `detect`'s answer and is drawn as it stands; an extension in the skipped-file
+list is an extension. `OutputFormat::label` stays the canonical English in the
+library, and the window translates a format name where it draws one — most are
+names of formats and do not move, DOCX and JSON being DOCX and JSON in any
+language, but *DocLang archive* has an ordinary noun in it and is
+*DocLang-Archiv* in German. Sending all seven through the catalogue is what lets
+a translator decide that rather than this application deciding for them.
+
+**One message was rebuilt rather than translated.** The line after adding files
+spliced a parenthesised extension list onto the end of a sentence; a translator
+handed a fragment cannot place it, and German would not put the list where
+English does. It is two whole messages now, chosen by whether the list is empty.
+
+**The line printed to stderr when the window will not open stays English.** It
+goes to a terminal and into a bug report, and one wording is what makes it
+searchable; the dialog beside it, which is what a person actually sees, is
+translated.
+
+---
+
+## 10. Open threads
 
 **The preview has no font for most of the world's scripts.** egui bundles
 Latin, Greek and Cyrillic. A converted Korean, Arabic, Hindi or Japanese

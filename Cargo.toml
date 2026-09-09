@@ -14,6 +14,12 @@ name = "duckling"
 path = "src/main.rs"
 
 [dependencies]
+# The language the window draws in, and the reader for the `.po` catalogues in
+# `po/`. Pure Rust, no build script; its two dependencies are platform-gated and
+# are the operating system's own answer to which language a person reads, which
+# on macOS is the only answer there is, a bundle opened from Finder having no
+# environment at all.
+potext = "0.1"
 # The converter. `pdf` is the ML pipeline (pdfium + ONNX Runtime), which is
 # the one C dependency this application takes; DESIGN.md §2 says why and what
 # it costs. The other defaults stay off: `asr` wants Whisper models this

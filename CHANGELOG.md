@@ -6,6 +6,17 @@ every claim here is checked against the built application rather than
 remembered. `git log` is the record of why the code is the way it is; this is
 not that.
 
+## [Unreleased]
+
+- **German.** Duckling comes up in German on a machine set to German — the
+  toolbar, the queue, the preview and every line the status bar shows. Nothing
+  to choose: it reads the language the desktop already knows, and falls back to
+  English for any other.
+- What a file is stays as the file says it. The format a row was read as, and
+  the extensions of files docling.rs does not read, are not translated; nor are
+  the names of most output formats, DOCX and JSON being DOCX and JSON in any
+  language.
+
 ## [0.1.1] - 2026-09-08
 
 - Writes ODT and DOCX as well, through waddle: a plain, well-structured

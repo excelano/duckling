@@ -1,0 +1,237 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the duckling package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: duckling\n"
+"Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
+"POT-Creation-Date: 2026-09-09 13:21-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: none\n"
+"Language: en-x-pseudo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.rs:101
+msgid "DocLang"
+msgstr "[DöcLäñg ···]"
+
+#: src/main.rs:102
+msgid "Markdown"
+msgstr "[Märkdöwñ ····]"
+
+#: src/main.rs:103
+msgid "JSON"
+msgstr "[JSÖN ··]"
+
+#: src/main.rs:104
+msgid "DocLang archive"
+msgstr "[DöcLäñg ärchívé ·······]"
+
+#: src/main.rs:105
+msgid "LaTeX"
+msgstr "[LäTéX ···]"
+
+#: src/main.rs:106
+msgid "ODT"
+msgstr "[ÖDT ··]"
+
+#: src/main.rs:107
+msgid "DOCX"
+msgstr "[DÖCX ··]"
+
+#: src/main.rs:148
+msgid ""
+"No models found beside the application; PDFs and images will not convert"
+msgstr ""
+"[Nö mödélš föüñd béšídé thé äpplícätíöñ; PDFš äñd ímägéš wíll ñöt cöñvért "
+"·····························]"
+
+#: src/main.rs:159
+msgid "Built without ONNX Runtime: PDFs and images will not convert"
+msgstr ""
+"[Büílt wíthöüt ÖNNX Rüñtímé: PDFš äñd ímägéš wíll ñöt cöñvért "
+"·························]"
+
+#: src/main.rs:186
+msgid "Duckling could not start"
+msgstr "[Dücklíñg cöüld ñöt štärt ··········]"
+
+#: src/main.rs:188
+msgid ""
+"The window could not be opened.\n"
+"\n"
+"{reason}\n"
+"\n"
+"This is usually a graphics driver the window system could not use. Duckling "
+"needs no particular graphics card, but it does need one the system can talk "
+"to."
+msgstr ""
+"[Thé wíñdöw cöüld ñöt bé öpéñéd. ·············][ ·][{reason} ····][ ·][Thíš "
+"íš üšüälly ä gräphícš drívér thé wíñdöw šyštém cöüld ñöt üšé. Dücklíñg ñéédš "
+"ñö pärtícülär gräphícš cärd, büt ít döéš ñééd öñé thé šyštém cäñ tälk tö. "
+"·······························································]"
+
+#: src/main.rs:242
+msgid "Nothing to add"
+msgstr "[Nöthíñg tö ädd ······]"
+
+#: src/main.rs:243
+msgid "Added {n}"
+msgstr "[Åddéd {n} ····]"
+
+#: src/main.rs:259
+msgid "Added {n}; skipped {k} docling.rs does not read"
+msgstr "[Åddéd {n}; škíppéd {k} döclíñg.rš döéš ñöt réäd ···················]"
+
+#: src/main.rs:264
+msgid "Added {n}; skipped {k} docling.rs does not read ({extensions})"
+msgstr ""
+"[Åddéd {n}; škíppéd {k} döclíñg.rš döéš ñöt réäd ({extensions}) "
+"·························]"
+
+#: src/main.rs:331
+msgid "Converting {count} to {format}"
+msgstr "[Cöñvértíñg {count} tö {format} ·············]"
+
+#: src/main.rs:335
+msgid "{n} left queued until their folder is allowed, or choose Into a folder"
+msgstr ""
+"[{n} léft qüéüéd üñtíl théír földér íš ällöwéd, ör chööšé Îñtö ä földér "
+"·····························]"
+
+#: src/main.rs:339
+msgid ""
+"Converting {count} to {format}; {n} left queued until their folder is "
+"allowed, or choose Into a folder"
+msgstr ""
+"[Cöñvértíñg {count} tö {format}; {n} léft qüéüéd üñtíl théír földér íš "
+"ällöwéd, ör chööšé Îñtö ä földér ·········································]"
+
+#: src/main.rs:379
+msgid ""
+"Allow Duckling to write beside the files in {folder}: choose that folder"
+msgstr ""
+"[Ållöw Dücklíñg tö wríté béšídé thé fíléš íñ {folder}: chööšé thät földér "
+"·····························]"
+
+#: src/main.rs:413 src/main.rs:594
+msgid "Wrote {file}"
+msgstr "[Wröté {file} ·····]"
+
+#: src/main.rs:421
+msgid "{file}: {reason}"
+msgstr "[{file}: {reason} ·······]"
+
+#: src/main.rs:462
+msgid "Add files…"
+msgstr "[Ådd fíléš… ·····]"
+
+#: src/main.rs:465
+msgid "Add folder…"
+msgstr "[Ådd földér… ······]"
+
+#: src/main.rs:469
+msgid "Convert to"
+msgstr "[Cöñvért tö ·····]"
+
+#: src/main.rs:479
+msgid "Beside each file"
+msgstr "[Béšídé éäch fílé ·······]"
+
+#: src/main.rs:482
+msgid "Into a folder"
+msgstr "[Îñtö ä földér ······]"
+
+#: src/main.rs:492
+msgid "Choose another folder"
+msgstr "[Chööšé äñöthér földér ·········]"
+
+#: src/main.rs:504
+msgid "Convert"
+msgstr "[Cöñvért ···]"
+
+#: src/main.rs:513
+msgid "Clear finished"
+msgstr "[Cléär fíñíšhéd ······]"
+
+#: src/main.rs:532
+msgid "Drop files or folders here, or use Add files."
+msgstr "[Dröp fíléš ör földérš héré, ör üšé Ådd fíléš. ···················]"
+
+#: src/main.rs:547
+msgid "File"
+msgstr "[Fílé ··]"
+
+#: src/main.rs:548
+msgid "Read as"
+msgstr "[Réäd äš ···]"
+
+#: src/main.rs:549
+msgid "Status"
+msgstr "[Stätüš ···]"
+
+#: src/main.rs:564
+msgid "Queued"
+msgstr "[Qüéüéd ···]"
+
+#: src/main.rs:575
+msgid "{done} of {total} pages"
+msgstr "[{done} öf {total} pägéš ··········]"
+
+#: src/main.rs:600
+msgid "Failed"
+msgstr "[Fäíléd ···]"
+
+#: src/main.rs:620
+msgid "Select a file to see its result."
+msgstr "[Séléct ä fílé tö šéé ítš réšült. ·············]"
+
+#: src/main.rs:633
+msgid "Queued. Press Convert."
+msgstr "[Qüéüéd. Préšš Cöñvért. ·········]"
+
+#: src/main.rs:638
+msgid "Converting…"
+msgstr "[Cöñvértíñg… ······]"
+
+#: src/main.rs:655
+msgid "Open"
+msgstr "[Öpéñ ··]"
+
+#: src/main.rs:657
+msgid "Could not open: {reason}"
+msgstr "[Cöüld ñöt öpéñ: {reason} ··········]"
+
+#: src/main.rs:660
+msgid "Show in folder"
+msgstr "[Shöw íñ földér ······]"
+
+#: src/main.rs:662
+msgid "Could not show: {reason}"
+msgstr "[Cöüld ñöt šhöw: {reason} ··········]"
+
+#: src/main.rs:667
+msgid "Converted with parts skipped"
+msgstr "[Cöñvértéd wíth pärtš škíppéd ············]"
+
+#: src/main.rs:677
+msgid "Preview shows the beginning; the file has the rest."
+msgstr ""
+"[Prévíéw šhöwš thé bégíññíñg; thé fílé häš thé réšt. ·····················]"
+
+#: src/main.rs:721
+msgid ""
+"{queued} queued · {converting} converting · {done} done · {failed} failed"
+msgstr ""
+"[{queued} qüéüéd · {converting} cöñvértíñg · {done} döñé · {failed} fäíléd "
+"·······························]"
+
+#: src/main.rs:748
+msgid "Drop to add"
+msgstr "[Dröp tö ädd ·····]"
