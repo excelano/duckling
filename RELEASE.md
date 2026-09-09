@@ -59,6 +59,27 @@ is the only thing that reads it.
 **Bump only for a number that has been tagged.** Ask `git tag --list` before
 deciding.
 
+## The crate publishes as `duckling-converter`
+
+`duckling` on crates.io is wafer-inc's Rust port of Facebook's Duckling, a
+natural-language parser with nothing to do with this application, published and
+current. So the crate takes the one hyphenated coordinate and everything else
+stays `duckling`: the binary, the Debian package, the desktop entry, the manual
+page, the Store identity. `[[bin]] name = "duckling"` in `Cargo.toml` is what
+holds the split, and `packaging/debian/build-deb.sh` reads
+`target/release/duckling` and is untouched by it. xray solved the same
+collision the same way and publishes as `x-ray`.
+
+The mismatch shows up in exactly one place, which is confirming the publish:
+the crates.io API path is `/crates/duckling-converter`, and asking after
+`duckling` returns somebody else's crate at a much higher version rather than a
+404. A check that only asks whether a version came back will believe it.
+
+**This was missing until 2026-09-09.** The step above said the release cuts the
+crate and there was no `publish-crate.yml` to cut it with, so 0.1.0 and 0.1.1
+shipped to apt and the Microsoft Store with no crate at all and nothing said
+so. `ship` found it by asking crates.io what the profile claimed was there.
+
 ## What is different about this application
 
 Every lane starts from segler's directory of the same name, and every lane

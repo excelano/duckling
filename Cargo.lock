@@ -1430,7 +1430,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "duckling"
+name = "duckling-converter"
 version = "0.1.1"
 dependencies = [
  "docling",
