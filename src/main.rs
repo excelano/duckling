@@ -606,8 +606,8 @@ impl App {
                             .small(),
                     );
                 }
-                if !self.format_of(&output).is_text() {
-                    ui.label(RichText::new("The archive's document.xml:").weak().small());
+                if let Some(note) = self.format_of(&output).preview_note() {
+                    ui.label(RichText::new(note).weak().small());
                 }
                 ui.add_space(4.0);
                 egui::ScrollArea::both()

@@ -11,9 +11,10 @@ A desktop application that converts documents with docling.rs. Presented to a
 person as **Duckling**; the crate and the binary are `duckling`. One window:
 a queue, a format and destination, a Convert button, a preview of the result.
 
-**It converts nothing itself.** Every conversion is `docling`'s. Where
-behaviour is missing, it goes upstream as an issue, the way slipcase-desktop
-did with `slpc`, rather than being worked around here.
+**It converts nothing itself.** Every conversion is `docling`'s, and every
+office package is `waddle-core`'s. Where behaviour is missing, it goes to
+that crate as an issue, the way slipcase-desktop did with `slpc`, rather
+than being worked around here.
 
 **Three documents, three authorities.** docling.rs's `README.md` and
 `docs/MIGRATION.md` are the authority on what converts and how well.

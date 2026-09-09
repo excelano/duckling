@@ -16,8 +16,10 @@ for the Python Docling, and David kept it: the reservation is his, and
 Segler went through the same reasoning about a collision and kept its name.
 
 The converter is `docling`, docling.rs, from crates.io at a published
-version and never a path dependency in a committed manifest. Duckling adds no
-conversion logic. Where a conversion is wrong, the issue goes upstream.
+version and never a path dependency in a committed manifest; the office
+writer is `waddle-core`, the same way. Duckling adds no conversion logic. It
+composes the two, and where a conversion is wrong the issue goes to
+whichever of them it belongs to.
 
 ## 2. Dependencies
 
@@ -191,7 +193,7 @@ in folder, and the written text in a read-only monospace editor capped at
 256 KB with a line saying so when the file is longer. A DocLang archive is a
 zip, so its preview is the `document.xml` inside.
 
-**Five outputs, and DocLang is the default.** Decided 2026-09-04 after the
+**Seven outputs, and DocLang is the default.** Decided 2026-09-04 after the
 first build offered four with the archive as the only DocLang form, because
 that is all the docling.rs command-line tool offers. The library writes the
 bare markup, the archive is that markup plus two fixed OPC parts, and Segler
@@ -217,6 +219,24 @@ last segment. For a bare `.dclg` it writes the assets into `assets/` beside
 the file, content-addressed, so an existing file of the same name holds the
 same bytes. A page render that fails is a note on the result, not a failed
 conversion.
+
+**ODT and DOCX come from waddle, added 2026-09-08.** docling.rs writes no
+office format; `waddle-core`, the sibling crate written for this, takes the
+`DoclingDocument` the engine produced and returns an OpenDocument Text or
+Word package. It emits the constructs docling.rs's own reader for that
+format recognises, so the package reads back into the document it came
+from as far as the reader allows, and its `DESIGN.md` §6 lists where it
+does not. The output is plain by design: the model carries no styles, page
+geometry or fonts, so there is nothing to reproduce a source's look from.
+Pictures invert here relative to the DocLang outputs: the bytes go into the
+package rather than beside the file, and the asset pairing in
+`src/doclang.rs` is not involved, because the document the engine holds
+already carries them. What the package cannot hold, a page header on the
+furniture layer, a reviewer comment, a picture without bytes, waddle
+reports and Duckling shows as notes on the result, one line per kind with
+a count. The preview for a package is the document as Markdown, since a
+person cannot read a zip. Duckling's principle holds: it adds no conversion
+logic of its own, and a wrong package is waddle's issue.
 
 **docling.rs writes no page breaks for a PDF, and Duckling inserts them.**
 Measured 2026-09-05 on `normal_4pages.pdf`: docling.rs's markup carries

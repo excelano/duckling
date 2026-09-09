@@ -19,7 +19,12 @@ path = "src/main.rs"
 # it costs. The other defaults stay off: `asr` wants Whisper models this
 # application does not ship, `vlm` wants a remote endpoint, `fetch-images`
 # wants the network.
-docling = { version = "1.36", default-features = false, features = ["pdf"] }
+docling = { version = "1.37", default-features = false, features = ["pdf"] }
+# The office writer: ODT and DOCX from the DoclingDocument docling.rs
+# produced. It depends on docling-core alone, so the two share one model
+# version, and it is pure Rust. Duckling adds no conversion logic of its own;
+# DESIGN.md §4 says what the writer keeps and what it reports.
+waddle-core = "0.1"
 # Same framework as slipcase-desktop and segler on purpose: one set of
 # platform lessons for three applications. Defaults carry accesskit, kept on.
 eframe = "0.36"

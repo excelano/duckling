@@ -120,15 +120,21 @@ pub enum OutputFormat {
     /// else goes in it today; DESIGN.md §9 says what could.
     DoclangArchive,
     Latex,
+    /// OpenDocument Text, written by waddle from the document docling.rs read.
+    Odt,
+    /// Word, written by waddle from the same document.
+    Docx,
 }
 
 impl OutputFormat {
-    pub const ALL: [OutputFormat; 5] = [
+    pub const ALL: [OutputFormat; 7] = [
         OutputFormat::Doclang,
         OutputFormat::Markdown,
         OutputFormat::Json,
         OutputFormat::DoclangArchive,
         OutputFormat::Latex,
+        OutputFormat::Odt,
+        OutputFormat::Docx,
     ];
 
     pub fn label(self) -> &'static str {
@@ -138,6 +144,8 @@ impl OutputFormat {
             OutputFormat::Json => "JSON",
             OutputFormat::DoclangArchive => "DocLang archive",
             OutputFormat::Latex => "LaTeX",
+            OutputFormat::Odt => "ODT",
+            OutputFormat::Docx => "DOCX",
         }
     }
 
@@ -148,12 +156,31 @@ impl OutputFormat {
             OutputFormat::Json => "json",
             OutputFormat::DoclangArchive => "dclx",
             OutputFormat::Latex => "tex",
+            OutputFormat::Odt => "odt",
+            OutputFormat::Docx => "docx",
         }
     }
 
     /// Whether the written file is text a person can read in the preview.
     pub fn is_text(self) -> bool {
-        !matches!(self, OutputFormat::DoclangArchive)
+        !matches!(
+            self,
+            OutputFormat::DoclangArchive | OutputFormat::Odt | OutputFormat::Docx
+        )
+    }
+
+    /// What the preview shows for a format that is not text, said above it.
+    pub fn preview_note(self) -> Option<&'static str> {
+        match self {
+            OutputFormat::DoclangArchive => Some("The archive's document.xml:"),
+            OutputFormat::Odt | OutputFormat::Docx => {
+                Some("The document as Markdown; the package holds it as written:")
+            }
+            OutputFormat::Doclang
+            | OutputFormat::Markdown
+            | OutputFormat::Json
+            | OutputFormat::Latex => None,
+        }
     }
 }
 
@@ -453,6 +480,36 @@ impl Engine {
                     }
                 }
             }
+            OutputFormat::Odt | OutputFormat::Docx => {
+                let written = if request.format == OutputFormat::Odt {
+                    waddle_core::odt::write(&document)
+                } else {
+                    waddle_core::docx::write(&document)
+                }
+                .map_err(|e| e.to_string())?;
+                // What the package could not carry, one line per kind with a
+                // count, in waddle's own words.
+                let mut kinds: Vec<(String, usize)> = Vec::new();
+                for warning in &written.warnings {
+                    let line = warning.to_string();
+                    match kinds.iter_mut().find(|(l, _)| *l == line) {
+                        Some((_, n)) => *n += 1,
+                        None => kinds.push((line, 1)),
+                    }
+                }
+                for (line, count) in kinds {
+                    notes.push(if count > 1 {
+                        format!("Not carried into the package: {line} ({count})")
+                    } else {
+                        format!("Not carried into the package: {line}")
+                    });
+                }
+                Rendered {
+                    bytes: written.bytes,
+                    preview: document.export_to_markdown(),
+                    beside: Vec::new(),
+                }
+            }
             other => render(&document, other),
         };
         let target = available_path(&request.destination.target(&request.source, request.format));
@@ -556,8 +613,11 @@ fn render(document: &DoclingDocument, format: OutputFormat) -> Rendered {
         OutputFormat::Markdown => document.export_to_markdown(),
         OutputFormat::Json => document.export_to_json(),
         OutputFormat::Latex => document.export_to_latex(),
-        OutputFormat::Doclang | OutputFormat::DoclangArchive => {
-            unreachable!("DocLang is rendered in Engine::convert")
+        OutputFormat::Doclang
+        | OutputFormat::DoclangArchive
+        | OutputFormat::Odt
+        | OutputFormat::Docx => {
+            unreachable!("DocLang and the office packages are rendered in Engine::convert")
         }
     };
     Rendered {

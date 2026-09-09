@@ -116,6 +116,47 @@ fn docx_to_doclang_writes_the_markup_bare() {
     std::fs::remove_dir_all(&out).unwrap();
 }
 
+/// The office packages come from waddle, which writes the picture bytes
+/// docling read into the package; the preview is the document as Markdown.
+#[test]
+fn docx_to_odt_and_docx_write_packages_with_the_picture() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    for (format, first_part, picture_part) in [
+        (OutputFormat::Odt, "mimetype", "Pictures/image1.png"),
+        (
+            OutputFormat::Docx,
+            "[Content_Types].xml",
+            "word/media/image1.png",
+        ),
+    ] {
+        let out = fresh_dir(format.extension());
+        let outcome = convert(&corpus.join("docx/sources/word_sample.docx"), format, &out).unwrap();
+        assert_eq!(
+            outcome.output,
+            out.join(format!("word_sample.{}", format.extension()))
+        );
+        let bytes = std::fs::read(&outcome.output).unwrap();
+        assert_eq!(&bytes[..2], b"PK", "a package is a zip");
+        let holds = |name: &str| bytes.windows(name.len()).any(|w| w == name.as_bytes());
+        assert!(holds(first_part), "{format:?} lacks {first_part}");
+        assert!(holds(picture_part), "{format:?} lacks the picture");
+        assert!(
+            outcome.preview.contains("Swimming in the lake"),
+            "{}",
+            outcome.preview
+        );
+        assert!(
+            outcome.notes.iter().any(|n| n.contains("furniture")),
+            "the page header docling puts on the furniture layer is reported: {:?}",
+            outcome.notes
+        );
+        std::fs::remove_dir_all(&out).unwrap();
+    }
+}
+
 #[test]
 fn an_unreadable_extension_fails_rather_than_panics() {
     let out = fresh_dir("unknown");

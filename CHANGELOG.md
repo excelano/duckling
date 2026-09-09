@@ -6,6 +6,12 @@ every claim here is checked against the built application rather than
 remembered. `git log` is the record of why the code is the way it is; this is
 not that.
 
+## [Unreleased]
+
+- Writes ODT and DOCX as well, through waddle: a plain, well-structured
+  office document from what docling.rs read, pictures inside the package.
+  What the package cannot hold is listed on the result.
+
 ## [0.1.0] - 2026-09-06
 
 The first packaged build.

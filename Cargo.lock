@@ -725,7 +725,7 @@ dependencies = [
  "log",
  "quick-xml 0.31.0",
  "serde",
- "zip",
+ "zip 2.4.2",
 ]
 
 [[package]]
@@ -1329,9 +1329,9 @@ dependencies = [
 
 [[package]]
 name = "docling"
-version = "1.36.0"
+version = "1.37.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5672cddc16cc1ba55586b5abd094b28de8fe46a92b1746c98c6bf46d33d3fc8f"
+checksum = "2bcbe8a58145ce640b2b20b490b9f90b27567d16c76734c291e33a280740c922"
 dependencies = [
  "calamine",
  "csv",
@@ -1350,14 +1350,14 @@ dependencies = [
  "serde",
  "serde_json",
  "snap",
- "zip",
+ "zip 2.4.2",
 ]
 
 [[package]]
 name = "docling-core"
-version = "1.36.0"
+version = "1.37.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "190122d1b99fc40a1b64595d3275a9fc26075143dbc9f57fd89c236bf2e292d9"
+checksum = "67250a17e73e869c038daa21f7530e27aa44f24e5a7ee34c8d5f210627461037"
 dependencies = [
  "serde_json",
  "sha2 0.10.9",
@@ -1365,9 +1365,9 @@ dependencies = [
 
 [[package]]
 name = "docling-onnx"
-version = "1.36.0"
+version = "1.37.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33e784a999dcc8e4c697f10831105944e4f9f6321ccf1a1b0c01f17b00aa7193"
+checksum = "77826c7cef534370d05ce70efc302424da26f322825ba32060560d8d88f90629"
 dependencies = [
  "docling-core",
  "ort",
@@ -1375,9 +1375,9 @@ dependencies = [
 
 [[package]]
 name = "docling-pdf"
-version = "1.36.0"
+version = "1.37.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c0b863e5a9356be7aa085bf2d75e5b36ffea9e0a19ee5824a29ba05ef4ce133"
+checksum = "2f51531311986804855a020abd9ab2bf0af72c143f9a7762910ac1c92ba052c2"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -1441,6 +1441,7 @@ dependencies = [
  "ort",
  "rfd",
  "sha2 0.11.0",
+ "waddle-core",
  "zbus",
 ]
 
@@ -5371,6 +5372,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "typed-path"
+version = "0.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e28f89b80c87b8fb0cf04ab448d5dd0dd0ade2f8891bae878de66a75a28600e"
+
+[[package]]
 name = "typenum"
 version = "1.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5637,6 +5644,16 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "waddle-core"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c8c6022d1e4b2b3ca24f8dd37ab319560c03f0e925c20589f0e31df9bfbd2cc"
+dependencies = [
+ "docling-core",
+ "zip 8.6.0",
+]
 
 [[package]]
 name = "walkdir"
@@ -6792,6 +6809,19 @@ dependencies = [
  "memchr",
  "thiserror 2.0.20",
  "zopfli",
+]
+
+[[package]]
+name = "zip"
+version = "8.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d04a6b5381502aa6087c94c669499eb1602eb9c5e8198e534de571f7154809b"
+dependencies = [
+ "crc32fast",
+ "flate2",
+ "indexmap",
+ "memchr",
+ "typed-path",
 ]
 
 [[package]]
