@@ -21,8 +21,10 @@ than being worked around here.
 `DESIGN.md` here is the authority on this application. `git log` is the record
 of why everything is the way it is, and it is written to be read.
 
-A clone of docling.rs is at `~/clones/docling.rs` on David's machine; its
-`tests/data/<format>/sources/` is the corpus the end-to-end tests draw on.
+The end-to-end tests draw on `tests/data/<format>/sources/` in a checkout of
+docling.rs, and skip when there is not one. Where such a checkout lives is a
+fact about a machine rather than about this repository, so it is not written
+down here.
 
 ---
 
