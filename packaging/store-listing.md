@@ -124,6 +124,12 @@ nobody had the application from either store when it went up, so there was
 nobody to tell. Neither field's limit has been measured, and the text below is
 short enough that it has not had to be.
 
+### 0.1.2
+
+Duckling speaks German. On a machine set to German the toolbar, the queue, the preview and every line the status bar shows come up in German, and there is nothing to choose: it reads the language the desktop already knows and falls back to English for any other.
+
+What a file is stays as the file says it. The format a row was read as, and the extensions of files the converter does not read, are not translated.
+
 ### 0.1.1
 
 Duckling writes ODT and DOCX now, alongside DocLang, Markdown, docling JSON and LaTeX: a plain, well-structured office document made from what the converter read, with the pictures inside the file. What that format cannot hold - a page header, a picture with no image of its own - is listed on the result rather than dropped in silence, and the preview of a package shows the document as Markdown.
@@ -147,12 +153,15 @@ and it offers an address and the GitHub issues. Both pages were read back on
 section is `packaging/privacy-entry.html` as pasted, and it is the answer to
 the Store's privacy question.
 
-**A reviewer needs documents, and they are in the repository.** Duckling claims
-no file type, so unlike segler there is nothing a tester must be handed before
-the window does anything - any Word file or PDF they already have will do. If
-they would rather have ours, the twelve the screenshots use are at
-`github.com/excelano/duckling/tree/v0.1.1/packaging/demo/documents`, invented
-for the purpose and MIT like the rest.
+## App Review notes
+
+Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT or DOCX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.
+
+There is nothing a tester must be handed before the window does anything. Duckling claims no file type and opens with an empty queue: drop any Word file or PDF you already have onto the window, or use Add files, pick an output format, and convert. If you would rather have ours, the twelve documents the screenshots were taken from are at https://github.com/excelano/duckling/tree/v0.1.2/packaging/demo/documents — invented for the purpose, MIT licensed like the rest of the repository, and between them they exercise every format claimed above.
+
+The App Sandbox is on with exactly two entitlements: the sandbox itself and read-write access to user-selected files. That grant is what a person gives by dropping a file or a folder on the window, picking one in the Add dialogs, or choosing a destination folder. What it does not cover is the folder around a file that arrived on its own, so Duckling asks for that folder before writing beside such a file rather than failing quietly. There is no network entitlement, no Downloads-folder entitlement, and no temporary exception.
+
+Conversion is local. Documents are read by docling.rs, the open-source Rust port of IBM's Docling, compiled into the application; nothing is uploaded and no model is fetched. The full privacy statement is at https://excelano.com/legal/#duckling and the complete source is at https://github.com/excelano/duckling.
 
 ## The two short fields, and what goes in them
 
