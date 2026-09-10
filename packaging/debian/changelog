@@ -8,7 +8,7 @@ duckling (0.1.2) unstable; urgency=medium
     of most output formats are not translated, DOCX and JSON being DOCX and
     JSON in any language.
 
- -- David M. Anderson <david.anderson@excelano.com>  Wed, 09 Sep 2026 23:40:00 -0500
+ -- David M. Anderson <david.anderson@excelano.com>  Wed, 09 Sep 2026 22:04:49 -0500
 
 duckling (0.1.1) unstable; urgency=medium
 
