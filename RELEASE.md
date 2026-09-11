@@ -146,7 +146,7 @@ Windows x64 and exits on anything else, so an arm64 runner cannot reach a
 build. An arm64 package needs a pinned `pdfium-linux-arm64` with its hash —
 bblanchon publishes one — and ONNX Runtime checked on that architecture.
 Until then the arm64 half of the apt repository has no Duckling in it, and
-`release.conf` says `deb_arches=amd64` so nothing reports that as a package
+`ship.conf` says `deb_arches=amd64` so nothing reports that as a package
 that went missing. Segler and Flyleaf carry neither dependency and build both
 architectures in CI.
 
