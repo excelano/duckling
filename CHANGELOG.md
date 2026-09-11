@@ -6,6 +6,17 @@ every claim here is checked against the built application rather than
 remembered. `git log` is the record of why the code is the way it is; this is
 not that.
 
+`Unreleased` at the top holds what has landed since the last release and
+takes a version and a date when one ships, which is what `preflight.sh`
+looks for before it will submit.
+
+## [Unreleased]
+
+- **The install is about 120 MB smaller**, and nothing converts differently
+  for it. Three of the table-structure model files were variants docling.rs
+  never opened, because one it prefers ships beside them; they are no longer
+  in the package. On Linux that is 687 MB installed from a 412 MB download.
+
 ## [0.1.2] - 2026-09-09
 
 - **German.** Duckling comes up in German on a machine set to German — the
