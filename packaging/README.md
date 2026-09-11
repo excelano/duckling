@@ -81,9 +81,12 @@ every push, with the three `embedded-library` tags on pdfium overridden in
 
 ## The icon
 
-`linux/icons/duckling.svg`: a yellow duckling in the fleet's blue roundel,
-so the three Excelano applications share a disc on a launcher and this one
-is the colour a rubber duck is. David chose it on 2026-09-05 from a sheet
+`linux/icons/duckling.svg`: a yellow duckling on the fleet's blue square,
+so the Excelano applications share a palette on a launcher and this one is
+the colour a rubber duck is. The tile is a plain square, full bleed and
+unframed, because that is the shape a store takes and it applies its own
+corner rounding to it; a drawing carrying a smaller shape or its own
+outline into that frame reads as a sticker. David chose it on 2026-09-05 from a sheet
 of three shapes and then three colours; the file's own comment records what
 the others cost. Checked at 16,
 32 and 128 pixels on light and dark grounds before committing, and any
@@ -96,6 +99,25 @@ It also writes the four PNGs the MSIX manifest names and the Store listing
 logo, and `windows.yml` rebuilds all of it on every push and refuses a
 difference, because those are committed artifacts in a tree that otherwise
 holds only sources.
+
+### Both shapes, for a submission form
+
+`icons/` holds the application icon in two shapes - `duckling-square` and
+`duckling-rounded`, each as an SVG and as PNGs at 256, 512, 1024, 1080 and 2160.
+`windows/make-ico` writes the directory and clips the rounded one from the same
+source; neither shape is duplicated as a drawing and neither is edited by hand.
+
+Which to upload is a decision taken at the form, which is why both exist and
+neither is the default. A store that masks what it is given wants the square:
+the iOS and iPadOS Store does, and so does Icon Composer. A form that draws what
+it is handed wants the rounded one. The corner is 22.37% of the side, which is
+Apple's proportion, drawn as a circular arc rather than the continuous curve
+Apple's own tooling produces; below about 512 pixels the two do not tell apart,
+and where they would, Icon Composer on a Mac is what draws Apple's shape.
+
+Nothing in `icons/` ships. The deb installs named files out of `linux/icons`
+and `build-msix.ps1` copies `windows/assets/*.png`, so neither reaches a
+package, and no code reads one at run time.
 
 ## windows
 

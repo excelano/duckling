@@ -108,6 +108,13 @@ const ASSETS: &[Asset] = &[
 /// package - see the comment where they are written.
 const LISTING_SIZES: &[u32] = &[1080, 2160];
 
+/// The sizes a submission form asks for.
+///
+/// 1024 is App Store Connect's, 1080 and 2160 are Partner Center's *Store
+/// logo*, and 256 and 512 are what a support page or a press kit wants. All
+/// square: no listing field on any of the three stores takes a wide one.
+const SUBMISSION_SIZES: &[u32] = &[256, 512, 1024, 1080, 2160];
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
     let mut args = std::env::args_os().skip(1);
@@ -121,9 +128,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listing = args
         .next()
         .map_or_else(|| here.join("../listing"), PathBuf::from);
+    // Two directories above this one, because both shapes are for every
+    // platform's submission rather than for Windows.
+    let submission = args
+        .next()
+        .map_or_else(|| here.join("../../icons"), PathBuf::from);
 
-    let data = std::fs::read(&svg).map_err(|e| format!("{}: {e}", svg.display()))?;
-    let tree = usvg::Tree::from_data(&data, &usvg::Options::default())?;
+    let source = std::fs::read_to_string(&svg).map_err(|e| format!("{}: {e}", svg.display()))?;
+    let tree = usvg::Tree::from_data(source.as_bytes(), &usvg::Options::default())?;
 
     // The icon directory: the window's icon, the Start menu shortcut's, and
     // what `install.ps1` points the Add/Remove entry at. One, because there is
@@ -220,10 +232,84 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             1.0,
         )?;
     }
-    println!("wrote {} - {} images", listing.display(), LISTING_SIZES.len());
+    println!(
+        "wrote {} - {} images",
+        listing.display(),
+        LISTING_SIZES.len()
+    );
+
+    // Both shapes of the application icon, for the submission forms.
+    //
+    // Neither goes in a package and neither is read at run time. A store's
+    // listing asks for an icon to be uploaded and each one treats the shape
+    // differently: the iOS and iPadOS Store and Icon Composer mask a square
+    // themselves and want the square, and a form that draws what it is handed
+    // wants the rounded one. Which to upload is a decision taken at the form,
+    // so both are written and neither is the default.
+    //
+    // The square is the drawing as `packaging/linux/icons` holds it - the
+    // repository's one source, unmodified - and the rounded one is that
+    // clipped; `rounded` argues the corner.
+    if submission.exists() {
+        std::fs::remove_dir_all(&submission)?;
+    }
+    std::fs::create_dir_all(&submission)?;
+    let round = rounded(&source)?;
+    let round_tree = usvg::Tree::from_data(round.as_bytes(), &usvg::Options::default())?;
+    std::fs::write(submission.join("duckling-square.svg"), &source)?;
+    std::fs::write(submission.join("duckling-rounded.svg"), &round)?;
+    for (shape, drawn) in [("square", &tree), ("rounded", &round_tree)] {
+        for &size in SUBMISSION_SIZES {
+            write_png(
+                drawn,
+                &submission,
+                &format!("duckling-{shape}-{size}.png"),
+                size,
+                size,
+                1.0,
+            )?;
+        }
+    }
+    println!(
+        "wrote {} - 2 svg, {} images",
+        submission.display(),
+        2 * SUBMISSION_SIZES.len()
+    );
 
     Ok(())
 }
+/// The same drawing, clipped to a rounded square.
+///
+/// Done to the SVG text rather than to rendered pixels, so that the vector
+/// written beside the PNGs is a real one rather than a trace, and so that both
+/// shapes come out of the one rasterizing path below. The source's own content
+/// is wrapped in a clipped group and nothing in it moves; the insert goes after
+/// the opening tag, so the `<svg` gdk-pixbuf sniffs for stays where it is.
+///
+/// 14.317 of 64 is 22.37%, which is the proportion of the side Apple's icon
+/// grid gives the corner. `rx` draws that as a circular arc and Apple's own
+/// tooling draws a continuous curve; the two are indistinguishable below about
+/// 512 pixels, and where the difference would show, Icon Composer on a Mac is
+/// what produces Apple's shape.
+fn rounded(source: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let open = source
+        .find("<svg")
+        .and_then(|at| source[at..].find('>').map(|end| at + end + 1))
+        .ok_or("the icon source has no opening <svg> tag")?;
+    let close = source
+        .rfind("</svg>")
+        .ok_or("the icon source has no closing </svg> tag")?;
+    let mut out = String::with_capacity(source.len() + 160);
+    out.push_str(&source[..open]);
+    out.push_str(
+        "\n  <clipPath id=\"rounded\"><rect width=\"64\" height=\"64\" rx=\"14.317\"/></clipPath>\n  <g clip-path=\"url(#rounded)\">",
+    );
+    out.push_str(&source[open..close]);
+    out.push_str("</g>\n");
+    out.push_str(&source[close..]);
+    Ok(out)
+}
+
 
 /// One asset dimension at one scaling, the way the Store rounds it.
 ///
@@ -281,9 +367,12 @@ fn draw(
 ///
 /// `tiny_skia` renders into premultiplied pixels and an icon directory holds
 /// straight ones. Handing the pixmap's bytes over unconverted looks right
-/// everywhere the drawing is opaque and wrong along every antialiased edge,
-/// which on this icon is the roundel's entire outline. Its own PNG encoder does
-/// the same conversion, which is why the assets above need no equivalent.
+/// everywhere the drawing is opaque and wrong along every antialiased edge.
+/// The tile is opaque to its corners and so has no such edge, and the
+/// conversion changes nothing on it; it is done because it is what makes a
+/// drawing with any transparency in it correct, and it costs one pass. Its
+/// own PNG encoder does the same conversion, which is why the assets above
+/// need no equivalent.
 fn icon_image(tree: &usvg::Tree, size: u32) -> Result<ico::IconImage, Box<dyn std::error::Error>> {
     let pixmap = draw(tree, size, size, 1.0)?;
     let mut rgba = Vec::with_capacity((size * size * 4) as usize);

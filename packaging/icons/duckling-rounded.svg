@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <clipPath id="rounded"><rect width="64" height="64" rx="14.317"/></clipPath>
+  <g clip-path="url(#rounded)">
   <!--
     Duckling: a duckling on a blue square. Body and head as one yellow
     shape, an orange bill, a dark eye.
@@ -43,4 +45,5 @@
   <path d="M44 22 L56 25 L44 29 z" fill="#e0782a"/>
   <!-- The eye. -->
   <circle cx="38" cy="23" r="2.4" fill="#2f3337"/>
+</g>
 </svg>
