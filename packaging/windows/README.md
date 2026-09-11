@@ -77,7 +77,7 @@ process cannot start without. Three things then matter at once:
   application starts against the old one, so the imported entry points happen to
   resolve - but nobody has checked anything beyond that, and the pairing that
   *is* checked is the library with its own DLL.
-- It is 18.5 MB, which against 740 MB of models is not a number worth trading
+- It is 18.5 MB, which against 613 MB of models is not a number worth trading
   anything for.
 
 So the dist's own copy ships. `runtime-files.ps1` finds it by reading the

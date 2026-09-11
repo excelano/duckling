@@ -22,7 +22,7 @@
 #
 # This is segler's script, which is slipcase-desktop's, with the names changed,
 # four assets where it checks six, an empty findings baseline, and one thing
-# neither of those has: **the package carries 740 MB of models and a shared
+# neither of those has: **the package carries 620 MB of models and a shared
 # library**, staged into `models\` and `pdfium\` beside the executable, which is
 # where `locate_assets` in `src/lib.rs` looks. DESIGN.md 8. Every measurement in
 # the comments below was taken on one of those two repositories unless it says

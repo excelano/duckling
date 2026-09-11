@@ -57,16 +57,20 @@ TableFormer on demand was drawn in full, with the prompt at the result row
 and the reconversion after. David chose to bundle everything: the package is
 larger than WhatsApp's and smaller than a game's, and the application then
 has no download code, no failure state for one, no privacy line about
-fetching, and works offline from the first launch. The model set is
-docling.rs's own default, pinned by URL and SHA-256 in
-`packaging/fetch-models.sh`, and the int8 and fp32 variants both ship
-because the pipeline runs int8 first and retries a page on fp32 when int8
-finds no text on it.
+fetching, and works offline from the first launch. The set is the one
+docling.rs resolves at run time, pinned by URL and SHA-256 in
+`packaging/fetch-models.sh`. The layout model ships in both precisions,
+because the pipeline runs int8 and re-runs a page on fp32 when int8's
+regions cover too little of it; TableFormer ships the one decoder the
+pipeline resolves, `decoder_kv.onnx`, and nothing behind it in that
+preference order.
 
-Measured 2026-09-04: `.models/` is 735 MB and `.pdfium/` 7 MB on Linux. The
-files the pipeline opened converting a four-page digital PDF with tables are
-recorded in `§7`; trimming to that set is available if a platform's package
-size ever matters, and is not done now.
+Measured 2026-09-11: `.models/` is 613 MB and `.pdfium/` 7 MB on Linux, and
+the package installs 687 MB. Which file each stage resolves to is
+docling.rs's `model_inventory`, and `tests/convert.rs` asks it: a release
+that reordered a preference or withdrew an export would resolve to a file no
+package carries, and the test says so before a conversion does. What is left
+to trim, and what only upstream can trim, is in `§10`.
 
 **What that costs on Windows is more than it costs on Linux, and it was
 measured on 2026-09-05 rather than predicted.** Two of the three findings were
@@ -317,9 +321,9 @@ a page int8 found no text on; the English OCR pair `ocr_rec_en.onnx` and
 set to Chinese; TableFormer's `encoder.onnx`, `bbox.onnx` with its data
 file, and for the decoder the first present of `decoder_kv_int8` (not
 hosted), `decoder_kv` (hosted, so this one), `decoder_int8`, `decoder`. So
-`decoder_int8.onnx` and `decoder.onnx` with its data file, about 120 MB
-together, ship as fallbacks that a package built from this script never
-reaches. Trimming them is the first cut if size ever matters.
+`decoder_int8.onnx` and `decoder.onnx` with its data file are fallbacks a
+package can never reach, and `fetch-models.sh` does not fetch them; the
+order was re-read at 1.37.5 and is unchanged.
 
 ## 8. Packaging
 
@@ -341,7 +345,7 @@ symlink, which is the layout docling.rs's own installer produces; the
 Windows lane puts the same two directories beside its executable, and the Mac
 lane could not, for the reason below.
 
-**One package, and the models are in it.** Debian proper would split 740 MB
+**One package, and the models are in it.** Debian proper would split 613 MB
 of arch-independent data into `duckling-data`; the fleet's rule is one
 package for one product, and `/usr/lib/duckling` is a private application
 directory where that data may live. The `.deb` is compressed with xz at its
@@ -492,9 +496,27 @@ and wants Markdown beside it presses one more button than they might expect.
 The batch argument in `§4` is why it is there; the first hands-on use by
 somebody who is not David is where the question gets answered.
 
-**Trimming the model set.** `§2` ships docling.rs's default set. If a
-platform's package size ever matters, `§7` records what a conversion
-actually opened.
+**Trimming the model set further.** `§2` ships what docling.rs resolves,
+which is 613 MB. Three things are left, in the order they are worth having.
+
+The largest single file is TableFormer's `encoder.onnx` at 226 MB, and
+upstream hosts no int8 variant of it: `models-v1` carries a quantized
+decoder and a quantized layout model and stops there. Their own ratios were
+0.40x on layout and 0.64x on the decoder, so an encoder in int8 would
+plausibly land between 90 and 145 MB. Asked as docling-project/docling.rs#374.
+
+`layout_heron.onnx` is 172 MB and is loaded only to re-run a page whose int8
+regions cover less than half its text cells, docling-pdf's quant-robustness
+guard. Dropping it is the biggest cut this repository can make on its own
+and the only one that costs a person anything, so it wants the measurement
+first: convert the conformance corpus with `DOCLING_RS_TIMING` on and count
+the pages that print the fp32 load. A handful in a corpus is a trade worth
+taking; one page in ten is not.
+
+The Chinese OCR pair, `ocr_rec.onnx` with `ppocr_keys_v1.txt`, is 11 MB that
+the window cannot select - `DOCLING_RS_OCR_LANG=ch` in the environment is the
+only route to it. Keeping it is defensible at that size, and taking it would
+not be noticed beside either of the other two.
 
 **Open With on macOS.** `§8` says why the bundle declares no document types:
 the Apple Event handler that would receive the document is an `unsafe` module,

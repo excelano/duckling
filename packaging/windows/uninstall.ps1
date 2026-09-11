@@ -108,7 +108,7 @@ if (-not $KeepFiles) {
         $path = Join-Path $Prefix $name
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force -Confirm:$false }
     }
-    # The models and pdfium, which are most of what is here: about 740 MB that
+    # The models and pdfium, which are most of what is here: about 620 MB that
     # a person removing this application certainly means to get back.
     foreach ($dir in 'models', 'pdfium') {
         $path = Join-Path $Prefix $dir

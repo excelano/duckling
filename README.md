@@ -14,7 +14,7 @@ no conversion logic of its own.
 ## Build
 
 ```
-./packaging/fetch-models.sh     # once; about 750 MB of models and pdfium
+./packaging/fetch-models.sh     # once; about 620 MB of models and pdfium
 cargo build --release
 ```
 

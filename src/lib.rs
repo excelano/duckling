@@ -35,7 +35,7 @@ use docling::{
 ///
 /// A Mac bundle is the one layout where "beside" is not a directory the
 /// package may fill. `codesign` treats everything under `Contents/MacOS` as
-/// code to be signed, so 735 MB of model weights cannot sit there, and a
+/// code to be signed, so 613 MB of model weights cannot sit there, and a
 /// shared library the Store will accept has to be nested code under
 /// `Contents/Frameworks`. So the second place looked is the bundle's:
 /// `../Resources/models` and `../Frameworks`, where `build-app.sh` puts them.

@@ -19,7 +19,7 @@
 # extension's default value is never written, no ProgID is created, and
 # `uninstall.ps1` never removes a `UserChoice`.
 #
-# It also copies about 740 MB, which is the models. `packaging/linux/install.sh`
+# It also copies about 620 MB, which is the models and pdfium. `packaging/linux/install.sh`
 # does the same into ~/.local and for the same reason: the application finds
 # them beside its own executable and there is no download at run time.
 #
@@ -190,7 +190,7 @@ if ($foundBinary) {
         $destination = Join-Path $Prefix $dir
         if (Test-Path -LiteralPath $destination) { Remove-Item -LiteralPath $destination -Recurse -Force }
     }
-    Write-Output "copying the models; this is about 740 MB and takes a moment"
+    Write-Output "copying the models; this is about 620 MB and takes a moment"
     Copy-Item -LiteralPath $models -Destination (Join-Path $Prefix 'models') -Recurse -Force
     New-Item -ItemType Directory -Force -Path (Join-Path $Prefix 'pdfium') | Out-Null
     Copy-Item -Path (Join-Path $pdfium '*') -Destination (Join-Path $Prefix 'pdfium') -Force

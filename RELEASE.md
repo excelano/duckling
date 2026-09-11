@@ -83,7 +83,7 @@ so. `ship` found it by asking crates.io what the profile claimed was there.
 ## What is different about this application
 
 Every lane starts from segler's directory of the same name, and every lane
-has more to do than a rename, for one reason: **the package carries 740 MB
+has more to do than a rename, for one reason: **the package carries 620 MB
 of models and a shared library**, and the application finds them beside its
 own executable. `packaging/fetch-models.sh` puts them at the repository root
 and verifies them by hash; each lane's build script copies them next to the

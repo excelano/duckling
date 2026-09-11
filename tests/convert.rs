@@ -346,3 +346,33 @@ fn demo_scanned_pdf_comes_back_through_ocr() {
     );
     std::fs::remove_dir_all(&out).unwrap();
 }
+
+/// The package ships one TableFormer decoder, and which one is docling.rs's
+/// choice rather than ours: `tableformer::resolved_paths` walks a preference
+/// order and `decoder_kv.onnx` is the first candidate upstream hosts. The
+/// candidates behind it are not fetched, so a docling.rs that reordered that
+/// preference, or withdrew the KV export, would resolve to a file no package
+/// carries and every table would fail at run time. Ask it what it resolved.
+#[test]
+fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
+    if !pipeline_available() {
+        return;
+    }
+    for entry in docling::model_inventory() {
+        assert!(
+            entry.found,
+            "docling.rs resolves {} to {}, which packaging/fetch-models.sh \
+             does not fetch",
+            entry.stage, entry.path
+        );
+    }
+    let decoder = docling::model_inventory()
+        .into_iter()
+        .find(|e| e.stage == "tableformer.decoder")
+        .expect("the inventory names the decoder");
+    assert!(
+        decoder.path.ends_with("decoder_kv.onnx"),
+        "the decoder resolved to {}, not the KV export the package ships",
+        decoder.path
+    );
+}

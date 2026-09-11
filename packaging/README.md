@@ -14,7 +14,7 @@ unless the file says otherwise.
 
 ## What every package carries
 
-The executable, and beside it `models/` and `pdfium/`: about 740 MB that are
+The executable, and beside it `models/` and `pdfium/`: about 620 MB that are
 the PDF and image pipeline. The application finds them by looking beside its
 own executable (`locate_assets` in `src/lib.rs`), so every platform's package
 puts them where it looks: `/usr/lib/duckling/` on Linux with a symlink on
