@@ -1329,14 +1329,15 @@ dependencies = [
 
 [[package]]
 name = "docling"
-version = "1.37.5"
+version = "1.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bcbe8a58145ce640b2b20b490b9f90b27567d16c76734c291e33a280740c922"
+checksum = "3dd14b873554543b10111a6447fc0b2841a29882e7d930d828ab6df17354f905"
 dependencies = [
  "calamine",
  "csv",
  "docling-core",
  "docling-pdf",
+ "encoding_rs",
  "flate2",
  "image",
  "mail-parser",
@@ -1355,9 +1356,9 @@ dependencies = [
 
 [[package]]
 name = "docling-core"
-version = "1.37.5"
+version = "1.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67250a17e73e869c038daa21f7530e27aa44f24e5a7ee34c8d5f210627461037"
+checksum = "6427e58b9ec8808c585b9f171749e9e127ec0b358ec9cff2a4cae2265726d58d"
 dependencies = [
  "serde_json",
  "sha2 0.10.9",
@@ -1365,9 +1366,9 @@ dependencies = [
 
 [[package]]
 name = "docling-onnx"
-version = "1.37.5"
+version = "1.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77826c7cef534370d05ce70efc302424da26f322825ba32060560d8d88f90629"
+checksum = "cd27b32820ae4981967de9a617c99488b289f2a98764eb23441b757fed30fe0d"
 dependencies = [
  "docling-core",
  "ort",
@@ -1375,9 +1376,9 @@ dependencies = [
 
 [[package]]
 name = "docling-pdf"
-version = "1.37.5"
+version = "1.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f51531311986804855a020abd9ab2bf0af72c143f9a7762910ac1c92ba052c2"
+checksum = "5ba658f54de4ae82d1ea4e9a87feacc3cf9981059e839ee3cb5209adc260a8ca"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -5658,9 +5659,9 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "waddle-core"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c8c6022d1e4b2b3ca24f8dd37ab319560c03f0e925c20589f0e31df9bfbd2cc"
+checksum = "b361232c3e458df31ec4ac31217534c11334139fd56296f08448e693ed17283a"
 dependencies = [
  "docling-core",
  "zip 8.6.0",

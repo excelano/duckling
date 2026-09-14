@@ -91,6 +91,7 @@ fn collect_images<'a>(node: &'a Node, by_hash: &mut HashMap<String, &'a [u8]>) {
         Node::Furniture { inner, .. }
         | Node::Commented { inner, .. }
         | Node::Located { inner, .. }
+        | Node::Prov { inner, .. }
         | Node::DoclangOnly(inner) => collect_images(inner, by_hash),
         _ => {}
     }
@@ -220,6 +221,7 @@ mod tests {
                 data: tiny_bmp(),
             }),
             classification: None,
+            caption_parent: Default::default(),
         }];
         let xml = doc.export_to_doclang();
         let found = assets(&doc, &xml);
