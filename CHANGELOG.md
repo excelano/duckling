@@ -10,7 +10,7 @@ not that.
 takes a version and a date when one ships, which is what `preflight.sh`
 looks for before it will submit.
 
-## [Unreleased]
+## [0.2.0] - 2026-09-14
 
 - **Writes ODS, ODP and XLSX as well**, through waddle, and offers each for
   the document it is a sibling of: ODS when every file in the queue is XLSX,

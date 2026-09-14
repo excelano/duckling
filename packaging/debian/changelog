@@ -1,3 +1,29 @@
+duckling (0.2.0) unstable; urgency=medium
+
+  * Writes ODS, ODP and XLSX as well as ODT and DOCX, each offered for the
+    document it is a sibling of: ODS when every file in the queue is XLSX,
+    XLSX when they are all ODS, ODP when they are all PPTX. A book converted
+    to a spreadsheet is one empty sheet and a list of what was dropped, so it
+    is not offered. The slide leg is one-way, because waddle writes ODP and
+    no PPTX.
+  * Text layer only, a checkbox for a PDF that already has text in it. Clean
+    Code, 460 pages, takes 179 seconds through the models and 1.2 seconds
+    from its text layer. What it gives up is the headings, the tables and any
+    page that needs OCR. A file with no text layer at all says so rather than
+    coming back blank.
+  * A line no longer falls out of a paragraph. On a PDF, roughly every few
+    paragraphs, one line was dropped from the paragraph it belonged to and
+    written after it, splicing the sentence it left behind. Found from this
+    application's own output and fixed upstream; documents are read by
+    docling.rs 1.51 now.
+  * The install is about 230 MB smaller and nothing converts differently for
+    it. Three of the table-structure model files were variants docling.rs
+    never opened, because one it prefers ships beside them, and that encoder
+    is a further 118 MB smaller than the file that shipped before, the same
+    model with padding stripped out of it upstream. 575 MB installed.
+
+ -- David M. Anderson <david.anderson@excelano.com>  Mon, 14 Sep 2026 18:16:22 -0500
+
 duckling (0.1.2) unstable; urgency=medium
 
   * German. Duckling comes up in German on a machine set to German — the
