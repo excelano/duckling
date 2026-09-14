@@ -74,8 +74,8 @@
 	  Not @VERSION@. App Store Connect deduplicates uploads by this key: it must
 	  increase on every upload of a bundle, including a rejected one resubmitted
 	  with nothing changed. The release version cannot do that, so this is the
-	  commit count, which only rises. `packaging/version.sh --build` is where it
-	  comes from and says why.
+	  commit count, which only rises. `packaging/version.sh` computes it, under
+	  the build flag, and says why.
 	-->
 	<key>CFBundleVersion</key>
 	<string>@BUILD@</string>
