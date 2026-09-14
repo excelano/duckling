@@ -12,10 +12,30 @@ looks for before it will submit.
 
 ## [Unreleased]
 
-- **The install is about 120 MB smaller**, and nothing converts differently
+- **Writes ODS, ODP and XLSX as well**, through waddle, and offers each for
+  the document it is a sibling of: ODS when every file in the queue is XLSX,
+  XLSX when they are all ODS, ODP when they are all PPTX. A book converted to
+  a spreadsheet is one empty sheet and a list of what was dropped, so it is
+  not offered. The slide leg is one-way, because waddle writes ODP and no
+  PPTX. Picking a format the queue stops warranting puts it back to DocLang
+  and the status bar says why.
+- **Text layer only**, a checkbox for a PDF that already has text in it.
+  Clean Code, 460 pages, takes 179 seconds through the models and 1.2 seconds
+  from its text layer. What it gives up is the headings — 211 of them in that
+  book, none without the models — along with the tables and any page that
+  needs OCR. A file with no text layer at all comes back with a line saying
+  so, rather than as a silent blank.
+- **A line no longer falls out of a paragraph.** On a PDF, roughly every few
+  paragraphs, one line was dropped from the paragraph it belonged to and
+  written after it, splicing the sentence it left behind. Found from this
+  application's own output and fixed upstream; Duckling now reads with
+  docling.rs 1.51.
+- **The install is about 230 MB smaller**, and nothing converts differently
   for it. Three of the table-structure model files were variants docling.rs
-  never opened, because one it prefers ships beside them; they are no longer
-  in the package. On Linux that is 687 MB installed from a 412 MB download.
+  never opened, because one it prefers ships beside them. The table-structure
+  encoder is a further 118 MB smaller than the file that shipped before, the
+  same model with padding stripped out of it upstream. On Linux that is
+  575 MB installed.
 
 ## [0.1.2] - 2026-09-09
 

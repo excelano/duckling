@@ -72,7 +72,7 @@ Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markd
 
 Duckling converts documents into the plain, structured text that language models and search indexes want: DocLang, Markdown, docling JSON, a DocLang archive, LaTeX, ODT, ODS, ODP, DOCX or XLSX. In go Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, email and forty more.
 
-Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of a 575 MB download.
+Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of the download.
 
 The converter is docling.rs, the Rust port of IBM's Docling.
 
@@ -105,7 +105,7 @@ HOW IT WORKS
 
 Drop files or folders on the window. Choose the output format and whether the results go beside each file or into one folder. Press Convert. Each row reports as it goes, page by page for a PDF, and the preview shows every result with a button to open it or show it in its folder. An existing file is never overwritten: a second report.md becomes report (1).md.
 
-A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of a 575 MB download, and they are why nothing has to be fetched afterwards and why the app works with the network off.
+A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of the download, and they are why nothing has to be fetched afterwards and why the app works with the network off.
 
 WHAT IT DOES NOT DO
 

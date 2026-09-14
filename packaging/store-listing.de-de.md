@@ -23,7 +23,7 @@ Hinein: Word, PowerPoint, Excel, PDF und vierzig weitere Formate. Heraus: DocLan
 
 Duckling wandelt Dokumente in einfachen, strukturierten Text für Sprachmodelle und Suchindizes um: DocLang, Markdown, docling-JSON, LaTeX, ODT, ODS, ODP, DOCX oder XLSX. Hinein: Word, PowerPoint, Excel, PDF, HTML, EPUB, OpenDocument, E-Mail und vierzig weitere Formate.
 
-Gescannte Seiten lesen mitgelieferte OCR-Modelle: Duckling arbeitet offline, nichts verlässt Ihren Rechner. Der Download ist deshalb rund 575 MB groß.
+Gescannte Seiten lesen mitgelieferte OCR-Modelle: Duckling arbeitet offline, nichts verlässt Ihren Rechner. Sie sind der größte Teil des Downloads.
 
 Gelesen wird mit docling.rs, der Rust-Portierung von IBMs Docling.
 
@@ -56,7 +56,7 @@ WIE ES ARBEITET
 
 Dateien oder Ordner auf das Fenster ziehen. Das Ausgabeformat wählen und ob die Ergebnisse neben jede Datei oder in einen Ordner gehen. Umwandeln drücken. Jede Zeile berichtet, während sie läuft, bei einem PDF Seite für Seite, und die Vorschau zeigt jedes Ergebnis mit einer Schaltfläche zum Öffnen oder zum Zeigen im Ordner. Eine vorhandene Datei wird nie überschrieben: aus einer zweiten report.md wird report (1).md.
 
-Ein gescanntes PDF oder ein Bild lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Sie sind der größte Teil eines Downloads von rund 575 MB, und sie sind der Grund, warum danach nichts nachgeladen werden muss und die Anwendung ohne Netz arbeitet.
+Ein gescanntes PDF oder ein Bild lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Sie sind der größte Teil des Downloads, und sie sind der Grund, warum danach nichts nachgeladen werden muss und die Anwendung ohne Netz arbeitet.
 
 WAS ES NICHT TUT
 
