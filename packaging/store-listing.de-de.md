@@ -17,20 +17,22 @@ Dokumente zu DocLang, offline
 
 ## Promotional text (Mac App Store, 170)
 
-Hinein: Word, PowerPoint, Excel, PDF und vierzig weitere Formate. Heraus: DocLang, Markdown, JSON, LaTeX, ODT oder DOCX — auf Ihrem Rechner, nichts wird gesendet.
+Hinein: Word, PowerPoint, Excel, PDF und vierzig weitere Formate. Heraus: DocLang, Markdown, JSON, LaTeX oder Office-Formate — auf Ihrem Rechner, nichts wird gesendet.
 
 ## Short description (Microsoft Store, 500)
 
-Duckling wandelt Dokumente in einfachen, strukturierten Text für Sprachmodelle und Suchindizes um: DocLang, Markdown, docling-JSON, LaTeX, ODT oder DOCX. Hinein: Word, PowerPoint, Excel, PDF, HTML, EPUB, OpenDocument, E-Mail und vierzig weitere Formate.
+Duckling wandelt Dokumente in einfachen, strukturierten Text für Sprachmodelle und Suchindizes um: DocLang, Markdown, docling-JSON, LaTeX, ODT, ODS, ODP, DOCX oder XLSX. Hinein: Word, PowerPoint, Excel, PDF, HTML, EPUB, OpenDocument, E-Mail und vierzig weitere Formate.
 
-Gescannte Seiten lesen mitgelieferte OCR-Modelle: Duckling arbeitet offline, nichts verlässt Ihren Rechner. Der Download ist deshalb rund 600 MB groß.
+Gescannte Seiten lesen mitgelieferte OCR-Modelle: Duckling arbeitet offline, nichts verlässt Ihren Rechner. Der Download ist deshalb rund 575 MB groß.
 
 Gelesen wird mit docling.rs, der Rust-Portierung von IBMs Docling.
 
 ## App features (Microsoft Store, up to 20 bullets of 200 characters)
 
     Liest Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, E-Mail, Visio und rund vierzig Formate insgesamt.
-    Schreibt DocLang, Markdown, docling-JSON, ein DocLang-Archiv oder LaTeX. Oder ODT und DOCX, ein schlichtes Office-Dokument mit den Bildern in der Datei.
+    Schreibt DocLang, Markdown, docling-JSON, ein DocLang-Archiv oder LaTeX. Oder ODT, ODS, ODP, DOCX und XLSX, ein schlichtes Office-Dokument mit den Bildern in der Datei.
+    Wandelt eine Tabelle oder eine Präsentation in das jeweils andere Format um: XLSX zu ODS, ODS zu XLSX, PPTX zu ODP — angeboten, wenn jede Datei in der Warteschlange von dieser Art ist.
+    Nur Textebene, für ein PDF, das bereits Text enthält: Sekunden statt Minuten, ohne die Überschriften und Tabellen, die die Modelle finden.
     Wandelt stapelweise um: Dateien oder einen ganzen Ordner hineinziehen, einmal wählen, Umwandeln drücken.
     Gescannte PDFs und Bilder lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Nach der Installation ist nichts nachzuladen.
     Ausgabe neben jede Datei oder in einen Ordner, und nie über eine vorhandene Datei.
@@ -48,13 +50,13 @@ Word, PowerPoint und Excel, aktuelle wie alte. PDF, digital oder gescannt. HTML,
 
 WAS HERAUSKOMMT
 
-DocLang, die offene Dokumentauszeichnung für Sprachmodelle, fertig zum Öffnen in Segler, bloß oder als Archiv, das ein Seitenbild je Seite und jedes Bild mitführt. Markdown, mit Überschriften, Listen und Tabellen. Doclings JSON, das alles behält, was docling.rs gefunden hat. Oder LaTeX. Oder ein ODT- oder DOCX-Dokument, schlicht und gut gegliedert, mit den Bildern in der Datei; was dieses Format nicht halten kann, steht am Ergebnis, statt still wegzufallen.
+DocLang, die offene Dokumentauszeichnung für Sprachmodelle, fertig zum Öffnen in Segler, bloß oder als Archiv, das ein Seitenbild je Seite und jedes Bild mitführt. Markdown, mit Überschriften, Listen und Tabellen. Doclings JSON, das alles behält, was docling.rs gefunden hat. Oder LaTeX. Oder ein Office-Dokument — ODT, ODS, ODP, DOCX oder XLSX — schlicht und gut gegliedert, mit den Bildern in der Datei; was dieses Format nicht halten kann, steht am Ergebnis, statt still wegzufallen.
 
 WIE ES ARBEITET
 
 Dateien oder Ordner auf das Fenster ziehen. Das Ausgabeformat wählen und ob die Ergebnisse neben jede Datei oder in einen Ordner gehen. Umwandeln drücken. Jede Zeile berichtet, während sie läuft, bei einem PDF Seite für Seite, und die Vorschau zeigt jedes Ergebnis mit einer Schaltfläche zum Öffnen oder zum Zeigen im Ordner. Eine vorhandene Datei wird nie überschrieben: aus einer zweiten report.md wird report (1).md.
 
-Ein gescanntes PDF oder ein Bild lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Sie sind der größte Teil eines Downloads von rund 600 MB, und sie sind der Grund, warum danach nichts nachgeladen werden muss und die Anwendung ohne Netz arbeitet.
+Ein gescanntes PDF oder ein Bild lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Sie sind der größte Teil eines Downloads von rund 575 MB, und sie sind der Grund, warum danach nichts nachgeladen werden muss und die Anwendung ohne Netz arbeitet.
 
 WAS ES NICHT TUT
 
@@ -72,6 +74,16 @@ Duckling ist Open Source unter der MIT-Lizenz, ebenso wie docling.rs, worauf es 
 bekommt keine: als diese Fassung in den Store ging, hatte sie niemand von dort,
 also war niemandem etwas zu sagen.
 
+### 0.2.0
+
+Duckling schreibt jetzt ODS, ODP und XLSX, neben ODT und DOCX. Die drei werden für das Dokument angeboten, dessen Gegenstück sie sind: ODS, wenn jede Datei in der Warteschlange XLSX ist, XLSX, wenn alle ODS sind, ODP, wenn alle PPTX sind. Ein Buch als Tabelle ist ein leeres Blatt und eine Liste dessen, was wegfiel — deshalb wird es nicht angeboten.
+
+Ein PDF, das bereits Text enthält, lässt sich allein aus diesem Text umwandeln, ohne ein geladenes Modell: Sekunden statt Minuten, auf Kosten der Überschriften, der Tabellen und all dessen, was OCR braucht. Das Kontrollkästchen sagt es.
+
+Der Download ist 112 MB kleiner. Und eine Zeile, die früher aus einem Absatz herausfiel und danach erneut erschien, bleibt jetzt, wo sie hingehört.
+
+Dokumente liest docling.rs 1.51.
+
 ### 0.1.2
 
 Duckling spricht Deutsch. Auf einem deutsch eingestellten Rechner erscheinen die Leiste, die Warteschlange, die Vorschau und jede Zeile der Statusleiste auf Deutsch, und es gibt nichts auszuwählen: Duckling übernimmt die Sprache, die der Rechner bereits eingestellt hat, und fällt für jede andere auf Englisch zurück.
@@ -88,7 +100,7 @@ Dokumente werden von docling.rs 1.37 gelesen.
 
 **Mac App Store** (100 characters, comma-separated, no spaces after commas):
 
-    Markdown,umwandeln,PDF,Word,DOCX,ODT,OCR,docling,DocLang,JSON,LaTeX,Dokument
+    Markdown,umwandeln,PDF,Word,DOCX,ODT,ODS,ODP,XLSX,OCR,docling,DocLang,JSON,LaTeX
 
 **Microsoft Store** (seven terms):
 

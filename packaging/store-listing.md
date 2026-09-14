@@ -66,20 +66,22 @@ Documents to DocLang, offline
 
 ## Promotional text (Mac App Store, 170)
 
-Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markdown, JSON, LaTeX, ODT or DOCX back, on your own machine, with nothing sent anywhere.
+Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markdown, JSON, LaTeX or an office file back, on your own machine, with nothing sent anywhere.
 
 ## Short description (Microsoft Store, 500)
 
-Duckling converts documents into the plain, structured text that language models and search indexes want: DocLang, Markdown, docling JSON, a DocLang archive, LaTeX, ODT or DOCX. In go Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, email and forty more formats.
+Duckling converts documents into the plain, structured text that language models and search indexes want: DocLang, Markdown, docling JSON, a DocLang archive, LaTeX, ODT, ODS, ODP, DOCX or XLSX. In go Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, email and forty more.
 
-Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of a download of about 600 MB.
+Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of a 575 MB download.
 
 The converter is docling.rs, the Rust port of IBM's Docling.
 
 ## App features (Microsoft Store, up to 20 bullets of 200 characters)
 
     Reads Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio, and some forty formats in all.
-    Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT and DOCX, a plain office document with the pictures inside it.
+    Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT, ODS, ODP, DOCX and XLSX, a plain office document with the pictures inside it.
+    Converts a spreadsheet or a deck into the other ecosystem: XLSX to ODS, ODS to XLSX, PPTX to ODP, offered when every file in the queue is that kind.
+    Text layer only, for a PDF that already has text in it: seconds rather than minutes, without the headings and tables the models find.
     Converts in batches: drop files or a whole folder, choose once, press Convert.
     Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.
     Output beside each file or into one folder, and never over an existing file.
@@ -97,13 +99,13 @@ Word, PowerPoint and Excel, current and legacy. PDF, digital or scanned. HTML, E
 
 WHAT COMES OUT
 
-DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX. Or an ODT or DOCX office document, plain and well structured, with the pictures inside the file; what that format cannot hold is listed on the result rather than dropped in silence.
+DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX. Or an office document - ODT, ODS, ODP, DOCX or XLSX - plain and well structured, with the pictures inside the file; what that format cannot hold is listed on the result rather than dropped in silence.
 
 HOW IT WORKS
 
 Drop files or folders on the window. Choose the output format and whether the results go beside each file or into one folder. Press Convert. Each row reports as it goes, page by page for a PDF, and the preview shows every result with a button to open it or show it in its folder. An existing file is never overwritten: a second report.md becomes report (1).md.
 
-A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of a download of about 600 MB, and they are why nothing has to be fetched afterwards and why the app works with the network off.
+A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of a 575 MB download, and they are why nothing has to be fetched afterwards and why the app works with the network off.
 
 WHAT IT DOES NOT DO
 
@@ -123,6 +125,16 @@ everything else here is and kept latest first. 0.1.0 has none and gets none:
 nobody had the application from either store when it went up, so there was
 nobody to tell. Neither field's limit has been measured, and the text below is
 short enough that it has not had to be.
+
+### 0.2.0
+
+Duckling writes ODS, ODP and XLSX now, alongside ODT and DOCX. The three are offered for the document each is a sibling of: ODS when every file in the queue is XLSX, XLSX when they are all ODS, ODP when they are all PPTX. A book converted to a spreadsheet is an empty sheet and a list of what was dropped, so it is not offered.
+
+A PDF that already has text in it can be converted from that text alone, with no model loaded: seconds rather than minutes, at the cost of the headings, the tables and anything that needs OCR. The checkbox says so.
+
+The download is 112 MB smaller. And a line that used to fall out of a paragraph and reappear after it now stays where it belongs.
+
+Documents are read by docling.rs 1.51.
 
 ### 0.1.2
 
@@ -155,7 +167,7 @@ the Store's privacy question.
 
 ## App Review notes
 
-Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT or DOCX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.
+Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT, ODS, ODP, DOCX or XLSX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.
 
 There is nothing a tester must be handed before the window does anything. Duckling claims no file type and opens with an empty queue: drop any Word file or PDF you already have onto the window, or use Add files, pick an output format, and convert. If you would rather have ours, the twelve documents the screenshots were taken from are at https://github.com/excelano/duckling/tree/v0.1.2/packaging/demo/documents — invented for the purpose, MIT licensed like the rest of the repository, and between them they exercise every format claimed above.
 

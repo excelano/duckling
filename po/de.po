@@ -99,6 +99,8 @@ msgid ""
 "{format} is offered only when every file is {input}; the format is back to "
 "{default}"
 msgstr ""
+"{format} wird nur angeboten, wenn alle Dateien {input} sind; das Format steht "
+"wieder auf {default}"
 
 #: src/main.rs:296
 msgid "Nothing to add"
@@ -167,10 +169,12 @@ msgid ""
 "Seconds rather than minutes on a PDF that already has text in it. No "
 "headings, no tables, nothing from a scan."
 msgstr ""
+"Sekunden statt Minuten bei einem PDF, das bereits Text enthält. Keine "
+"Überschriften, keine Tabellen, nichts aus einem Scan."
 
 #: src/main.rs:541
 msgid "Text layer only"
-msgstr ""
+msgstr "Nur Textebene"
 
 #: src/main.rs:545
 msgid "Beside each file"
