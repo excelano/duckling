@@ -65,8 +65,19 @@ regions cover too little of it; TableFormer ships the one decoder the
 pipeline resolves, `decoder_kv.onnx`, and nothing behind it in that
 preference order.
 
-Measured 2026-09-11: `.models/` is 613 MB and `.pdfium/` 7 MB on Linux, and
-the package installs 687 MB. Which file each stage resolves to is
+The TableFormer encoder is the fp32 file and not the fp16 repack beside it,
+which is the reverse of the decoder rule and is deliberate. Only one encoder
+is ever loaded, chosen once at startup, so shipping both would carry a file
+nothing opens. docling-pdf ranks fp16 first *unless* it prefers fp32, which
+it does for CUDA, TensorRT, DirectML and CoreML — and in that branch fp16 is
+not a candidate at all. Duckling compiles no GPU execution provider today,
+so either file would resolve; fp32 is the one that still resolves if that
+changes. The 226 MB it used to be became 108 MB upstream when the baked zero
+masks were stripped, bit-identical in output, so the choice costs 54 MB
+against fp16 and nothing at all against last week.
+
+Measured 2026-09-14: `.models/` is 500 MB and `.pdfium/` 7 MB on Linux, and
+the package installs 575 MB. Which file each stage resolves to is
 docling.rs's `model_inventory`, and `tests/convert.rs` asks it: a release
 that reordered a preference or withdrew an export would resolve to a file no
 package carries, and the test says so before a conversion does. What is left
@@ -497,13 +508,7 @@ The batch argument in `§4` is why it is there; the first hands-on use by
 somebody who is not David is where the question gets answered.
 
 **Trimming the model set further.** `§2` ships what docling.rs resolves,
-which is 613 MB. Three things are left, in the order they are worth having.
-
-The largest single file is TableFormer's `encoder.onnx` at 226 MB, and
-upstream hosts no int8 variant of it: `models-v1` carries a quantized
-decoder and a quantized layout model and stops there. Their own ratios were
-0.40x on layout and 0.64x on the decoder, so an encoder in int8 would
-plausibly land between 90 and 145 MB. Asked as docling-project/docling.rs#374.
+which is 500 MB. Two things are left, in the order they are worth having.
 
 `layout_heron.onnx` is 172 MB and is loaded only to re-run a page whose int8
 regions cover less than half its text cells, docling-pdf's quant-robustness
