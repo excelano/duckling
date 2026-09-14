@@ -49,11 +49,18 @@ else
     bad "the tree is clean" "$(git status --porcelain | wc -l | tr -d ' ') uncommitted files"
 fi
 
-# 2. A tag on an unpushed commit points at nothing anybody else can fetch.
-if [ -z "$(git log --oneline '@{u}..' 2>/dev/null)" ]; then
-    ok "nothing unpushed"
+# 2. A tag on an unpushed commit points at nothing anybody else can fetch. A
+#    branch with no upstream at all is the same problem and is reported as
+#    itself rather than as a pass.
+if upstream=$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null); then
+    behind=$(git log --oneline '@{u}..' | wc -l | tr -d ' ')
+    if [ "$behind" -eq 0 ]; then
+        ok "nothing unpushed (${upstream})"
+    else
+        bad "nothing unpushed" "${behind} commits not on ${upstream}"
+    fi
 else
-    bad "nothing unpushed" "$(git log --oneline '@{u}..' | wc -l | tr -d ' ') commits"
+    bad "nothing unpushed" "this branch has no upstream"
 fi
 
 # 3. The Debian changelog is hand-written and can name a different version.
@@ -81,7 +88,17 @@ else
     bad "the version has an AppxManifest spelling" "$("${here}/version.sh" --appx 2>&1 | head -1)"
 fi
 
-# 6. The models every package ships, present and matching their pins. A
+# 6. **A version is never released twice**, which is this family's rule and the
+#    one thing its versioning convention rules out. A tag that already exists
+#    means either the number was not moved or somebody is about to overwrite a
+#    release.
+if git rev-parse --verify --quiet "refs/tags/v${version}" >/dev/null; then
+    bad "v${version} is not already tagged" "the tag exists"
+else
+    ok "v${version} is not already tagged"
+fi
+
+# 7. The models every package ships, present and matching their pins. A
 #    package built without them installs and converts no PDF, and nothing
 #    else here would notice.
 if "${here}/fetch-models.sh" 2>/dev/null | grep -q "every asset present and verified"; then
@@ -90,7 +107,7 @@ else
     bad "the models are present and verified" "run packaging/fetch-models.sh"
 fi
 
-# 7. CLAUDE.md says clippy must be silent and CI enforces it with -D warnings.
+# 8. CLAUDE.md says clippy must be silent and CI enforces it with -D warnings.
 #    Local `cargo check` does not.
 if cargo clippy --quiet --all-targets 2>&1 | grep -qE '^(warning|error)'; then
     bad "clippy is silent" "it is not"
@@ -110,7 +127,7 @@ else
     bad "the suite passes" "it does not"
 fi
 
-# 8. Green on this commit, not on some commit. Asked of GitHub because nothing
+# 9. Green on this commit, not on some commit. Asked of GitHub because nothing
 #    local knows. Three states: a run still going is neither a pass nor a
 #    failure, and a release cut while CI is mid-flight is one nobody checked.
 if [ "$ask_ci" = yes ]; then
