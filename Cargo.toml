@@ -5,7 +5,7 @@
 # the Store identity — stays `duckling`. Same shape as xray, which publishes as
 # `x-ray` and installs as `xray`. RELEASE.md says what that costs a release.
 name = "duckling-converter"
-description = "Convert documents to Markdown, JSON, DocLang and LaTeX with docling.rs"
+description = "Convert documents to DocLang, Markdown, JSON, LaTeX and office formats with docling.rs"
 version = "0.1.2"
 edition = "2021"
 authors = ["David M. Anderson"]

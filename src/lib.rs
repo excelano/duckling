@@ -16,9 +16,11 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::Arc;
 use std::thread;
 
-use docling::{
-    ConversionStatus, DoclingDocument, DocumentConverter, InputFormat, Pipeline, SourceDocument,
-};
+/// docling.rs's own name for what a file reads as. Re-exported because it is
+/// in this crate's public surface — [`Job::format`], [`common_input`] and
+/// [`OutputFormat::sibling_input`] all speak it.
+pub use docling::InputFormat;
+use docling::{ConversionStatus, DoclingDocument, DocumentConverter, Pipeline, SourceDocument};
 
 /// Point docling.rs at the models and pdfium a package installed beside the
 /// executable, when they are there and nothing has said otherwise.
@@ -122,19 +124,34 @@ pub enum OutputFormat {
     Latex,
     /// OpenDocument Text, written by waddle from the document docling.rs read.
     Odt,
+    /// OpenDocument Spreadsheet, one sheet per table. Offered for a queue of
+    /// XLSX and nothing else; see [`OutputFormat::sibling_input`].
+    Ods,
+    /// OpenDocument Presentation, a slide per level-1 heading. Offered for a
+    /// queue of PPTX.
+    Odp,
     /// Word, written by waddle from the same document.
     Docx,
+    /// Excel, the OOXML twin of [`OutputFormat::Ods`]. Offered for a queue of
+    /// ODS.
+    Xlsx,
 }
 
 impl OutputFormat {
-    pub const ALL: [OutputFormat; 7] = [
+    /// Every format, in the order the picker shows them: the ODF family
+    /// together, then the OOXML pair, so a sibling conversion appears beside
+    /// its own ecosystem rather than at the end.
+    pub const ALL: [OutputFormat; 10] = [
         OutputFormat::Doclang,
         OutputFormat::Markdown,
         OutputFormat::Json,
         OutputFormat::DoclangArchive,
         OutputFormat::Latex,
         OutputFormat::Odt,
+        OutputFormat::Ods,
+        OutputFormat::Odp,
         OutputFormat::Docx,
+        OutputFormat::Xlsx,
     ];
 
     pub fn label(self) -> &'static str {
@@ -145,7 +162,10 @@ impl OutputFormat {
             OutputFormat::DoclangArchive => "DocLang archive",
             OutputFormat::Latex => "LaTeX",
             OutputFormat::Odt => "ODT",
+            OutputFormat::Ods => "ODS",
+            OutputFormat::Odp => "ODP",
             OutputFormat::Docx => "DOCX",
+            OutputFormat::Xlsx => "XLSX",
         }
     }
 
@@ -157,29 +177,64 @@ impl OutputFormat {
             OutputFormat::DoclangArchive => "dclx",
             OutputFormat::Latex => "tex",
             OutputFormat::Odt => "odt",
+            OutputFormat::Ods => "ods",
+            OutputFormat::Odp => "odp",
             OutputFormat::Docx => "docx",
+            OutputFormat::Xlsx => "xlsx",
         }
-    }
-
-    /// Whether the written file is text a person can read in the preview.
-    pub fn is_text(self) -> bool {
-        !matches!(
-            self,
-            OutputFormat::DoclangArchive | OutputFormat::Odt | OutputFormat::Docx
-        )
     }
 
     /// What the preview shows for a format that is not text, said above it.
     pub fn preview_note(self) -> Option<&'static str> {
         match self {
             OutputFormat::DoclangArchive => Some("The archive's document.xml:"),
-            OutputFormat::Odt | OutputFormat::Docx => {
+            OutputFormat::Odt
+            | OutputFormat::Ods
+            | OutputFormat::Odp
+            | OutputFormat::Docx
+            | OutputFormat::Xlsx => {
                 Some("The document as Markdown; the package holds it as written:")
             }
             OutputFormat::Doclang
             | OutputFormat::Markdown
             | OutputFormat::Json
             | OutputFormat::Latex => None,
+        }
+    }
+
+    /// The one input format this output is a sibling conversion of: the same
+    /// document in the other office ecosystem. `None` for the formats offered
+    /// whatever the queue holds.
+    ///
+    /// Exhaustive on purpose. A format added later has to answer this
+    /// question rather than fall through to "always offered".
+    pub const fn sibling_input(self) -> Option<InputFormat> {
+        match self {
+            OutputFormat::Doclang
+            | OutputFormat::Markdown
+            | OutputFormat::Json
+            | OutputFormat::DoclangArchive
+            | OutputFormat::Latex
+            | OutputFormat::Odt
+            | OutputFormat::Docx => None,
+            OutputFormat::Ods => Some(InputFormat::Xlsx),
+            OutputFormat::Xlsx => Some(InputFormat::Ods),
+            // The slide leg is one-way: waddle writes ODP and no PPTX.
+            OutputFormat::Odp => Some(InputFormat::Pptx),
+        }
+    }
+
+    /// Whether the picker may offer this format for a queue that reads as
+    /// `queue`, which is [`common_input`]'s answer. A sibling needs a queue
+    /// that is not empty and whose every file is its input format.
+    ///
+    /// An affordance in the picker and never a check in the engine:
+    /// [`Engine`] converts whatever a [`Request`] asks for, which is what
+    /// lets the tests ask for combinations the window would not offer.
+    pub fn offered_for(self, queue: Option<InputFormat>) -> bool {
+        match self.sibling_input() {
+            None => true,
+            Some(needed) => queue == Some(needed),
         }
     }
 }
@@ -324,6 +379,18 @@ pub fn detect(path: &Path) -> Result<InputFormat, Rejection> {
         .and_then(|e| e.to_str())
         .ok_or(Rejection::NoExtension)?;
     InputFormat::from_extension(ext).ok_or_else(|| Rejection::UnknownExtension(ext.to_owned()))
+}
+
+/// The one format every file in the queue reads as, when the queue is not
+/// empty and they all agree; `None` for an empty or a mixed queue.
+///
+/// Every job counts whatever state it is in: a batch that has finished
+/// converting is still a queue of spreadsheets, and the picker should not
+/// change under a person because the work completed.
+pub fn common_input(jobs: &[Job]) -> Option<InputFormat> {
+    let mut all = jobs.iter().map(|job| job.format);
+    let first = all.next()?;
+    all.all(|format| format == first).then_some(first)
 }
 
 /// Every convertible file under `dir`, depth first, files before
@@ -480,11 +547,18 @@ impl Engine {
                     }
                 }
             }
-            OutputFormat::Odt | OutputFormat::Docx => {
-                let written = if request.format == OutputFormat::Odt {
-                    waddle_core::odt::write(&document)
-                } else {
-                    waddle_core::docx::write(&document)
+            OutputFormat::Odt
+            | OutputFormat::Ods
+            | OutputFormat::Odp
+            | OutputFormat::Docx
+            | OutputFormat::Xlsx => {
+                let written = match request.format {
+                    OutputFormat::Odt => waddle_core::odt::write(&document),
+                    OutputFormat::Ods => waddle_core::ods::write(&document),
+                    OutputFormat::Odp => waddle_core::odp::write(&document),
+                    OutputFormat::Docx => waddle_core::docx::write(&document),
+                    OutputFormat::Xlsx => waddle_core::xlsx::write(&document),
+                    other => unreachable!("{other:?} is not a waddle target"),
                 }
                 .map_err(|e| e.to_string())?;
                 // What the package could not carry, one line per kind with a
@@ -616,7 +690,10 @@ fn render(document: &DoclingDocument, format: OutputFormat) -> Rendered {
         OutputFormat::Doclang
         | OutputFormat::DoclangArchive
         | OutputFormat::Odt
-        | OutputFormat::Docx => {
+        | OutputFormat::Ods
+        | OutputFormat::Odp
+        | OutputFormat::Docx
+        | OutputFormat::Xlsx => {
             unreachable!("DocLang and the office packages are rendered in Engine::convert")
         }
     };
@@ -653,6 +730,134 @@ fn write_atomically(target: &Path, bytes: &[u8]) -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn job(id: u64, format: InputFormat, state: JobState) -> Job {
+        Job {
+            id: JobId(id),
+            source: PathBuf::from(format!("/a/{id}.x")),
+            format,
+            state,
+        }
+    }
+
+    #[test]
+    fn only_the_three_sibling_conversions_name_an_input() {
+        assert_eq!(OutputFormat::Ods.sibling_input(), Some(InputFormat::Xlsx));
+        assert_eq!(OutputFormat::Xlsx.sibling_input(), Some(InputFormat::Ods));
+        assert_eq!(OutputFormat::Odp.sibling_input(), Some(InputFormat::Pptx));
+        let named = OutputFormat::ALL
+            .into_iter()
+            .filter(|f| f.sibling_input().is_some())
+            .count();
+        assert_eq!(named, 3, "only the siblings depend on the queue");
+    }
+
+    #[test]
+    fn the_default_format_is_always_offered() {
+        // What `revalidate_format` falls back to has to be legal for any
+        // queue, or the fallback could not settle.
+        assert_eq!(OutputFormat::default().sibling_input(), None);
+        assert!(OutputFormat::default().offered_for(None));
+    }
+
+    #[test]
+    fn the_queue_reads_as_one_format_only_when_they_all_agree() {
+        assert_eq!(common_input(&[]), None);
+        assert_eq!(
+            common_input(&[job(1, InputFormat::Xlsx, JobState::Queued)]),
+            Some(InputFormat::Xlsx)
+        );
+        assert_eq!(
+            common_input(&[
+                job(1, InputFormat::Xlsx, JobState::Queued),
+                job(
+                    2,
+                    InputFormat::Xlsx,
+                    JobState::Converting {
+                        pages_done: 0,
+                        pages_total: 0,
+                    },
+                ),
+            ]),
+            Some(InputFormat::Xlsx)
+        );
+        assert_eq!(
+            common_input(&[
+                job(1, InputFormat::Xlsx, JobState::Queued),
+                job(2, InputFormat::Pdf, JobState::Queued),
+            ]),
+            None,
+            "a mixed queue reads as nothing"
+        );
+    }
+
+    #[test]
+    fn a_finished_queue_still_reads_as_what_it_holds() {
+        // The picker must not change under somebody because the work ended.
+        let done = [
+            job(1, InputFormat::Pptx, JobState::Failed("no".into())),
+            job(
+                2,
+                InputFormat::Pptx,
+                JobState::Converting {
+                    pages_done: 3,
+                    pages_total: 3,
+                },
+            ),
+        ];
+        assert_eq!(common_input(&done), Some(InputFormat::Pptx));
+        assert!(OutputFormat::Odp.offered_for(common_input(&done)));
+    }
+
+    #[test]
+    fn a_queue_offers_the_seven_plus_its_own_sibling() {
+        let offered = |jobs: &[Job]| -> Vec<OutputFormat> {
+            let queue = common_input(jobs);
+            OutputFormat::ALL
+                .into_iter()
+                .filter(|f| f.offered_for(queue))
+                .collect()
+        };
+        assert_eq!(offered(&[]).len(), 7, "an empty queue offers the seven");
+        let xlsx = [job(1, InputFormat::Xlsx, JobState::Queued)];
+        assert!(offered(&xlsx).contains(&OutputFormat::Ods));
+        assert!(!offered(&xlsx).contains(&OutputFormat::Xlsx));
+        assert!(!offered(&xlsx).contains(&OutputFormat::Odp));
+        let ods = [job(1, InputFormat::Ods, JobState::Queued)];
+        assert!(offered(&ods).contains(&OutputFormat::Xlsx));
+        let pptx = [job(1, InputFormat::Pptx, JobState::Queued)];
+        assert!(offered(&pptx).contains(&OutputFormat::Odp));
+        let mixed = [
+            job(1, InputFormat::Xlsx, JobState::Queued),
+            job(2, InputFormat::Pdf, JobState::Queued),
+        ];
+        assert_eq!(offered(&mixed).len(), 7);
+    }
+
+    #[test]
+    fn every_format_is_in_all_and_owns_its_extension() {
+        // `App::format_of` maps a finished file back by extension, so a
+        // collision would give a row the wrong preview note.
+        assert_eq!(OutputFormat::ALL.len(), 10);
+        for (i, a) in OutputFormat::ALL.iter().enumerate() {
+            for b in &OutputFormat::ALL[i + 1..] {
+                assert_ne!(a.extension(), b.extension(), "{a:?} and {b:?} collide");
+                assert_ne!(a, b, "{a:?} is in ALL twice");
+            }
+        }
+    }
+
+    #[test]
+    fn the_new_packages_take_their_own_extension() {
+        for (format, name) in [
+            (OutputFormat::Ods, "/a/b/report.ods"),
+            (OutputFormat::Odp, "/a/b/report.odp"),
+            (OutputFormat::Xlsx, "/a/b/report.xlsx"),
+        ] {
+            let target = Destination::BesideSource.target(Path::new("/a/b/report.pdf"), format);
+            assert_eq!(target, PathBuf::from(name));
+        }
+    }
 
     #[test]
     fn beside_source_swaps_the_extension() {

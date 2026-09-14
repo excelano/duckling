@@ -45,8 +45,8 @@ const CATALOGUES: &[(&str, &str)] = &[
 use std::path::{Path, PathBuf};
 
 use duckling::{
-    detect, walk, Destination, Event, Job, JobId, JobState, OutputFormat, Rejection, Request,
-    Worker,
+    common_input, detect, walk, Destination, Event, InputFormat, Job, JobId, JobState,
+    OutputFormat, Rejection, Request, Worker,
 };
 use eframe::egui::{self, Align2, Color32, FontId, RichText};
 
@@ -104,7 +104,23 @@ fn format_label(format: OutputFormat) -> &'static str {
         OutputFormat::DoclangArchive => t("DocLang archive"),
         OutputFormat::Latex => t("LaTeX"),
         OutputFormat::Odt => t("ODT"),
+        OutputFormat::Ods => t("ODS"),
+        OutputFormat::Odp => t("ODP"),
         OutputFormat::Docx => t("DOCX"),
+        OutputFormat::Xlsx => t("XLSX"),
+    }
+}
+
+/// What an input format is called in a sentence, for the one sentence that
+/// names one. Only the three a sibling conversion asks for have a name here;
+/// anything else falls back to docling.rs's own identifier, which is what the
+/// queue's own column already shows.
+fn input_label(format: InputFormat) -> &'static str {
+    match format {
+        InputFormat::Xlsx => t("XLSX"),
+        InputFormat::Ods => t("ODS"),
+        InputFormat::Pptx => t("PPTX"),
+        other => other.as_str(),
     }
 }
 
@@ -218,6 +234,40 @@ impl App {
             selected: None,
             status: String::new(),
         }
+    }
+
+    /// Fall back to the default when the queue no longer warrants the format
+    /// that is selected, and say why.
+    ///
+    /// Called once a frame before anything is drawn, which is the placement
+    /// no later change to the queue can get around: files arrive through four
+    /// routes into `add_paths` and leave through the Clear finished button,
+    /// which goes nowhere near it. Running before the toolbar is also what
+    /// keeps the picker from painting a selection its own list no longer has.
+    ///
+    /// Silent unless it changes something: once the default is selected the
+    /// format is offered again and the next frame does nothing, so this can
+    /// never nag. Work already handed to the worker keeps the format it was
+    /// given — a conversion running as the last file leaves the queue still
+    /// writes what it was asked for.
+    fn revalidate_format(&mut self) {
+        let queue = common_input(&self.jobs);
+        if self.format.offered_for(queue) {
+            return;
+        }
+        let was = self.format;
+        let needed = was
+            .sibling_input()
+            .expect("only a sibling conversion can stop being offered");
+        self.format = OutputFormat::default();
+        self.status = fill(
+            t("{format} is offered only when every file is {input}; the format is back to {default}"),
+            &[
+                ("format", format_label(was)),
+                ("input", input_label(needed)),
+                ("default", format_label(OutputFormat::default())),
+            ],
+        );
     }
 
     /// Queue files, and the convertible files under folders. Paths that are
@@ -770,6 +820,7 @@ impl eframe::App for App {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
         self.apply_events();
+        self.revalidate_format();
         // egui 0.36 folded `TopBottomPanel` and `SidePanel` into one `Panel`.
         egui::Panel::top("toolbar").show(ui, |ui| {
             ui.add_space(4.0);

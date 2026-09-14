@@ -251,7 +251,7 @@ if (Test-Path -LiteralPath $installedExe) {
     $link.TargetPath = $installedExe
     $link.WorkingDirectory = $Prefix
     $link.IconLocation = "$installedAppIcon,0"
-    $link.Description = 'Convert documents to DocLang, Markdown, JSON or LaTeX'
+    $link.Description = 'Convert documents to DocLang, Markdown, JSON, LaTeX or an office format'
     $link.Save()
     # Deliberately no AppUserModelID on this shortcut. Setting one would need
     # the running process to declare the same identity through

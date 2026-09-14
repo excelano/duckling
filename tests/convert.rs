@@ -116,6 +116,71 @@ fn docx_to_doclang_writes_the_markup_bare() {
     std::fs::remove_dir_all(&out).unwrap();
 }
 
+/// The sibling conversions: a spreadsheet into the other ecosystem's
+/// spreadsheet, a deck into the other ecosystem's deck. Part names are
+/// waddle's own, from the writers in `waddle-core/src/{ods,odp,xlsx}`.
+///
+/// These draw on `packaging/demo/documents`, which is in the tree, so they
+/// run wherever the models do rather than only where the corpus is.
+#[test]
+fn a_spreadsheet_and_a_deck_convert_into_their_siblings() {
+    for (source, format, first_part, part) in [
+        (
+            "sample-log.xlsx",
+            OutputFormat::Ods,
+            "mimetype",
+            "content.xml",
+        ),
+        (
+            "orientation-deck.pptx",
+            OutputFormat::Odp,
+            "mimetype",
+            "content.xml",
+        ),
+    ] {
+        let out = fresh_dir(format.extension());
+        let source = Path::new("packaging/demo/documents").join(source);
+        let outcome = convert(&source, format, &out).unwrap();
+        let stem = source.file_stem().unwrap().to_string_lossy();
+        assert_eq!(
+            outcome.output,
+            out.join(format!("{stem}.{}", format.extension()))
+        );
+        let bytes = std::fs::read(&outcome.output).unwrap();
+        assert_eq!(&bytes[..2], b"PK", "a package is a zip");
+        let names = zip_names(&bytes);
+        for want in [first_part, part] {
+            assert!(names.iter().any(|n| n == want), "{format:?} lacks {want}");
+        }
+        std::fs::remove_dir_all(&out).unwrap();
+    }
+}
+
+/// The third leg, ODS to XLSX, which the demo set has no source for. The
+/// fixture is under `odf/`, not a directory of its own.
+#[test]
+fn an_opendocument_spreadsheet_converts_to_xlsx() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    let out = fresh_dir("xlsx");
+    let outcome = convert(
+        &corpus.join("odf/sources/odf_table_with_title_01.ods"),
+        OutputFormat::Xlsx,
+        &out,
+    )
+    .unwrap();
+    assert_eq!(outcome.output, out.join("odf_table_with_title_01.xlsx"));
+    let bytes = std::fs::read(&outcome.output).unwrap();
+    assert_eq!(&bytes[..2], b"PK", "a package is a zip");
+    let names = zip_names(&bytes);
+    for want in ["[Content_Types].xml", "xl/workbook.xml"] {
+        assert!(names.iter().any(|n| n == want), "no {want}");
+    }
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
 /// The office packages come from waddle, which writes the picture bytes
 /// docling read into the package; the preview is the document as Markdown.
 #[test]

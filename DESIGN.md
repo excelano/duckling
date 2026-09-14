@@ -208,7 +208,7 @@ in folder, and the written text in a read-only monospace editor capped at
 256 KB with a line saying so when the file is longer. A DocLang archive is a
 zip, so its preview is the `document.xml` inside.
 
-**Seven outputs, and DocLang is the default.** Decided 2026-09-04 after the
+**Ten outputs, and DocLang is the default.** Decided 2026-09-04 after the
 first build offered four with the archive as the only DocLang form, because
 that is all the docling.rs command-line tool offers. The library writes the
 bare markup, the archive is that markup plus two fixed OPC parts, and Segler
@@ -216,6 +216,25 @@ opens both, so bare DocLang, `.dclg`, is the first entry and the default:
 it is the format the two applications share, and it is the smaller and
 more readable of the two spellings. The archive stays for whatever
 downstream wants the packaged form.
+
+**Three of the ten are offered only for the input they are a sibling of.**
+ODS appears when every file in the queue is XLSX, XLSX when every file is
+ODS, ODP when every file is PPTX; the other seven are offered whatever the
+queue holds. The three write one sheet per table or one slide per level-1
+heading, so a book converted to XLSX is an empty sheet and a stack of
+dropped-node warnings: an output worth having for the document it was meant
+for and worth nobody's time for anything else. The rule is `common_input`
+and `OutputFormat::offered_for` in `src/lib.rs`, and it is an affordance in
+the picker rather than a check in the engine — a `Request` asking for any
+pairing still converts, which is what lets the tests ask for combinations
+the window would not offer. When the queue stops warranting the selected
+format the picker falls back to the default and the status line says why,
+checked once a frame before anything is drawn so that no later route into
+the queue can get around it.
+
+The slide leg is one-way. waddle writes ODP and no PPTX, so a deck converts
+out of the OOXML ecosystem and not back into it; the spreadsheet pair goes
+both ways.
 
 **The archive carries page images and the pictures, and bare DocLang gets
 its pictures beside it.** Decided 2026-09-05; David: "Yes, I want the
@@ -235,10 +254,11 @@ the file, content-addressed, so an existing file of the same name holds the
 same bytes. A page render that fails is a note on the result, not a failed
 conversion.
 
-**ODT and DOCX come from waddle, added 2026-09-08.** docling.rs writes no
-office format; `waddle-core`, the sibling crate written for this, takes the
-`DoclingDocument` the engine produced and returns an OpenDocument Text or
-Word package. It emits the constructs docling.rs's own reader for that
+**The office packages come from waddle, added 2026-09-08.** docling.rs
+writes no office format; `waddle-core`, the sibling crate written for this,
+takes the `DoclingDocument` the engine produced and returns an OpenDocument
+or OOXML package: ODT and DOCX from the first release, ODS, ODP and XLSX
+from 0.2. It emits the constructs docling.rs's own reader for that
 format recognises, so the package reads back into the document it came
 from as far as the reader allows, and its `DESIGN.md` §6 lists where it
 does not. The output is plain by design: the model carries no styles, page
