@@ -273,6 +273,23 @@ a count. The preview for a package is the document as Markdown, since a
 person cannot read a zip. Duckling's principle holds: it adds no conversion
 logic of its own, and a wrong package is waddle's issue.
 
+**One pipeline option reaches the window: text layer only.** Added
+2026-09-14. Every other knob docling.rs offers stays where it is, because a
+window with a preferences panel is a different application from the one `§4`
+argues for. This one earns a checkbox because the cost it removes is
+measured in minutes: a 460-page digital PDF takes about five through the
+models and seconds off its text layer. It is framed as speed and not as
+accuracy — the models read that book correctly once
+docling-project/docling.rs#419 was fixed — and what it gives up is headings,
+tables and any page that needs OCR.
+
+`no_ocr` is a builder rather than a setter, so the engine rebuilds its
+pipeline when the mode changes and remembers which mode the warm one is for.
+A text-only pipeline loads no model at all, so switching to it is free and
+switching back pays the load once. A file with no text layer reads as
+nothing in this mode, which is correct and looks like a failure, so the
+result carries a note saying which it is.
+
 **docling.rs writes no page breaks for a PDF, and Duckling inserts them.**
 Measured 2026-09-05 on `normal_4pages.pdf`: docling.rs's markup carries
 four `PageInfo` nodes and no `<page_break/>`, where the reference archive

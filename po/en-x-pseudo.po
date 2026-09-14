@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-09-14 16:38-0500\n"
+"POT-Creation-Date: 2026-09-14 16:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: none\n"
@@ -93,7 +93,7 @@ msgstr ""
 "ñö pärtícülär gräphícš cärd, büt ít döéš ñééd öñé thé šyštém cäñ tälk tö. "
 "·······························································]"
 
-#: src/main.rs:264
+#: src/main.rs:268
 msgid ""
 "{format} is offered only when every file is {input}; the format is back to "
 "{default}"
@@ -101,35 +101,35 @@ msgstr ""
 "[{format} íš öfféréd öñly whéñ évéry fílé íš {input}; thé förmät íš bäck tö "
 "{default} ··································]"
 
-#: src/main.rs:292
+#: src/main.rs:296
 msgid "Nothing to add"
 msgstr "[Nöthíñg tö ädd ······]"
 
-#: src/main.rs:293
+#: src/main.rs:297
 msgid "Added {n}"
 msgstr "[Åddéd {n} ····]"
 
-#: src/main.rs:309
+#: src/main.rs:313
 msgid "Added {n}; skipped {k} docling.rs does not read"
 msgstr "[Åddéd {n}; škíppéd {k} döclíñg.rš döéš ñöt réäd ···················]"
 
-#: src/main.rs:314
+#: src/main.rs:318
 msgid "Added {n}; skipped {k} docling.rs does not read ({extensions})"
 msgstr ""
 "[Åddéd {n}; škíppéd {k} döclíñg.rš döéš ñöt réäd ({extensions}) "
 "·························]"
 
-#: src/main.rs:381
+#: src/main.rs:386
 msgid "Converting {count} to {format}"
 msgstr "[Cöñvértíñg {count} tö {format} ·············]"
 
-#: src/main.rs:385
+#: src/main.rs:390
 msgid "{n} left queued until their folder is allowed, or choose Into a folder"
 msgstr ""
 "[{n} léft qüéüéd üñtíl théír földér íš ällöwéd, ör chööšé Îñtö ä földér "
 "·····························]"
 
-#: src/main.rs:389
+#: src/main.rs:394
 msgid ""
 "Converting {count} to {format}; {n} left queued until their folder is "
 "allowed, or choose Into a folder"
@@ -137,125 +137,138 @@ msgstr ""
 "[Cöñvértíñg {count} tö {format}; {n} léft qüéüéd üñtíl théír földér íš "
 "ällöwéd, ör chööšé Îñtö ä földér ·········································]"
 
-#: src/main.rs:429
+#: src/main.rs:434
 msgid ""
 "Allow Duckling to write beside the files in {folder}: choose that folder"
 msgstr ""
 "[Ållöw Dücklíñg tö wríté béšídé thé fíléš íñ {folder}: chööšé thät földér "
 "·····························]"
 
-#: src/main.rs:463 src/main.rs:644
+#: src/main.rs:468 src/main.rs:660
 msgid "Wrote {file}"
 msgstr "[Wröté {file} ·····]"
 
-#: src/main.rs:471
+#: src/main.rs:476
 msgid "{file}: {reason}"
 msgstr "[{file}: {reason} ·······]"
 
-#: src/main.rs:512
+#: src/main.rs:517
 msgid "Add files…"
 msgstr "[Ådd fíléš… ·····]"
 
-#: src/main.rs:515
+#: src/main.rs:520
 msgid "Add folder…"
 msgstr "[Ådd földér… ······]"
 
-#: src/main.rs:519
+#: src/main.rs:524
 msgid "Convert to"
 msgstr "[Cöñvért tö ·····]"
 
-#: src/main.rs:529
+#: src/main.rs:540
+msgid ""
+"Seconds rather than minutes on a PDF that already has text in it. No "
+"headings, no tables, nothing from a scan."
+msgstr ""
+"[Sécöñdš räthér thäñ míñütéš öñ ä PDF thät älréädy häš téxt íñ ít. Nö "
+"héädíñgš, ñö täbléš, ñöthíñg fröm ä šcäñ. "
+"·············································]"
+
+#: src/main.rs:541
+msgid "Text layer only"
+msgstr "[Téxt läyér öñly ·······]"
+
+#: src/main.rs:545
 msgid "Beside each file"
 msgstr "[Béšídé éäch fílé ·······]"
 
-#: src/main.rs:532
+#: src/main.rs:548
 msgid "Into a folder"
 msgstr "[Îñtö ä földér ······]"
 
-#: src/main.rs:542
+#: src/main.rs:558
 msgid "Choose another folder"
 msgstr "[Chööšé äñöthér földér ·········]"
 
-#: src/main.rs:554
+#: src/main.rs:570
 msgid "Convert"
 msgstr "[Cöñvért ···]"
 
-#: src/main.rs:563
+#: src/main.rs:579
 msgid "Clear finished"
 msgstr "[Cléär fíñíšhéd ······]"
 
-#: src/main.rs:582
+#: src/main.rs:598
 msgid "Drop files or folders here, or use Add files."
 msgstr "[Dröp fíléš ör földérš héré, ör üšé Ådd fíléš. ···················]"
 
-#: src/main.rs:597
+#: src/main.rs:613
 msgid "File"
 msgstr "[Fílé ··]"
 
-#: src/main.rs:598
+#: src/main.rs:614
 msgid "Read as"
 msgstr "[Réäd äš ···]"
 
-#: src/main.rs:599
+#: src/main.rs:615
 msgid "Status"
 msgstr "[Stätüš ···]"
 
-#: src/main.rs:614
+#: src/main.rs:630
 msgid "Queued"
 msgstr "[Qüéüéd ···]"
 
-#: src/main.rs:625
+#: src/main.rs:641
 msgid "{done} of {total} pages"
 msgstr "[{done} öf {total} pägéš ··········]"
 
-#: src/main.rs:650
+#: src/main.rs:666
 msgid "Failed"
 msgstr "[Fäíléd ···]"
 
-#: src/main.rs:671
+#: src/main.rs:687
 msgid "Select a file to see its result."
 msgstr "[Séléct ä fílé tö šéé ítš réšült. ·············]"
 
-#: src/main.rs:684
+#: src/main.rs:700
 msgid "Queued. Press Convert."
 msgstr "[Qüéüéd. Préšš Cöñvért. ·········]"
 
-#: src/main.rs:689
+#: src/main.rs:705
 msgid "Converting…"
 msgstr "[Cöñvértíñg… ······]"
 
-#: src/main.rs:706
+#: src/main.rs:722
 msgid "Open"
 msgstr "[Öpéñ ··]"
 
-#: src/main.rs:709
+#: src/main.rs:725
 msgid "Could not open: {reason}"
 msgstr "[Cöüld ñöt öpéñ: {reason} ··········]"
 
-#: src/main.rs:712
+#: src/main.rs:728
 msgid "Show in folder"
 msgstr "[Shöw íñ földér ······]"
 
-#: src/main.rs:715
+#: src/main.rs:731
 msgid "Could not show: {reason}"
 msgstr "[Cöüld ñöt šhöw: {reason} ··········]"
 
-#: src/main.rs:720
+#: src/main.rs:736
 msgid "Converted with parts skipped"
 msgstr "[Cöñvértéd wíth pärtš škíppéd ············]"
 
-#: src/main.rs:730
+#: src/main.rs:746
 msgid "Preview shows the beginning; the file has the rest."
 msgstr ""
 "[Prévíéw šhöwš thé bégíññíñg; thé fílé häš thé réšt. ·····················]"
 
-#: src/main.rs:774
+#: src/main.rs:790
 msgid ""
 "{queued} queued · {converting} converting · {done} done · {failed} failed"
 msgstr ""
 "[{queued} qüéüéd · {converting} cöñvértíñg · {done} döñé · {failed} fäíléd "
 "·······························]"
 
-#: src/main.rs:801
+#: src/main.rs:817
 msgid "Drop to add"
 msgstr "[Dröp tö ädd ·····]"

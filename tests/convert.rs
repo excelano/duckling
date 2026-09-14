@@ -34,12 +34,23 @@ fn fresh_dir(name: &str) -> PathBuf {
 
 /// Submit one request and wait for its outcome.
 fn convert(source: &Path, format: OutputFormat, into: &Path) -> Result<duckling::Outcome, String> {
+    convert_as(source, format, into, false)
+}
+
+/// The same, choosing the PDF pipeline's mode.
+fn convert_as(
+    source: &Path,
+    format: OutputFormat,
+    into: &Path,
+    text_only: bool,
+) -> Result<duckling::Outcome, String> {
     let worker = Worker::spawn(|| {});
     worker.submit(Request {
         id: JobId(1),
         source: source.to_path_buf(),
         format,
         destination: Destination::Folder(into.to_path_buf()),
+        text_only,
     });
     let deadline = Instant::now() + Duration::from_secs(300);
     loop {
@@ -385,6 +396,55 @@ fn demo_digital_pdf_converts_through_the_layout_model() {
     let text = std::fs::read_to_string(&outcome.output).unwrap();
     assert!(text.contains("## "), "no headings:\n{text}");
     assert!(text.contains('|'), "no table:\n{text}");
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// Text-only mode: the same digital PDF, read from its text layer with no
+/// model loaded. The words survive; the structure the layout model finds
+/// does not, which is the trade the checkbox offers.
+#[test]
+fn text_only_keeps_the_words_and_drops_the_structure() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("text-only");
+    let outcome = convert_as(
+        &demo().join("site-survey-report.pdf"),
+        OutputFormat::Markdown,
+        &out,
+        true,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&outcome.output).unwrap();
+    assert!(!text.trim().is_empty(), "the text layer came back empty");
+    assert!(
+        !text.contains("## "),
+        "headings without the layout model:\n{text}"
+    );
+    assert!(outcome.notes.is_empty(), "{:?}", outcome.notes);
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// A scan has no text layer, so text-only mode has nothing to read. That is
+/// correct and looks like a failure, so the outcome says which it is.
+#[test]
+fn text_only_explains_itself_on_a_file_with_no_text_layer() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("text-only-scan");
+    let outcome = convert_as(
+        &demo().join("scanned-notice.pdf"),
+        OutputFormat::Markdown,
+        &out,
+        true,
+    )
+    .unwrap();
+    assert!(
+        outcome.notes.iter().any(|n| n.contains("no text layer")),
+        "{:?}",
+        outcome.notes
+    );
     std::fs::remove_dir_all(&out).unwrap();
 }
 

@@ -214,6 +214,9 @@ struct App {
     jobs: Vec<Job>,
     next_id: u64,
     format: OutputFormat,
+    /// Read a PDF's text layer and run no models: seconds rather than
+    /// minutes, at the cost of headings, tables and anything needing OCR.
+    text_only: bool,
     destination: Destination,
     /// The folder last chosen, kept when the destination switches back to
     /// beside-the-source so that switching again does not ask twice.
@@ -229,6 +232,7 @@ impl App {
             jobs: Vec::new(),
             next_id: 1,
             format: OutputFormat::default(),
+            text_only: false,
             destination: Destination::BesideSource,
             folder: None,
             selected: None,
@@ -373,6 +377,7 @@ impl App {
                 source: job.source.clone(),
                 format: self.format,
                 destination: self.destination.clone(),
+                text_only: self.text_only,
             });
             sent += 1;
         }
@@ -517,13 +522,24 @@ impl App {
             }
             ui.separator();
             ui.label(t("Convert to"));
+            let queue = common_input(&self.jobs);
             egui::ComboBox::from_id_salt("format")
                 .selected_text(format_label(self.format))
                 .show_ui(ui, |ui| {
-                    for format in OutputFormat::ALL {
+                    for format in OutputFormat::ALL
+                        .into_iter()
+                        .filter(|f| f.offered_for(queue))
+                    {
                         ui.selectable_value(&mut self.format, format, format_label(format));
                     }
                 });
+            ui.separator();
+            // One literal and no line continuation: `po/update-po.sh` reads
+            // these as C, where a continuation keeps the indentation Rust
+            // drops, so the msgid would not match what is looked up.
+            let cost = t("Seconds rather than minutes on a PDF that already has text in it. No headings, no tables, nothing from a scan.");
+            ui.checkbox(&mut self.text_only, t("Text layer only"))
+                .on_hover_text(cost);
             ui.separator();
             let beside = matches!(self.destination, Destination::BesideSource);
             if ui.radio(beside, t("Beside each file")).clicked() {
