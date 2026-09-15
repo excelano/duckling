@@ -3,14 +3,11 @@
 The German half of `store-listing.md`, one file per language. The headings are
 that file's headings and stay in English, because `fenster`'s parser reads both
 files the same way; only what sits under them is German. Only the fields a store
-shows a reader are here.
+shows a reader are here. Terminology is the application's own, out of
+`po/de.po`: where the catalogue has a term, it wins. German runs longer than
+English, so run `fenster/check-listing.ps1` on this file after any edit to
+either language.
 
-**Terminology is the application's own, out of `po/de.po`** — a listing that
-calls a thing something the window does not teaches the customer a word the
-product has no use for. Where the catalogue has a term, it wins.
-
-**German runs longer than English.** Run `fenster/check-listing.ps1` on this file
-after any edit to either language rather than trusting a translation to fit.
 ## Subtitle (Mac App Store, 30)
 
 Dokumente zu DocLang, offline

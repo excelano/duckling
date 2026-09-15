@@ -1,28 +1,10 @@
 # Build the Linux package on every push and put it under the checks a machine
-# can run: the package's ownership and modes, its md5sums, lintian, and the
-# desktop entry through GLib. The suite, clippy and formatting are the
-# fleet's `ci.yml` and are not repeated here.
-#
-# What is Duckling's own, against segler's `linux.yml` this is cloned from:
-# the models are fetched and cached, since the package carries them and is
-# not a package without them; and the executable is allowed to link
-# libstdc++, which ONNX Runtime needs, and nothing further. Nothing headless
-# reaches a window, so `packaging/linux/check-libraries.sh` and
-# `CHECKLIST.md` stay commands run by a person with a display. The package
-# is not uploaded as an artifact: it is most of a gigabyte, and on a release
-# it goes straight to the release page from the job that built it rather than
-# through an artifact and back down again.
-#
-# On a push this is a check. On a published release it is also where the
-# package comes from, which until 2026-09-09 was this VM: build-deb.sh run by
-# hand, and the 510 MB result uploaded from a home connection.
-#
-# **amd64 alone, and that is a limitation rather than a decision.**
-# `packaging/fetch-models.sh` pins pdfium for Linux x86_64, macOS universal
-# and Windows x64, and exits on anything else, so an arm64 runner cannot get
-# as far as a build. An arm64 package needs a pinned `pdfium-linux-arm64`
-# with its hash, and ONNX Runtime checked on that architecture. Segler and
-# Flyleaf, which carry neither dependency, build both here.
+# can run: ownership and modes, md5sums, lintian, and the desktop entry through
+# GLib; the suite, clippy and formatting are the fleet's `ci.yml`. On a
+# published release the package goes straight to the release page from the job
+# that built it, never through an artifact. Nothing here reaches a window:
+# `check-libraries.sh` and `CHECKLIST.md` are commands run by a person with a
+# display. amd64 only: `fetch-models.sh` pins no arm64 pdfium.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
@@ -34,10 +16,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # Fires when a person publishes the release, which on this loop is what
-  # happens: nothing else creates it. A release created by a workflow using
-  # the default GITHUB_TOKEN fires no event at all, so the dispatch below is
-  # the fallback for that case.
+  # A release created by a workflow with the default GITHUB_TOKEN fires no
+  # event at all, so the dispatch below is the fallback for that case.
   release:
     types: [published]
   workflow_dispatch:
@@ -51,25 +31,17 @@ permissions:
   contents: read
 
 concurrency:
-  # Keyed by the tag when this is releasing and by the ref when it is checking,
-  # so the two never share a group. They did, and a push to main cancelled the
-  # dispatched run that was building flyleaf 0.2.2's packages a minute after it
-  # started — `github.ref` is refs/heads/main for a workflow_dispatch as much
-  # as for a push.
+  # Keyed by the tag when releasing and by the ref when checking, so the two
+  # never share a group: `github.ref` is refs/heads/main for a dispatch too.
   group: linux-${{ github.event.release.tag_name || inputs.tag || github.ref }}
-  # A superseded check is worth cancelling; a half-built release is not. The
-  # next push is not a reason to stop producing an artefact somebody is waiting
-  # to install.
+  # A superseded check is cancelled; a half-built release is not.
   cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
 
 jobs:
   package:
     runs-on: ubuntu-latest
-    # Wanted by one step, which runs only for a release. The alternative was
-    # an artifact and a second job to attach it, which is the shape segler and
-    # flyleaf use and the right one when the package is measured in megabytes.
-    # This package is measured in hundreds of them, and pushing it twice to
-    # keep a token narrower on runs that never use it is the worse trade.
+    # For the release upload step alone; an artifact and a second job would
+    # push most of a gigabyte twice to keep the token narrower.
     permissions:
       contents: write
 
@@ -83,9 +55,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      # Keyed on the fetch script, which is where every pin lives: a changed
-      # pin is a changed key, and a cache hit is a set the script verifies
-      # again before anything is packaged.
+      # Keyed on the fetch script, where every pin lives; a hit is verified again.
       - name: The models, cached by their pins
         uses: actions/cache@v6
         with:
@@ -149,9 +119,8 @@ jobs:
           sudo apt-get install -y -qq lintian
           lintian --info --tag-display-limit 0 --fail-on error,warning dist/*.deb
 
-      # The entry is registered only on a machine that can run its Exec, so
-      # the executable is installed too; segler's first run found GLib
-      # dropping an entry whose program was not on PATH.
+      # GLib drops an entry whose Exec is not on PATH, so the executable is
+      # installed first.
       - name: The entry is ours and lists the types
         run: |
           sudo apt-get install -y -qq desktop-file-utils hicolor-icon-theme libglib2.0-bin
@@ -165,17 +134,10 @@ jobs:
                   { echo "duckling.desktop is not among the handlers for ${type}" >&2; exit 1; }
           done
 
-      # Last, because it installs the package system-wide and the step above
-      # asks GLib which handlers are registered — an installed copy in
-      # /usr/bin would change the question it is answering.
-      #
-      # Duckling ships one executable and it is the application, so there is
-      # nothing here to run to completion: it opens a window from `main`.
-      # What can be asked without a display is whether the loader takes it —
-      # everything it links resolving once the package's dependencies are in,
-      # libstdc++ for ONNX Runtime included — and that is read from how it
-      # fails rather than whether it does. Reaching a window is
-      # `packaging/linux/check-libraries.sh`, on a machine with one.
+      # Last, because it installs system-wide and the step above asks GLib which
+      # handlers are registered. The executable opens a window from `main`, so
+      # without a display the question is only whether the loader takes it,
+      # read from how it fails rather than whether it does.
       - name: It installs, and the executable loads
         run: |
           set -eu

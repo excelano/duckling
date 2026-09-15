@@ -1,25 +1,11 @@
 # The macOS checks a machine can run, on the only kind of machine the release
-# build runs on.
-#
-# Every other lane in this repository can run what it builds. This one cannot:
-# the Mac lane is an Intel machine, `ort` has no prebuilt ONNX Runtime for
-# `x86_64-apple-darwin` and neither does Microsoft since 1.28, so the release
-# build is Apple silicon only and the machine that packages it never executes
-# it. `packaging/macos/README.md` §1 has the measurement. An arm64 runner is
-# therefore not a convenience here - until a person sits at an Apple silicon
-# Mac with the bundle, it is the only place the shipped architecture converts
-# anything at all.
-#
-# So this fetches the models, runs the suite - which since 2026-09-05 converts
-# the demo documents, a scanned PDF through the OCR models among them -
-# assembles the bundle with the private-symbol check that slipcase-desktop's
-# rejection under Guideline 2.5.1 produced, opens it with a document as an
-# argument, and asks the window server whether a window appeared.
-#
-# What it does not reach: the sandbox, which needs a signing identity no runner
-# has; the folder panel `src/main.rs` shows under it; the icon as a person sees
-# it; the Store package, which needs the profile. `CHECKLIST.md` holds those
-# and a green run here does not stand in for one.
+# build runs on: the build is Apple silicon only and the Mac lane is Intel, so
+# an arm64 runner is where the shipped architecture converts anything. This
+# fetches the models, runs the suite (the demo documents, a scanned PDF through
+# OCR among them), assembles the bundle with the private-symbol check, opens it
+# with a document, and asks the window server whether a window appeared. It
+# does not reach the sandbox, the folder panel, the icon as a person sees it, or
+# the Store package; `CHECKLIST.md` holds those.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
@@ -46,9 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # The architecture is the whole reason this workflow exists, and a label
-      # is a promise rather than a fact: `macos-13` is Intel and `macos-14`
-      # onwards is Apple silicon, which is a mapping GitHub can change.
+      # `macos-13` is Intel and `macos-14` onwards is Apple silicon, a mapping
+      # GitHub can change, so the architecture is checked rather than assumed.
       - name: The runner is Apple silicon
         run: |
           arch=$(uname -m)
@@ -79,16 +64,13 @@ jobs:
         run: rustc -V && cargo -V && sw_vers && xcodebuild -version | head -1
 
       # `ort` downloads its prebuilt ONNX Runtime here and `onig_sys` compiles
-      # oniguruma with the clang a runner already has. The deployment target is
-      # the bundle's floor, so that what this runs is what ships.
+      # oniguruma. The deployment target is the bundle's floor.
       - name: Build
         run: cargo build --all-targets
         env:
           MACOSX_DEPLOYMENT_TARGET: "13.4"
 
-      # The demo documents go through the worker here, models and all. This is
-      # the release architecture converting a scanned page through OCR, which
-      # nothing on the Mac lane can do.
+      # The demo documents go through the worker here, models and all.
       - name: Test
         run: cargo test
         env:
@@ -100,13 +82,8 @@ jobs:
       - name: Formatting
         run: cargo fmt --check
 
-      # The bundle is the unit, and `build-app.sh` is where the private-symbol
-      # check lives: for every symbol the executable and pdfium import from a
-      # system framework, does that framework's public headers declare it?
-      # Built from the debug binary the steps above already produced, because
-      # a release build here would cost minutes to answer a question that does
-      # not depend on optimisation - and the symbol table it is asked about is
-      # the same either way.
+      # `build-app.sh` holds the private-symbol check. The debug binary, since
+      # the symbol table asked about is the same either way.
       - name: Assemble the bundle, and no private symbol is in it
         run: |
           target=$(cargo metadata --format-version 1 --no-deps |
@@ -116,11 +93,9 @@ jobs:
           lipo -archs dist/Duckling.app/Contents/MacOS/duckling
           ls dist/Duckling.app/Contents/Frameworks dist/Duckling.app/Contents/Resources
 
-      # `open --args` is the path a command-line launch takes, and the one that
-      # exists on this platform: Duckling claims no document type here, so
-      # `open -a Duckling file.pdf` would be refused by AppKit for want of a
-      # handler. The window server is then asked rather than a screenshot
-      # taken, for the reason `packaging/macos/window-probe.swift` gives.
+      # Duckling claims no document type here, so `open --args` is the one
+      # launch path. The window server is asked rather than a screenshot taken;
+      # `packaging/macos/window-probe.swift` says why.
       - name: A document opens, and a window appears
         run: |
           swiftc -O packaging/macos/window-probe.swift -o "${RUNNER_TEMP}/window-probe"

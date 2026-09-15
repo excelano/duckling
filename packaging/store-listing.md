@@ -1,64 +1,34 @@
 # Store listing text
 
-One draft, used twice. Both stores want the same things at different lengths,
-so everything here is written to the shorter limit. Nothing here is submitted
-yet; the Windows and Mac lanes copy from this file into their forms and record
-in their `SUBMITTING.local.md` what the form did with it.
-
-This is written from the release notes, not beside it. Every claim below appears
-there first, checked against the built application. If the two disagree, the
-changelog is right and this is stale.
-
-Limits, so a later edit does not overrun them:
+The text both stores are given, one draft written to the shorter of the two
+limits. Every claim here is checked against the built application. The Windows
+and Mac lanes copy from this file into their forms.
 
 | Field | Microsoft Store | Mac App Store |
 | --- | --- | --- |
 | App name | unmeasured | 30 |
 | Description | 10,000 | 4,000 |
-| Short description | 500 | — |
-| Subtitle | — | 30 |
-| Promotional text | — | 170 |
+| Short description | 500 | not asked |
+| Subtitle | not asked | 30 |
+| Promotional text | not asked | 170 |
 | Keywords | 7 terms | 100 characters |
 | Release notes | unmeasured | unmeasured |
 
-**The API's limit is not the form's, and the API's is the one that binds now.**
-Partner Center's form takes 1,000 characters of short description and 0.1.0 went
-up with 867. The submission API refuses anything over 500 - *The length of
-ShortDescription must be 500 or less* - and it refuses it while copying the
-**published** listing into the new draft, so the old text blocked the upload
-before the new text was ever sent. Measured 2026-09-09 on this product's first
-API submission. Once a product goes up that way its short description lives at
-500, and the number in the table above is the API's.
+The short description's 500 is the submission API's limit, not Partner Center's
+form, which takes 1,000. The API refuses a longer text while copying the
+published listing into a new draft, so the published text has to fit as well as
+the new one.
 
 ## App name
 
     Microsoft Store   Duckling
     Mac App Store     Duckling Converter
 
-The Microsoft Store reservation is the bare name, taken before the survey in
-`DESIGN.md` §3, and Product identity assigned `Excelano.Duckling` under it. App
-Store Connect refused the bare name when David created the record on
-2026-09-05, and the fallback was taken: the Mac App Store lists the
-application as **Duckling Converter**. The bundle, the window title and every
-other surface still say Duckling; only the store's listing name differs, and
-the support page says so where it names the stores.
-
-## The download size, which the listing has to say
-
-**605 MB**, measured on the Windows lane 2026-09-05 against
-`Duckling-0.1.0.0-x64.msix`, and **594 MB** on the Mac lane the same day
-against an unsigned `productbuild` of the arm64 bundle, whose installed size
-is 805 MB. The release record said the listing should say it and this is where that
-is kept true: three quarters of the package is ONNX weights that barely
-compress, and a person deciding whether to install should meet the number in
-the description rather than in the progress bar. It appears twice below, in
-the short description and in HOW IT WORKS, and both are written to survive
-the number changing by a few tens of megabytes without becoming wrong.
-
-**The Mac App Store lists the application for Apple silicon**, and does so
-from the binary rather than from anything written here; `DESIGN.md` §2 says
-why there is no Intel build. Nothing below says "Apple silicon" because the
-Store says it in its own place, and the Windows text is the same text.
+Only the Mac App Store's listing name differs; the bundle, the window title and
+every other surface say Duckling, and the support page says so where it names
+the stores. The Microsoft Store product identity is `Excelano.Duckling`. The Mac
+App Store lists the application for Apple silicon from the binary, so nothing
+below says so.
 
 ## Subtitle (Mac App Store, 30)
 
@@ -120,11 +90,7 @@ Duckling is open source under the MIT licence, the same as the converter it is b
 ## Release notes
 
 *What's new in this version* on the Microsoft Store and *What's New* on the Mac
-App Store, one version's text each, written from the release notes the way
-everything else here is and kept latest first. 0.1.0 has none and gets none:
-nobody had the application from either store when it went up, so there was
-nobody to tell. Neither field's limit has been measured, and the text below is
-short enough that it has not had to be.
+App Store, one version's text each, latest first.
 
 ### 0.2.0
 
@@ -158,12 +124,10 @@ Both forms ask for the same three, and both lanes take them from here:
 | Support | https://excelano.com/duckling/#support |
 | Marketing / website | https://excelano.com/duckling/ |
 
-The page at `excelano.com/duckling/` is the support and marketing URL both, the
-way segler's and slipcase-desktop's are; its *Support* heading is the anchor
-and it offers an address and the GitHub issues. Both pages were read back on
-2026-09-06 and both carry their section: the legal page's Duckling privacy
-section is `packaging/privacy-entry.html` as pasted, and it is the answer to
-the Store's privacy question.
+The page at `excelano.com/duckling/` is the support and marketing URL both; its
+*Support* heading is the anchor and it offers an address and the GitHub issues.
+The legal page's Duckling privacy section is `packaging/privacy-entry.html` as
+pasted, and it is the answer to the Store's privacy question.
 
 ## App Review notes
 
@@ -177,13 +141,9 @@ Conversion is local. Documents are read by docling.rs, the open-source Rust port
 
 ## Notes for certification
 
-What the Microsoft Store shows a certification tester, and what the fenced
-block below is. It answers the question this package raises and no other in
-the fleet does: five DLLs ship beside the executable, and a tester who looks
-will find four Visual C++ runtime files and DirectML.
-
-The message count changes with the binary. Reread it off the kit report
-before a submission rather than trusting the number below.
+What the Microsoft Store shows a certification tester. The message count in
+the second paragraph changes with the binary: reread it off the kit report
+before a submission.
 
 ```
 Five DLLs ship inside the package beside duckling.exe: four Visual C++ runtime files and DirectML. The runtime files are app-local because +crt-static cannot link the ONNX Runtime this application uses - the link fails with 63 unresolved externals. DirectML is linked in by the ONNX Runtime distribution whether or not the application asks for it, at the version that library was built against rather than whatever the machine has.
@@ -214,89 +174,46 @@ Duckling converts documents offline, so about 734 MB of the package is ONNX mode
 
 ## Screenshots
 
-Taken on Windows 2026-09-05; the Mac's are in their own section below. Each
-lane takes its own with its platform's script, against the packaged
-application, light theme first because both platforms ship light by default, with the pointer parked off the window and the window photographed by
-its id. The queue should show a mix of formats with a PDF mid-conversion in one
-shot and a finished batch with the preview open in another.
-
-On Windows that script is `packaging/windows/screenshot.ps1`, which takes the
-documents to queue and writes one PNG at a size the Store accepts. It launches
-the *packaged* application, which needs saying because it cannot do it the way
-segler's copy does: Duckling registers no file type as its own, so opening a
-document opens whatever owns that document, and the executable inside
-`WindowsApps` refuses to be run directly. It goes through the apps folder
-moniker with arguments instead, which is the same activation path Open With
-takes. `packaging/windows/README.md` §5 has the measurement.
-
-**Which documents was the editorial decision, and it is taken.** The obvious
-source was docling.rs's own test corpus; David chose on 2026-09-05 to author six
-instead, because the corpus files are real third-party documents and their
-content in a commercial listing is a licence question better not created.
-`packaging/demo/` holds them and the script that makes them, and its README
-argues the choice at length. The queue in a screenshot therefore reads:
-
-    site-survey-report.pdf     orientation-deck.pptx
-    field-notes.docx           observers-handbook.epub
-    sample-log.xlsx            scanned-notice.pdf
-
-Two of those are doing a job. `site-survey-report.pdf` is the only one long
-enough to be caught mid-conversion showing a page count, and `scanned-notice.pdf`
-is the only one in the set that cannot convert without the models in the
-package - so a screenshot of it converted is the offline-OCR claim above,
-photographed.
-
-**Which output format is selected matters more than it looks.** DocLang is the
-default and the thing no competitor has, but it previews as markup carrying four
-`<location>` elements per node - correct, and dense to look at. So: DocLang
-selected in the queue shot, where the preview is not the subject, and **Markdown
-in the shot with the preview open**, which is also the word people searched for.
-
-## Screenshots (Mac App Store)
-
-**Taken 2026-09-07 on the rented Mac mini M1**, from the `v0.1.0` tag's arm64
-bundle signed for development, the same two states as Windows: `01-converting`
-with seven done, the scanned PDF spinning and four queued, `field-notes.docx`
-selected in DocLang; `02-converted` in Markdown with `site-survey-report.pdf`
-selected and `species-list (1).md` in row eleven. 2880x1800 each, the window
-at 1440 by 900 points on the display's HiDPI mode (`display-mode.swift`), four
-zoom steps, pointer parked, the twelve documents in `/Users/m1/Documents/Alder
-Creek`. Uploaded to the en-US desktop screenshot set through the API the same
-evening. The sandbox blocks the script's argument route, so the folder went in
-through Add folder by hand and the rest was driven over ssh. App Store Connect
-accepts 1280x800, 1440x900, 2560x1600 and 2880x1800, and
-`packaging/macos/screenshot.sh` takes 1440x900 by default, by window id with
-the pointer parked, from a bundle launched with the documents as arguments.
-The bundle has to be the arm64 one signed with a Developer ID or Apple
-Development identity from the commit being released - a Store package cannot
-be launched off the Store - and that bundle runs only on an Apple silicon Mac.
-The `intel-mac` build on the lane machine draws the same window and fails
-every PDF row, which for a listing whose second shot is a scanned PDF
-converted is a picture of the wrong thing. So the two shots below are taken
-where the walkthrough is, with the same twelve documents and the same two
-states, and this section records which commit they came from once they exist.
-
-## The recipe, so the Mac lane can match
-
-Taken on Windows 2026-09-05. Both 1366x768, the Store's minimum, light theme,
-the twelve documents copied to a folder with a short readable path -
-`C:\Users\david\Documents\Alder Creek` was used, and the path shows in the
-preview, so a scratch directory is the wrong place for them.
-
-**Zoom four steps, which is about 140%, and it is not vanity.** The Store
-renders screenshots small and at 100% this application's text is about ten
-pixels: legible in the window, not in a thumbnail. Four steps also stops the
-preview pane wrapping DocLang into fragments. `screenshot.ps1 -Zoom 4` does it
-with egui's own `Ctrl` and `+`, and nothing persists.
+Each lane takes its own with its platform's script, against the packaged
+application, light theme, with the pointer parked off the window and the window
+photographed by its id. The documents are the ones in `packaging/demo/documents`,
+copied to a folder with a short readable path, since the path shows in the
+preview. Two shots:
 
 | | State to reach |
 | --- | --- |
-| `01-converting` | Convert to **DocLang**, press Convert, select `field-notes.docx` about a second later, capture at ~2.5s. Four rows still Queued, the scanned PDF spinning, seven done. |
+| `01-converting` | Convert to **DocLang**, press Convert, select `field-notes.docx` about a second later, capture at about 2.5 s: some rows still Queued, the scanned PDF spinning, the rest done. |
 | `02-converted` | Convert to **Markdown**, let the batch finish, select `site-survey-report.pdf`, capture. |
 
-Two details worth keeping if the shots are retaken. In the first, select a
-result that came from a Word file rather than from a PDF or the CSV: PDF DocLang
-carries the `<location>` elements and the CSV is all table markup, and neither
-reads as prose in a narrow pane. In the second, row eleven shows
-`species-list.md` becoming `species-list (1).md` - the never-overwrite rule of
-`DESIGN.md` 5 demonstrating itself, unplanned, in the picture. Do not lose it.
+DocLang is selected in the first shot, where the preview is not the subject,
+because its preview is markup carrying four `<location>` elements per node;
+Markdown is selected in the shot with the preview open, and it is the word
+people search for. In the first, the selected result comes from a Word file
+rather than a PDF or the CSV, since neither of those reads as prose in a narrow
+pane. In the second, a row shows `species-list.md` becoming
+`species-list (1).md`, the never-overwrite rule of `DESIGN.md` §5 in the
+picture; keep it. `site-survey-report.pdf` is the one long enough to be caught
+mid-conversion with a page count, and `scanned-notice.pdf` is the one that
+cannot convert without the models in the package, so a shot of it converted is
+the offline-OCR claim photographed.
+
+Zoom four steps, about 140%, with egui's own `Ctrl` and `+`, which the scripts
+do and which nothing persists: the Store renders screenshots small, and at 100%
+this application's text is about ten pixels.
+
+**Windows.** `packaging/windows/screenshot.ps1 -Zoom 4` launches the packaged
+application through the apps folder moniker with the documents as arguments,
+since Duckling claims no file type and the executable under `WindowsApps`
+cannot be run directly, and writes 1366x768, the Store's minimum.
+
+**Mac App Store.** App Store Connect accepts 1280x800, 1440x900, 2560x1600 and
+2880x1800; `packaging/macos/screenshot.sh` takes 1440x900 by default, from a
+bundle launched with the documents as arguments. The bundle has to be the arm64
+one signed with a Developer ID or Apple Development identity from the commit
+being released, since a Store package cannot be launched off the Store, and it
+runs only on an Apple silicon Mac; the sandbox blocks the argument route there,
+so the folder goes in through Add folder. The `intel-mac` build fails every PDF
+row, which for a listing whose second shot is a scanned PDF converted is a
+picture of the wrong thing. Under the display's HiDPI mode
+(`packaging/macos/display-mode.swift`) the window at 1440 by 900 points
+captures at 2880x1800.

@@ -1,19 +1,13 @@
 name: Publish to crates.io
 
 # Fires on the version tag the release pushes, and can be run by hand.
-# `cargo publish` compiles and uploads from source, so it is independent of
-# the .deb and runs beside it; the tag is pushed before the GitHub release
-# exists, so the crate lands first. Copied from flyleaf's, without the
-# `--workspace`: this repository is one package, not a workspace.
-#
-# It publishes as `duckling-converter`, which is the crate coordinate and
-# nothing else — the binary, the Debian package and the Store identity are all
-# `duckling`. Cargo.toml says why.
-#
-# The step is token-gated: it skips cleanly, with no failed run, unless a
-# CRATES_IO_TOKEN secret is available (repo- or org-level). Versions on
-# crates.io are immutable: a bad one is yanked, never re-published, and the
-# fix is the next number.
+# `cargo publish` compiles and uploads from source, independent of the .deb;
+# the tag is pushed before the GitHub release exists, so the crate lands first.
+# It publishes as `duckling-converter`, the crate coordinate alone; the binary,
+# the Debian package and the Store identity are `duckling`. Cargo.toml says why.
+# The step is token-gated and skips cleanly without a CRATES_IO_TOKEN secret.
+# Versions on crates.io are immutable: a bad one is yanked and the fix is the
+# next number.
 on:
   push:
     tags:

@@ -1,155 +1,41 @@
 # CLAUDE.md
 
-Guidance for Claude Code working in `duckling`. Short because `DESIGN.md` is
-where the reasoning lives; read that before touching anything.
-
----
-
-## What this is
-
-A desktop application that converts documents with docling.rs. Presented to a
-person as **Duckling**; the crate and the binary are `duckling`. One window:
-a queue, a format and destination, a Convert button, a preview of the result.
-
-**It converts nothing itself.** Every conversion is `docling`'s, and every
-office package is `waddle-core`'s. Where behaviour is missing, it goes to
-that crate as an issue, the way slipcase-desktop did with `slpc`, rather
-than being worked around here.
-
-**Three documents, three authorities.** docling.rs's `README.md` and
-`docs/MIGRATION.md` are the authority on what converts and how well.
-`DESIGN.md` here is the authority on this application. `git log` is the record
-of why everything is the way it is, and it is written to be read.
-
-The end-to-end tests draw on `tests/data/<format>/sources/` in a checkout of
-docling.rs, and skip when there is not one. Where such a checkout lives is a
-fact about a machine rather than about this repository, so it is not written
-down here.
-
----
+Duckling converts documents with docling.rs: one crate, `duckling`, presented as Duckling.
+`src/lib.rs` is the queue, the worker and the output rules and knows nothing about a window;
+`src/main.rs` is the window. Duckling adds no conversion logic: a wrong conversion is
+docling.rs's issue and a wrong office package is `waddle-core`'s. `DESIGN.md` is the authority.
 
 ## Commands
 
-    ./packaging/fetch-models.sh               # once, pinned, idempotent
+    ./packaging/fetch-models.sh                 # once; pinned, idempotent
     cargo build
-    cargo test                                # unit tests; the end-to-end
-                                              # tests skip without the corpus
-    cargo clippy --all-targets -- -D warnings # must be silent
+    cargo test                                  # end-to-end tests skip without a docling.rs checkout
+    cargo clippy --all-targets -- -D warnings   # must be silent
     cargo fmt --check
     cargo run -- [FILE|FOLDER ...]
-    ./po/update-po.sh                         # after changing any sentence a person reads
-    ./po/pseudo.sh                            # then a debug build with POTEXT_LANG=en-x-pseudo
+    ./po/update-po.sh                           # after changing any sentence a person reads
+    ./po/pseudo.sh                              # then a debug build with POTEXT_LANG=en-x-pseudo
 
-**Seeing the window from here.** Launch under XWayland and capture its own
-window: `env -u WAYLAND_DISPLAY DISPLAY=:0 setsid target/debug/duckling DIR &`,
-find it with `xwininfo -root -tree | grep '"duckling"'`, then
-`xwd -id ID | convert xwd:- shot.png`. Drive it with `xdotool`. The build
-directory is the shared one in `~/.cargo/config.toml`, not `target/`. That
-proves a code path draws; it does not stand in for David's keyboard
-walkthrough, which every slice that touches the window gets.
+The build directory is the shared one in `~/.cargo/config.toml`, not `target/`. Windows:
+`fetch-models.sh` in Git Bash, `cargo build --release`, then `packaging\windows\check-imports.ps1`
+and `build-msix.ps1 -SelfSign`. macOS: `MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target
+aarch64-apple-darwin`, then `packaging/macos/build-app.sh`; an Intel Mac adds `--features intel-mac`
+to every `cargo` command. Each `packaging/` README has its lane. A screenshot proves a code path
+draws; it does not replace David's keyboard walkthrough.
 
-## On the Windows VM
-
-    ./packaging/fetch-models.sh                   # in Git Bash, not PowerShell
-    cargo build --release
-    powershell -File packaging\windows\check-imports.ps1
-    powershell -File packaging\windows\build-msix.ps1 -SelfSign
-
-`packaging/windows/README.md` has every measurement behind this lane. Two things to know before touching anything there:
-`+crt-static` is deliberately absent and must not be added back without
-rerunning the link, and Duckling claims no file type, so nothing in that
-directory may write an extension's default value or remove a `UserChoice`.
-
-**Seeing the window from here** is the packaged application, not a developer
-build, and the executable under `C:\Program Files\WindowsApps` cannot be run
-directly - `Start-Process` on it is *Access is denied*. Use the apps folder
-moniker, which takes arguments:
-`Start-Process "shell:AppsFolder\Excelano.Duckling_nbxmgv0sk86m4!Duckling"
--ArgumentList '"C:\path\file.pdf"'`. Capture it by its window handle with
-`DwmGetWindowAttribute` for the visible frame; `packaging/windows/screenshot.ps1`
-does the whole of that properly. The same caveat holds as on Linux: it proves a
-code path draws and does not stand in for David's walkthrough.
-
-## On the Mac
-
-    ./packaging/fetch-models.sh
-    MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
-    ./packaging/macos/build-app.sh --store ~/Downloads/Duckling_Mac_App_Store.provisionprofile
-
-`packaging/macos/README.md` has every measurement behind this lane. Three things to know before touching anything there.
-**The build is Apple silicon only**: no prebuilt ONNX Runtime exists for an
-Intel Mac, and David's Mac is one, so the lane packages what it cannot run and
-`macos.yml` on an arm64 runner is where the shipped build converts anything.
-**On that Mac every `cargo` command needs `--features intel-mac`**, which
-builds the application with no ONNX Runtime in it; without the feature
-`ort-sys` refuses at once, with it PDFs and images fail in their rows and
-everything else works. **The floor is 13.4** and is the library's, not ours.
-
-**Seeing the window from here** is the `intel-mac` bundle signed with the
-Apple Development identity, which is sandboxed and so is where the folder
-panel and every other sandbox behaviour get measured:
-`cargo build --release --features intel-mac`, then `build-app.sh --binary
-target/release/duckling --outdir dist-intel --sign "Apple Development: David
-Anderson (Y79D796839)"`, then `open -a dist-intel/Duckling.app`. Add files
-through the button: a file given as an argument to a sandboxed application
-cannot be read, which is the sandbox and not a defect. Accessibility is
-granted to the terminal, so `osascript` keystrokes and a CGEvent click reach
-the window, and `packaging/macos/window-probe.swift` asks the window server
-whether it drew. The same caveat holds as on the other two: it proves a code
-path draws and does not stand in for David's walkthrough, which on this
-platform happens on an Apple silicon Mac; `CHECKLIST.md` records the rented
-one, and `packaging/macos/display-mode.swift` is how it got a 2x display.
-
----
+Releases: run `ship duckling`. There is no release document.
 
 ## Rules
 
-**The UI is a renderer.** The queue, the worker, the output rules and the
-collision rule live in `src/lib.rs`, which does not know egui exists. Logic in
-`src/main.rs` that another front-end would need is in the wrong file. The same
-rule decides where the German lives: the catalogue is declared in `src/main.rs`,
-because every sentence a person reads is produced there and the library says
-nothing to anybody. `DESIGN.md` §9.
-
-**Never overwrite.** A converter that writes beside its source is one wrong
-extension away from replacing somebody's file. `available_path` numbers a
-taken name and it is tested; nothing writes around it.
-
-**The models ship in the package.** Every platform's package carries
-`.models/` and `.pdfium/` beside the executable, fetched by
-`packaging/fetch-models.sh` from pinned URLs with pinned hashes. There is no
-download at run time and no code for one. DESIGN.md §2.
-
-**C is taken here, deliberately and once.** ONNX Runtime and pdfium are the
-whole of it on Linux, and `DESIGN.md` §2 records what they cost, on Linux, on
-Windows, and on macOS, where the cost is Intel Macs. The fleet's
-stance is in `~/notes/pure_rust_preference.md`; adding another C dependency is
-a decision to take with David.
-
-**On Windows it is not once.** The ONNX Runtime `ort` fetches for that target
-brings DirectML with it and cannot be linked with `+crt-static`, so five DLLs
-ship inside the package beside the executable: four Visual C++ runtime files
-and DirectML. That was measured on 2026-09-05 and decided the same day;
-`DESIGN.md` §2, `.cargo/config.toml`, and `packaging/windows/README.md` §1 and
-§2 are the three places it is written down. `packaging/windows/check-imports.ps1`
-is what keeps the number at five, and it refusing is a thing to bring to David
-rather than a list to add a name to.
-
-**Unsafe has no home.** `src/lib.rs` is `forbid`; `src/main.rs` is `deny`,
-which a platform arm may lift for one module the way slipcase-desktop's
-document-open handler on macOS does. Adding one is a decision to take with
-David, and it is the decision that would give the Mac bundle Open With;
-`DESIGN.md` §9 holds it.
-
----
-
-## Conventions
-
-Every source file carries `Author: David M. Anderson` and `Built with AI
-assistance (Claude, Anthropic)` in its header comment. Commits carry a
-`Co-Authored-By` trailer for the Claude model in use and a `Signed-off-by`
-trailer for David, and no session URL.
-
-Packaging is cloned from `excelano/slipcase-desktop` through `excelano/segler`,
-one directory per platform; `packaging/README.md` says what is there. CI is
-the fleet's `excelano/.github` Rust workflow.
+Logic another front end would need lives in `src/lib.rs`, never in `src/main.rs`; the translation
+catalogue is declared in `src/main.rs`, since only the window speaks. Nothing writes around
+`available_path`: no existing file is overwritten. The models ship in the package from
+`fetch-models.sh`'s pins; there is no download at run time and no code for one. The C in the tree is
+ONNX Runtime, pdfium and oniguruma, plus DirectML on Windows; another C dependency is David's decision
+(`~/notes/pure_rust_preference.md`). `+crt-static` stays absent on Windows, and `check-imports.ps1`
+refusing a DLL goes to David, not into its list. Nothing under `packaging/windows` may write an
+extension's default value or remove a `UserChoice`. `src/lib.rs` is `forbid(unsafe_code)` and
+`src/main.rs` is `deny`; lifting it for a platform module is David's decision. Every source file
+header carries `Author: David M. Anderson` and `Built with AI assistance (Claude, Anthropic)`. Commits
+carry a `Co-Authored-By` trailer for the Claude model in use and a `Signed-off-by` trailer for David,
+and no session URL.
