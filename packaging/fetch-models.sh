@@ -79,7 +79,7 @@ fetch_member() { # <url> <archive sha256> <member> <path>
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64)
     fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
-      3019ad1cd6980e51d900bb9266f8980cb846cb8e0c1f6553c52a7a1626469020 ;;
+      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b ;;
   Darwin-*)
     fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
       794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
