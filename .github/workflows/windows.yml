@@ -144,6 +144,27 @@ jobs:
       # the documents are arguments. The packaged build cannot be assembled
       # here without an identity, so the frames are of the side-loaded one -
       # the same commit, and the difference is the package around it.
+      # 500 MB, and the only step here that wants them. An ordinary push checks
+      # the tree and the import tables and needs none of it, so this is behind
+      # the same switch as the screenshots. Keyed on the fetch script, which is
+      # where every pin lives, the way the Linux and macOS lanes key theirs.
+      - name: The models, cached by their pins
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        uses: actions/cache@v6
+        with:
+          path: |
+            .models
+            .pdfium
+          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
+
+      # `install.ps1` refuses without them, and rightly: the second frame is
+      # `scanned-notice.pdf` converted, which is the offline-OCR claim
+      # photographed, and it cannot convert without the models.
+      - name: Fetch and verify the models
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        shell: bash
+        run: ./packaging/fetch-models.sh
+
       - name: Put the build where -SideLoaded looks for it
         if: inputs.screenshots && inputs.screenshots != 'no'
         run: powershell -ExecutionPolicy Bypass -File packaging/windows/install.ps1
