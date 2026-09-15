@@ -122,6 +122,18 @@ jobs:
           cd ../../..
           git diff --exit-code -- packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing
 
+      - name: The models, cached by their pins
+        uses: actions/cache@v6
+        with:
+          path: |
+            .models
+            .pdfium
+          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
+
+      - name: Fetch and verify the models
+        shell: bash
+        run: ./packaging/fetch-models.sh
+
       # The Store takes the package unsigned. The identity comes from the
       # repository variable STORE_IDENTITY_PSD1, and from the example file
       # until that is set; a release refuses without it.
