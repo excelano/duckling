@@ -16,13 +16,25 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # The release event is what builds the binary the Mac signs. A person's
+  # token creates the release, so the event fires.
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build the release binary for'
+        required: true
+        type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: macos-${{ github.ref }}
-  cancel-in-progress: true
+  # Keyed by the tag when this is releasing and by the ref when it is
+  # checking: github.ref is refs/heads/main for a workflow_dispatch too.
+  group: macos-${{ github.event.release.tag_name || inputs.tag || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
 
 jobs:
   arm64:
@@ -30,6 +42,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
 
       # `macos-13` is Intel and `macos-14` onwards is Apple silicon, a mapping
       # GitHub can change, so the architecture is checked rather than assumed.
@@ -138,3 +152,16 @@ jobs:
           name: arm64-window
           path: ${{ runner.temp }}/screen.png
           if-no-files-found: warn
+
+      # Built here and signed on the Mac: the Distribution certificate stays
+      # where it is, and the slow half plus the two checks that cost a review
+      # cycle happen before anybody is waiting. The steps are excelano/.github's,
+      # because every repository with this target needs the same ones.
+      - name: The binary the Store package is built from
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        uses: excelano/.github/.github/actions/mac-release-binary@main
+        with:
+          binary: duckling
+          targets: aarch64-apple-darwin
+          tag: ${{ github.event.release.tag_name || inputs.tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
