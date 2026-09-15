@@ -109,6 +109,14 @@ foreach ($name in $vcNames) {
 # not something to glob at: two of them can sit side by side after a dependency
 # bump, and picking the wrong one pairs a 1.15 library with some other DirectML
 # and says nothing.
+#
+# The line records a path, not the files at it, so the distribution has to
+# outlive the build that named it. `ort` extracts into a user cache directory
+# unless `ORT_CACHE_DIR` says otherwise, and a build restored from a cache that
+# carried the target directory alone arrives here naming a directory that was
+# never created on this machine. `.github/workflows/windows.yml` sets the
+# variable so that the two travel together; the refusal below says which of the
+# two things went wrong.
 if (-not $TargetDir) {
     $TargetDir = Join-Path $root 'target'
     if (Get-Command cargo -ErrorAction SilentlyContinue) {
@@ -129,15 +137,33 @@ if (-not $outputs) {
 }
 
 $directml = $null
+$looked = @()
 foreach ($output in $outputs) {
     $line = Select-String -LiteralPath $output -Pattern '^cargo:rustc-link-search=native=(.+)$' |
         Select-Object -First 1
-    if (-not $line) { continue }
-    $candidate = Join-Path $line.Matches[0].Groups[1].Value 'DirectML.dll'
+    if (-not $line) {
+        $looked += "$output - no rustc-link-search line in it"
+        continue
+    }
+    $dir = $line.Matches[0].Groups[1].Value
+    $candidate = Join-Path $dir 'DirectML.dll'
     if (Test-Path $candidate) { $directml = (Resolve-Path $candidate).Path; break }
+    if (Test-Path -LiteralPath $dir) {
+        $looked += "$dir - there, and holds no DirectML.dll"
+    } else {
+        $looked += "$dir - named by $output, and not on this machine"
+    }
 }
 if (-not $directml) {
-    Refuse "no DirectML.dll in the ONNX Runtime distribution ort-sys linked against - the newest build output under $TargetDir\release\build named a directory that has none, so either the dist changed shape or the link search line is gone"
+    Refuse @"
+no DirectML.dll in the ONNX Runtime distribution ort-sys linked against. What was read under $TargetDir\release\build:
+  $($looked -join "`n  ")
+A directory that is named and absent is a build restored from a cache that did
+not carry the distribution: set ORT_CACHE_DIR to a path that is cached beside
+the target directory, or build again with the target directory empty. A
+directory that is there and holds no DirectML.dll is a distribution that has
+changed shape.
+"@
 }
 $files += [pscustomobject]@{ Name = 'DirectML.dll'; Path = $directml }
 

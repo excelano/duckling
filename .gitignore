@@ -14,6 +14,12 @@
 /.models
 /.pdfium
 
+# The prebuilt ONNX Runtime `ort` links, extracted here rather than into a
+# user cache directory so that it and the build output naming it are one
+# thing. `.github/workflows/windows.yml` says why that matters.
+/.ort
+
+/packaging/windows/identity.psd1
 /packaging/windows/SUBMITTING.local.md
 /packaging/windows/PASTE.local.md
 /packaging/macos/SUBMITTING.local.md
