@@ -31,6 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The packaging scripts are the only code here that nothing else compiles
+      # or runs, and there is no PowerShell on the Linux lane. The step is
+      # excelano/.github's because it is the same one in every repository that
+      # has them.
+      - name: The packaging scripts parse
+        uses: excelano/.github/.github/actions/powershell-parses@main
+
       - name: Install Rust
         run: rustup toolchain install stable --profile minimal
 
