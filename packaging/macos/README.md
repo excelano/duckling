@@ -24,7 +24,7 @@ Everything below marked **measured** was measured on the Mac lane on
 
 ## 1. The one that changed the product: Apple silicon only
 
-`RELEASE.md` sent this lane to build a universal binary, the way
+The release record sent this lane to build a universal binary, the way
 slipcase-desktop does. **It cannot be built, from any machine.**
 
 `ort` links a prebuilt ONNX Runtime, and its dist list for macOS - `dist.tsv`

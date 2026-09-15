@@ -12,7 +12,7 @@
 # dependency rather than declaring it.
 #
 # Duckling cannot do that, measured on the Windows lane on 2026-09-05, which is
-# the question `RELEASE.md` sent this lane to answer. The prebuilt ONNX Runtime
+# the question the release record sent this lane to answer. The prebuilt ONNX Runtime
 # `ort` fetches for `x86_64-pc-windows-msvc` - `ms@1.28.0`, from pyke's CDN - was
 # compiled against the *dynamic* CRT, so its objects reach the C library through
 # `__imp_` import thunks that the static CRT does not define. The link fails with

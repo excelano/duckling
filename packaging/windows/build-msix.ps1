@@ -64,7 +64,7 @@ $ErrorActionPreference = 'Stop'
 #
 # **This is a record of what is known, not a claim that it is acceptable.**
 # Whether to submit with a test failing is a decision, it is David's, and
-# `RELEASE.md` carries it. Recording a finding here does not take it.
+# The release record carries it. Recording a finding here does not take it.
 #
 # One entry, from the first kit run, 2026-09-05, against
 # `Duckling-0.1.0.0-x64.msix`. 23 of 24 tests passed. It was left empty until
@@ -192,7 +192,7 @@ function Test-CertificationReport([string] $report) {
         $seen[$name] = $verdict
         $expected = $KNOWN_FINDINGS[$name]
         if ($expected -eq $verdict) {
-            Write-Host "$verdict  $name  (known - see RELEASE.md)"
+            Write-Host "$verdict  $name  (known - baselined)"
         } else {
             $unexpected += "$verdict $name"
             Write-Host "$verdict  $name  ** NOT IN THE KNOWN LIST **"

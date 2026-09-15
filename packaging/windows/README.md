@@ -25,7 +25,7 @@ inherited and says where from.
 
 ## 1. The one that changed the build: `+crt-static` cannot be used
 
-`RELEASE.md` sent this lane to find out whether the prebuilt ONNX Runtime `ort`
+The release record sent this lane to find out whether the prebuilt ONNX Runtime `ort`
 fetches for `x86_64-pc-windows-msvc` links against the static CRT without
 conflict. **It does not.**
 
@@ -293,7 +293,7 @@ binary is subsystem 2 and carries `PerMonitorV2`, both on the first build.
 
 ## 10. What a Store build is
 
-`build-msix.ps1` produces it and `RELEASE.md` has the process; what belongs here
+`build-msix.ps1` produces it and `ship` has the process; what belongs here
 is why it is shaped that way.
 
 **Signing is not optional for a local install.** The shell will not accept an
@@ -341,4 +341,4 @@ this finding, and the certification note says so in those words rather than
 reusing that repository's.
 
 Whether to submit with an optional test failing is David's decision;
-`RELEASE.md` carries it and recording the finding does not take it.
+The release record carries it and recording the finding does not take it.

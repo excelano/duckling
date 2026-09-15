@@ -55,8 +55,7 @@ walkthrough, which every slice that touches the window gets.
     powershell -File packaging\windows\check-imports.ps1
     powershell -File packaging\windows\build-msix.ps1 -SelfSign
 
-`RELEASE.md` has the rest of the lane and `packaging/windows/README.md` has
-every measurement behind it. Two things to know before touching anything there:
+`packaging/windows/README.md` has every measurement behind this lane. Two things to know before touching anything there:
 `+crt-static` is deliberately absent and must not be added back without
 rerunning the link, and Duckling claims no file type, so nothing in that
 directory may write an extension's default value or remove a `UserChoice`.
@@ -77,8 +76,7 @@ code path draws and does not stand in for David's walkthrough.
     MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
     ./packaging/macos/build-app.sh --store ~/Downloads/Duckling_Mac_App_Store.provisionprofile
 
-`RELEASE.md` has the rest of the lane and `packaging/macos/README.md` has every
-measurement behind it. Three things to know before touching anything there.
+`packaging/macos/README.md` has every measurement behind this lane. Three things to know before touching anything there.
 **The build is Apple silicon only**: no prebuilt ONNX Runtime exists for an
 Intel Mac, and David's Mac is one, so the lane packages what it cannot run and
 `macos.yml` on an arm64 runner is where the shipped build converts anything.

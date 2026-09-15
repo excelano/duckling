@@ -85,7 +85,7 @@ to trim, and what only upstream can trim, is in `§10`.
 
 **What that costs on Windows is more than it costs on Linux, and it was
 measured on 2026-09-05 rather than predicted.** Two of the three findings were
-open questions in `RELEASE.md` and the third was not foreseen at all.
+open questions in the release record and the third was not foreseen at all.
 
 The first: **`+crt-static` cannot be used.** Every other application in the
 fleet links the Visual C++ runtime into the executable, because that runtime is
@@ -125,7 +125,7 @@ with David; this is the fourth arriving inside the first, which is not the shape
 that rule anticipated, and taking it was still David's on 2026-09-05.
 
 **What it costs on macOS is a whole architecture, and that was measured on
-2026-09-05 on the Mac lane rather than predicted.** `RELEASE.md` sent the lane
+2026-09-05 on the Mac lane rather than predicted.** the release record sent the lane
 to build the universal binary slipcase-desktop ships. It cannot be built from
 any machine: `ort`'s dist list for macOS carries only `aarch64-apple-darwin`,
 and Microsoft's own releases, which those builds are made from, stopped
@@ -377,7 +377,7 @@ order was re-read at 1.37.5 and is unchanged.
 
 Cloned from `excelano/segler`, which cloned it from `excelano/slipcase-desktop`,
 one directory per platform, with what is Duckling's own stated here and in
-`RELEASE.md`.
+The release record.
 
 **The models and pdfium sit beside the executable, and the executable finds
 them there.** docling.rs looks under the working directory, then under two
@@ -399,7 +399,7 @@ package for one product, and `/usr/lib/duckling` is a private application
 directory where that data may live. The `.deb` is compressed with xz at its
 highest level, which costs minutes and saves little, because ONNX weights
 barely compress. Whether the Excelano apt host serves a file that size is
-measured on the first release, and `RELEASE.md` says what happens if it does
+measured on the first release, and the release record says what happens if it does
 not.
 
 **Three lintian overrides, the fleet's first.** pdfium is a prebuilt

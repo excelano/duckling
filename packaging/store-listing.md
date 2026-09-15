@@ -48,7 +48,7 @@ the support page says so where it names the stores.
 **605 MB**, measured on the Windows lane 2026-09-05 against
 `Duckling-0.1.0.0-x64.msix`, and **594 MB** on the Mac lane the same day
 against an unsigned `productbuild` of the arm64 bundle, whose installed size
-is 805 MB. `RELEASE.md` said the listing should say it and this is where that
+is 805 MB. The release record said the listing should say it and this is where that
 is kept true: three quarters of the package is ONNX weights that barely
 compress, and a person deciding whether to install should meet the number in
 the description rather than in the progress bar. It appears twice below, in
