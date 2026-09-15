@@ -33,19 +33,32 @@ retire() { # <path>
   fi
 }
 
+# ` *` rather than two spaces, which is sha256sum's binary mode. On this
+# platform's Git Bash it is the same answer and on a future one it may not be,
+# and a checksum that depends on how the reader felt about line endings is not
+# a checksum.
 fetch() { # <url> <path> <sha256>
-  if [ -f "$2" ] && echo "$3  $2" | sha256sum -c --quiet - 2>/dev/null; then
+  if [ -f "$2" ] && echo "$3 *$2" | sha256sum -c --quiet - 2>/dev/null; then
     echo "  = $2"
     return
   fi
   mkdir -p "$(dirname "$2")"
   echo "  > $2"
   curl -fsSL --connect-timeout 30 --retry 3 --retry-delay 2 -o "$2.part" "$1"
-  if echo "$3  $2.part" | sha256sum -c --quiet -; then
+  if echo "$3 *$2.part" | sha256sum -c --quiet -; then
     mv "$2.part" "$2"
   else
-    rm -f "$2.part"
+    # What was actually received, before it is thrown away. A mismatch is
+    # either a transfer that stopped early or a different file upstream, and
+    # those want opposite responses: the first is retried and the second is
+    # investigated. Without the size and the hash the message fits both and
+    # answers neither, which is how a Windows runner failed twice on the same
+    # 172 MB file while every other lane stayed green.
     echo "fetch-models: $2 did not match its pinned SHA-256; not kept" >&2
+    echo "  pinned   $3" >&2
+    echo "  received $(sha256sum "$2.part" | cut -d' ' -f1)" >&2
+    echo "  bytes    $(wc -c < "$2.part")" >&2
+    rm -f "$2.part"
     exit 1
   fi
 }
