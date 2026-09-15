@@ -37,6 +37,19 @@ jobs:
   windows:
     runs-on: windows-latest
 
+    # `ort` extracts the prebuilt ONNX Runtime it links into a cache directory
+    # and prints that path for the linker; `runtime-files.ps1` reads the path
+    # back, because `DirectML.dll` has to be the copy from the distribution
+    # `onnxruntime.lib` was built against. Left to itself that directory is
+    # under `%LOCALAPPDATA%`, which nothing here carries between runs, while
+    # `rust-cache` does carry `target` - build script output and all. A
+    # restored build is then a build whose recorded link path names a
+    # directory that never existed on this machine. Extracting into the
+    # workspace puts the distribution in the same cache entry as the output
+    # that names it, so the two arrive together or not at all.
+    env:
+      ORT_CACHE_DIR: ${{ github.workspace }}\.ort
+
     steps:
       - uses: actions/checkout@v7
         with:
@@ -46,6 +59,12 @@ jobs:
         run: rustup toolchain install stable --profile minimal
 
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-directories: ${{ github.workspace }}\.ort
+          # `ORT_CACHE_DIR` in the key, so that a cache saved before the
+          # distribution was part of the entry is not restored into a build
+          # that expects it to be.
+          env-vars: ORT
 
       - name: What is installed
         run: rustc -V; cargo -V
