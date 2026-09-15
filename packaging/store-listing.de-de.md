@@ -70,7 +70,7 @@ Duckling ist Open Source unter der MIT-Lizenz, ebenso wie docling.rs, worauf es 
 
 ## Release notes
 
-*Neu in dieser Version*, aus `CHANGELOG.md`, neueste zuerst. 0.1.0 hat keine und
+*Neu in dieser Version*, aus den Release Notes, neueste zuerst. 0.1.0 hat keine und
 bekommt keine: als diese Fassung in den Store ging, hatte sie niemand von dort,
 also war niemandem etwas zu sagen.
 

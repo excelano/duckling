@@ -391,7 +391,7 @@ Copy-Item $Binary (Join-Path $stage 'duckling.exe')
 #
 # Fetched rather than built, verified by hash by the script that fetches them,
 # and copied rather than re-verified here: `packaging/fetch-models.sh` is
-# idempotent and `preflight.sh` is the gate that asks whether they match. What
+# idempotent and `ship` is the gate that asks whether they match. What
 # this refuses on is their absence, because the alternative is an MSIX that
 # installs, launches, and cannot convert a PDF - which is a defect no check
 # after this point would see.

@@ -5,7 +5,7 @@ so everything here is written to the shorter limit. Nothing here is submitted
 yet; the Windows and Mac lanes copy from this file into their forms and record
 in their `SUBMITTING.local.md` what the form did with it.
 
-This is written from `CHANGELOG.md`, not beside it. Every claim below appears
+This is written from the release notes, not beside it. Every claim below appears
 there first, checked against the built application. If the two disagree, the
 changelog is right and this is stale.
 
@@ -120,7 +120,7 @@ Duckling is open source under the MIT licence, the same as the converter it is b
 ## Release notes
 
 *What's new in this version* on the Microsoft Store and *What's New* on the Mac
-App Store, one version's text each, written from `CHANGELOG.md` the way
+App Store, one version's text each, written from the release notes the way
 everything else here is and kept latest first. 0.1.0 has none and gets none:
 nobody had the application from either store when it went up, so there was
 nobody to tell. Neither field's limit has been measured, and the text below is

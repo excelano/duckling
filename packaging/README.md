@@ -4,7 +4,7 @@
 distributed, and four files shared by all of them: `fetch-models.sh`, which
 puts the pinned models and pdfium under `.models/` and `.pdfium/` at the
 repository root and is what every package copies from; `version.sh`, the only
-thing that reads the version out of `Cargo.toml`; `preflight.sh`, which asks
+thing that reads the version out of `Cargo.toml`; `ship`, which asks
 everything that must be true before a release at once; and
 `store-listing.md`, the text both stores are given.
 
