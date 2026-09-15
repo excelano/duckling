@@ -201,10 +201,15 @@ Zoom four steps, about 140%, with egui's own `Ctrl` and `+`, which the scripts
 do and which nothing persists: the Store renders screenshots small, and at 100%
 this application's text is about ten pixels.
 
-**Windows.** `packaging/windows/screenshot.ps1 -Zoom 4` launches the packaged
-application through the apps folder moniker with the documents as arguments,
-since Duckling claims no file type and the executable under `WindowsApps`
-cannot be run directly, and writes 1366x768, the Store's minimum.
+**Windows.** `packaging/windows/shots.ps1` carries both frames and launches the
+packaged application through the apps folder moniker with the documents as
+arguments, since Duckling claims no file type and the executable under
+`WindowsApps` cannot be run directly. It writes 1366x768, the Store's minimum.
+The coordinates its recipes need have never been measured here — the Windows
+pair predates the driver growing actions and was taken by hand — so
+`shots.ps1 -Reference` takes the frame to read them off, and until they are
+filled in the set refuses rather than photographing clicks that landed on
+nothing.
 
 **Mac App Store.** App Store Connect accepts 1280x800, 1440x900, 2560x1600 and
 2880x1800; `packaging/macos/screenshot.sh` takes 1440x900 by default, from a
