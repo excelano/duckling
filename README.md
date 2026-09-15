@@ -62,5 +62,8 @@ reasoning live; `CLAUDE.md` is the short guide for a session working here.
 
 ## License
 
-MIT, like docling.rs. The models Duckling ships are docling's, under their
-own licenses, listed in `packaging/fetch-models.sh` by origin.
+MIT, like docling.rs. The models Duckling ships are docling's, under their own
+licenses. `packaging/fetch-models.sh` fetches them from a dated release on this
+repository rather than from where each one came, because upstream publishes
+them to a tag it overwrites; that release's notes carry the origins and the
+attribution those licenses require.

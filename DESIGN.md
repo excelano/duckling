@@ -34,7 +34,12 @@ lane, and the executable links `libstdc++` beyond libc, libgcc and libm.
 **The models ship in the package.** The set is the one docling.rs resolves at
 run time, pinned by URL and SHA-256 in `packaging/fetch-models.sh`, so the
 application has no download code, no failure state for one, no privacy line
-about fetching, and works offline from the first launch. The layout model
+about fetching, and works offline from the first launch. The URL is a dated
+release on this repository and not upstream's, because upstream publishes its
+models to one tag it overwrites: a hash pinned against a moving reference
+breaks on somebody else's schedule, and a build cache hides the change until
+the day it does not. Taking a new upstream set is a new dated release, new
+hashes, and a look at what the change does to conversion quality. The layout model
 ships in both precisions, because the pipeline runs int8 and re-runs a page on
 fp32 when int8's regions cover too little of it; TableFormer ships the one
 decoder the pipeline resolves, `decoder_kv.onnx`, and nothing behind it in

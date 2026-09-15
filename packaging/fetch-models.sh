@@ -7,9 +7,21 @@
 # file that is present and matches is not fetched again, and a file that
 # arrives and does not match is deleted and reported.
 #
-# The set is the one docling.rs resolves at run time, drawn from the release
-# assets at tag `models-v1` of docling-project/docling.rs plus the English
-# PP-OCRv3 recognizer the pipeline prefers, which upstream hosts elsewhere.
+# The set is the one docling.rs resolves at run time. It is fetched from a
+# release on this repository rather than from where each file originally came,
+# and that is the point of it: `models-v1` on docling-project/docling.rs is a
+# *rolling* tag whose assets are overwritten by upstream's publish workflow —
+# five times in the ten days before the mirror was taken — and the English
+# recognizer and the key list came from a branch. A hash pinned against a
+# moving reference is a build that breaks on somebody else's schedule, and a
+# cache then hides the change until the day it does not.
+#
+# Taking an upstream model change is deliberate: a new dated release here, the
+# new hashes below, and a look at what the change does to conversion quality
+# before either lands. A mirror tag is never republished.
+#
+# The original sources and their licences are in the mirror release's notes,
+# which is where the attribution those licences require lives.
 # The layout model ships in both precisions, because the pipeline runs int8
 # and re-runs a page on fp32 when int8's regions cover too little of it;
 # TableFormer ships the one decoder the pipeline resolves. DESIGN.md §2.
@@ -24,7 +36,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-BASE=https://github.com/docling-project/docling.rs/releases/download/models-v1
+BASE=https://github.com/excelano/duckling/releases/download/models-2026-09-15
 
 retire() { # <path>
   if [ -e "$1" ]; then
@@ -64,10 +76,14 @@ fetch() { # <url> <path> <sha256>
 }
 
 # pdfium per platform. Linux x64 takes the build docling.rs pins for its
-# conformance runs. Windows and macOS take bblanchon's prebuilts, the same
-# source that Linux build came from, at one release tag for both, pinned by
-# the archive's hash; only the library member is kept. The Mac archive is
-# universal, so one file serves both architectures.
+# conformance runs, mirrored with the models. Windows and macOS take
+# bblanchon's prebuilts, the same source that Linux build came from, at one
+# release tag for both, pinned by the archive's hash; only the library member
+# is kept. The Mac archive is universal, so one file serves both architectures.
+#
+# Those two are not mirrored, and the difference is the tag: `chromium/8035`
+# names one chromium build, and bblanchon publishes a new tag rather than
+# overwriting that one.
 PDFIUM=https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F8035
 
 fetch_member() { # <url> <archive sha256> <member> <path>
@@ -110,10 +126,8 @@ fetch "$BASE/layout_heron.onnx"      .models/layout_heron.onnx      97129cc59827
 fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 1c53e651ade205ce7d6dfbe54af9730d774af4ec0249832b94860466de0b440b
 fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38fee0dae2c1ccee38241f37df202c9509e3abca02e9217c5ee615
 fetch "$BASE/ppocr_keys_v1.txt"      .models/ppocr_keys_v1.txt      a1c84d9bdb9ab29043c58896224d32941783eb821629618416dcb08f12886492
-fetch "https://huggingface.co/SWHL/RapidOCR/resolve/main/PP-OCRv3/en_PP-OCRv3_rec_infer.onnx" \
-      .models/ocr_rec_en.onnx ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea
-fetch "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/main/ppocr/utils/en_dict.txt" \
-      .models/en_dict.txt 5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3
+fetch "$BASE/ocr_rec_en.onnx"        .models/ocr_rec_en.onnx        ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea
+fetch "$BASE/en_dict.txt"            .models/en_dict.txt            5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3
 fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         d6a360e3c7663ebaffa5e578ddb6f0d1806f1b469f85b7c304e7a7de41a43abf
 fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      1a260bbf82a205bfcac64b0a92219ea76aae9faa99dd357bbbefcca5b558db89
 fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 0d567955041b9b62ea95464372ffdf4e05f7a9429f6318401187bb30470275e0
