@@ -42,9 +42,9 @@ out=po/en-x-pseudo.po
 # every message is ASCII, `msgen` writes `charset=ASCII` into the catalogue it
 # hands on, and `msgfilter` then drops every non-ASCII byte the filter produced:
 # the accents and the padding dots vanish and what comes back is the English
-# with letters missing. It reads as a broken filter and is a declared encoding.
-# Measured in slipcase-open on 2026-09-09, the first application here whose
-# messages carry no `…` or accent of their own to make `msginit` choose UTF-8.
+# with letters missing. It reads as a broken filter and is a declared encoding,
+# which bites wherever no message carries an accent of its own to make
+# `msginit` choose UTF-8.
 msgen "$pot" |
     sed 's/charset=[A-Za-z0-9_-]*/charset=UTF-8/' |
     msgfilter --keep-header --output-file="$out" awk '

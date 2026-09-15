@@ -66,13 +66,12 @@ $ErrorActionPreference = 'Stop'
 # Whether to submit with a test failing is a decision, it is David's, and
 # The release record carries it. Recording a finding here does not take it.
 #
-# One entry, from the first kit run, 2026-09-05, against
-# `Duckling-0.1.0.0-x64.msix`. 23 of 24 tests passed. It was left empty until
-# that run rather than copied from segler's, because a baseline copied from
-# another application is a list of things somebody else measured.
+# One entry, from a kit run against this package and not copied from another
+# application's baseline, which would be a list of things somebody else
+# measured.
 #
-# `Blocked executables` reported 58 messages and every one of them was traced
-# before this line was written. They are four different things:
+# `Blocked executables` reports messages that are four different things, every
+# one traced before it was baselined:
 #
 #   The model files          Forty of the fifty-eight. `layout_heron.onnx`,
 #                            `bbox.onnx.data` and the rest "contain a blocked
@@ -126,20 +125,14 @@ $ErrorActionPreference = 'Stop'
 # configuration shipped with SDK 10.0.26100 on this machine, so the report's own
 # attribute is what was checked here. Both say the same thing.
 #
-# **This is not a new decision. slipcase-desktop took it on 2026-08-28: submit
-# with it failing.** That application had the same two real messages this one
-# has - the `cmd.exe` strings and `ShellExecuteW` under `opener` - and its
-# 0.1.2 passed certification and was published on 2026-08-30 with the test
-# failing exactly as it fails here. Its rejection, the one that produced
-# `check-imports.ps1`, was policy 10.2.4.1 over VCRUNTIME140.dll and had nothing
-# to do with this test.
-#
-# What is new here is the volume rather than the kind: slipcase-desktop traced
-# six messages and this run has fifty-eight, because 734 MB of model weights and
-# two prebuilt C libraries give the three-letter scan far more bytes to find
-# itself in. That is worth saying in the certification note, since a reviewer
-# reading fifty-eight lines is reading a longer list than any Excelano
-# submission has carried before.
+# **Submitting with this optional test failing has passed certification
+# before**: slipcase-desktop carries the same two real messages, the `cmd.exe`
+# strings and `ShellExecuteW` under `opener`, and its rejection, the one that
+# produced `check-imports.ps1`, was policy 10.2.4.1 over VCRUNTIME140.dll and
+# had nothing to do with this test. What differs here is the volume: hundreds
+# of megabytes of model weights and two prebuilt C libraries give the
+# three-letter scan far more bytes to find itself in, and the certification
+# note says so.
 #
 # `DPIAwarenessValidation` is not in this list and that is worth saying, because
 # it is slipcase-desktop's second entry: the kit reads the PE application
@@ -509,8 +502,7 @@ $priConfig = Join-Path $OutDir 'priconfig.xml'
 # qualifier `en-US;de-DE`. If the two sides disagree the index has no default
 # language and the shell falls back to the literal paths, which is the failure
 # this whole step exists to remove - and it fails silently, so it is spelled
-# once here from the manifest's values. It was `en-GB` until 2026-09-06 and
-# `en-US` alone until 2026-09-10; the manifest carries the why.
+# once here from the manifest's values.
 & $makepri createconfig /cf $priConfig /dq en-US_de-DE /o | Out-Null
 if ($LASTEXITCODE -ne 0) { Refuse "makepri createconfig failed ($LASTEXITCODE)" }
 

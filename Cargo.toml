@@ -66,9 +66,9 @@ sha2 = "0.11"
 # `ort` links a prebuilt ONNX Runtime and has none for `x86_64-apple-darwin`:
 # pyke's dist list carries only the Apple silicon build, and Microsoft's own
 # releases stopped shipping an Intel or a universal macOS library at 1.28, the
-# version `ort` pins. So a Mac App Store build is Apple silicon only, measured
-# on 2026-09-05 and recorded in DESIGN.md §2, and an Intel Mac - which is the
-# Mac this application is developed on - cannot link the release build at all.
+# version `ort` pins. So a Mac App Store build is Apple silicon only (DESIGN.md
+# §2), and an Intel Mac - which is the Mac this application is developed on -
+# cannot link the release build at all.
 #
 # This feature turns `ort`'s `load-dynamic` on, which links nothing and looks
 # for a `libonnxruntime.dylib` at run time that no Intel Mac has. Everything
@@ -100,22 +100,17 @@ ort = { version = "2.0.0-rc.13", optional = true, default-features = false, feat
 # module and the reasoning is there. Already in the tree under accesskit.
 zbus = { version = "5", default-features = false, features = ["async-io", "blocking-api"] }
 
-# A Mac App Store submission of slipcase-desktop was refused on 2026-08-31 under
-# Guideline 2.5.1 for referencing `_CGSSetWindowBackgroundBlurRadius`, a private
-# CoreGraphics symbol nothing there or here calls. `winit` 0.30.13 declares it in
-# `platform_impl/macos/ffi.rs` and calls it from `WindowDelegate::set_blur`,
-# behind neither a feature nor a `cfg`, and review reads the symbol table rather
-# than the call graph; fat LTO with `-dead_strip` still carries it. Upstream put
-# it behind a `private-apple-apis` feature in winit#4541 on 2026-07-23 and no
-# published release has that yet. This is slipcase-desktop's pin of that change
-# on the `v0.30.13` tag, taken unchanged so that the three applications carry
-# one fix. `packaging/macos/build-app.sh` refuses a binary that imports any
-# symbol a framework's public headers do not declare, which is what notices if
-# this pin is dropped too early. **Delete it when a winit release carries the
-# gate.**
-#
-# slipcase-desktop's copy of this comment says the pin moves `dpi` in its
-# lockfile by one line; here it does not, measured: `dpi` stays at 0.1.2 and
-# only winit's source line changes.
+# Mac App Store review refuses, under Guideline 2.5.1, a binary that references
+# `_CGSSetWindowBackgroundBlurRadius`, a private CoreGraphics symbol nothing
+# here calls. `winit` 0.30.13 declares it in `platform_impl/macos/ffi.rs` and
+# calls it from `WindowDelegate::set_blur`, behind neither a feature nor a
+# `cfg`, and review reads the symbol table rather than the call graph; fat LTO
+# with `-dead_strip` still carries it. Upstream gates it behind a
+# `private-apple-apis` feature (winit#4541) that no published release carries
+# yet. This is slipcase-desktop's pin of that change on the `v0.30.13` tag,
+# taken unchanged so that the three applications carry one fix.
+# `packaging/macos/build-app.sh` refuses a binary that imports any symbol a
+# framework's public headers do not declare, which is what notices if this pin
+# is dropped too early. **Delete it when a winit release carries the gate.**
 [patch.crates-io]
 winit = { git = "https://github.com/excelano/winit", rev = "3cfd905679da3ca241b97dea723211b580620a27" }

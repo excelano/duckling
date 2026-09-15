@@ -16,11 +16,10 @@
 # WHY THESE FILES ARE NOT LINKED IN
 #
 # `+crt-static` cannot link the prebuilt ONNX Runtime `ort` fetches for this
-# target: it was compiled against the dynamic CRT and the link fails with 63
-# unresolved `__imp_` externals. Measured on the Windows lane 2026-09-05;
-# `.cargo/config.toml` carries the whole argument and the decision that followed
-# from it. DirectML arrives in the same library and is a separate finding, which
-# the comment above its lookup below records.
+# target: it is compiled against the dynamic CRT and the link fails with
+# unresolved `__imp_` externals. `.cargo/config.toml` carries the argument and
+# the decision that follows from it. DirectML arrives in the same library and
+# the comment above its lookup below says why it ships.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)

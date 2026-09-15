@@ -222,8 +222,7 @@ echo
 if [ "$findings" -eq 0 ]; then
     echo "Nothing mechanical is wrong with this install."
 else
-    echo "${findings} thing(s) to write down - in the commit, and in"
-    echo "CHECKLIST.md only if the next person would run the list differently."
+    echo "${findings} thing(s) to write down in the commit."
 fi
 echo "The rest needs eyes: a scanned PDF converting with the network off, the"
 echo "folder panel when a single file is converted beside itself, the icon,"

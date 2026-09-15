@@ -4,7 +4,7 @@
 # The suite, clippy and formatting are repeated from `ci.yml` because that runs
 # on Linux and four things here compile only for this target. Nothing reaches
 # the window, the installer scripts, an MSIX, an Open With entry, the
-# certification kit or the icon as a person sees it; `CHECKLIST.md` holds those.
+# certification kit or the icon as a person sees it.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)

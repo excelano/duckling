@@ -82,8 +82,8 @@ $InBox = @(
     'uxtheme.dll',
 
     # Duckling's own three, all of them arriving with ONNX Runtime and all
-    # three confirmed in C:\Windows\System32 on this machine on 2026-09-05,
-    # with the versions read off the files:
+    # three in C:\Windows\System32 on a stock machine, with the versions read
+    # off the files there:
     #
     #   bcrypt.dll    10.0.19041.1     Windows' cryptography API. In-box since
     #                                  Vista, and distinct from the
@@ -114,15 +114,15 @@ $InBox = @(
 # directory. They are here because `+crt-static` cannot link the prebuilt ONNX
 # Runtime; `.cargo/config.toml` is where that is argued at length.
 #
-# DirectML is the fifth and is a finding of its own, measured 2026-09-05. The
-# Windows dist `ort` chooses is `ms@1.28.0/x86_64-pc-windows-msvc+directml`, so
+# DirectML is the fifth. The Windows dist `ort` chooses is
+# `ms@1.28.0/x86_64-pc-windows-msvc+directml`, so
 # DirectML is linked in whether or not anything asks for it - docling.rs runs
 # the CPU provider and Duckling never selects another - and `directml.dll`
 # becomes a hard import the process cannot start without. In-box DirectML began
 # at Windows 10 10.0.18362 and `AppxManifest.xml.in` declares a floor of
 # 10.0.17763, so relying on the machine's copy would promise a Windows that has
-# none; the copy this machine does have is 1.0.200713, from July 2020, against
-# the 1.15.4 that pyke ships beside the `onnxruntime.lib` actually linked.
+# none; and an in-box copy can be years older (1.0.200713, from 2020, on one
+# machine) than the 1.15.4 that pyke ships beside the `onnxruntime.lib` linked.
 # Shipping their copy is the only way the two are known to match. It does not
 # make that floor proven - whether 1.15.4 loads on 1809 at all is untested, and
 # README.md 2 says what to do about it if it ever matters.

@@ -3,8 +3,7 @@
 # GLib; the suite, clippy and formatting are the fleet's `ci.yml`. On a
 # published release the package goes straight to the release page from the job
 # that built it, never through an artifact. Nothing here reaches a window:
-# `check-libraries.sh` and `CHECKLIST.md` are commands run by a person with a
-# display. amd64 only: `fetch-models.sh` pins no arm64 pdfium.
+# `check-libraries.sh` is run by a person with a display. amd64 only: `fetch-models.sh` pins no arm64 pdfium.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)

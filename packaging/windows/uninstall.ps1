@@ -117,12 +117,8 @@ if (-not $KeepFiles) {
     # Add/Remove Programs points at the copy inside the install directory, so
     # the usual run is a script emptying the directory it is itself in, and a
     # running script cannot delete itself. Run from a checkout it is not that
-    # file, and then the copy is an ordinary file that can go with the rest.
-    #
-    # Both branches were one line in slipcase-desktop until 2026-08-26, when a
-    # run from the checkout left the copy behind and said it was the script now
-    # running. That was untrue and it left a directory the script says it
-    # removes, so the two cases are told apart rather than assumed to be one.
+    # file, and then the copy is an ordinary file that can go with the rest, so
+    # the two cases are told apart rather than assumed to be one.
     $copy = Join-Path $Prefix 'uninstall.ps1'
     $self = $MyInvocation.MyCommand.Path
     if (Test-Path -LiteralPath $copy) {

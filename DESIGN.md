@@ -206,7 +206,7 @@ the preview cap: previewed to the cap, marked.
 ## 7. Walkthroughs
 
 Every slice that touches the window gets a walkthrough at the keyboard,
-against the packaged application, and `CHECKLIST.md` is the list. A
+against the packaged application. A
 screenshot from a lane proves that a code path draws and nothing more.
 
 ## 8. Packaging

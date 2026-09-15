@@ -14,7 +14,7 @@
 # comma-joined with no spaces; its own comment says why the spaced form cannot
 # work through `-File`.
 #
-# HOW THE PACKAGED APPLICATION IS LAUNCHED WITH FILES, MEASURED HERE 2026-09-05
+# HOW THE PACKAGED APPLICATION IS LAUNCHED WITH FILES
 #
 # segler's copy of this script opens its document and lets the file association
 # find the packaged application. Duckling claims no association, so that route
@@ -81,8 +81,7 @@ param(
     # **A listing screenshot wants this and the reason is not vanity.** The
     # Store renders screenshots small, and at the default scale this
     # application's text is around ten pixels - legible in the window and not
-    # in a thumbnail. Four steps is about 140% and was what the first pair were
-    # taken at; measured 2026-09-05, six steps also fixed the preview pane
+    # in a thumbnail. Four steps is about 140%, and also stops the preview pane
     # wrapping the DocLang into fragments.
     #
     # It is egui's own `Ctrl` and `+`, so this changes nothing a person could
@@ -178,9 +177,8 @@ $NOTOPMOST = [IntPtr](-2)
 # has the same time to come to rest as it would without it.
 #
 # `SendKeys` through `WScript.Shell` is the obvious way to do this and it throws
-# *Value does not fall within the expected range* on this machine; the Forms one
-# works. Measured 2026-09-05, and written down because the COM error message
-# names nothing that would lead anybody to the answer.
+# *Value does not fall within the expected range*; the Forms one works, and the
+# COM error message names nothing that would lead anybody to the answer.
 if ($Zoom -gt 0) {
     Add-Type -AssemblyName System.Windows.Forms
     Start-Sleep -Milliseconds 600
@@ -191,11 +189,9 @@ if ($Zoom -gt 0) {
 }
 
 # The pointer goes somewhere the window is not, because egui draws hover state
-# and the capture keeps it. Measured on slipcase-desktop 2026-08-29: a retake
-# landed with the mouse resting over a field, which came out highlighted and
-# focus-ringed in a picture meant to show the application at rest, and with the
-# scroll bar drawn because the pointer was inside the scroll area. Neither is
-# wrong and both are noise a shopper reads as an interface doing something.
+# and the capture keeps it: a pointer resting over a field draws it highlighted
+# and focus-ringed, and one inside the scroll area draws the scroll bar. Neither
+# is wrong and both are noise a shopper reads as an interface doing something.
 #
 # Bottom right of the virtual screen rather than a constant: the window is
 # placed near the top left, and a fixed 1900x1200 is off-screen on a smaller

@@ -17,14 +17,6 @@
 // and egui falls back to `Theme::Dark`, so before this module every Linux user
 // saw the dark card and no desktop setting could reach them.
 //
-// Measured 2026-08-28 before it was written, because the comfortable
-// explanations had to be ruled out first. With GNOME set to Light the card drew
-// dark; with `color-scheme` forced to `prefer-light`, so the portal answered
-// `uint32 2` rather than `0`, the card drew dark again *and the window's own
-// titlebar turned light in the same screenshot*. One window, two halves,
-// disagreeing — which is what rules out the desktop having failed to say what
-// it wanted. The run and the pixel samples are in `git log`.
-//
 // The titlebar's answer comes from `sctk-adwaita`, which spawns `dbus-send` and
 // greps its output for `uint32 1` under a 100ms timeout. That is the second
 // implementation this window would have had, and it is why this one asks the

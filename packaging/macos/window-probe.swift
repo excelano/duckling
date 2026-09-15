@@ -8,7 +8,7 @@
 // at all, and the one thing a test cannot reach is the window.
 //
 // **A screenshot is the wrong assertion and the fleet already knows it.**
-// slipcase-desktop's `CHECKLIST.md` records `screencapture` returning the
+// slipcase-desktop's Mac lane recorded `screencapture` returning the
 // desktop and the menu bar with every window omitted, reporting no error while
 // doing it. A job asserting on pixels would have gone green against that. So
 // this asks the window server directly.

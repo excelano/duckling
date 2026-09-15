@@ -152,9 +152,8 @@ if ($foundBinary) {
     # the ordinary course of things, and Windows will not let a running
     # executable be overwritten. Left to itself the script stops with a .NET
     # IOException and a stack trace naming Copy-Item, which is true and tells
-    # nobody what to do. slipcase-desktop walked this on 2026-08-26; the run
-    # stopped before the registry stage, so nothing was left half-registered,
-    # and that part is worth keeping exactly as it is.
+    # nobody what to do. The copy comes before the registry stage, so a refusal
+    # leaves nothing half-registered.
     try {
         Copy-Item -LiteralPath $foundBinary -Destination $installedExe -Force
     } catch [System.IO.IOException] {
@@ -277,10 +276,9 @@ $uninstallCommand = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$
 # Store package names itself Duckling with a publisher of Excelano, and on
 # segler an entry that did the same put two rows in Settings > Apps reading
 # "Segler" by "Excelano" with the same icon, separated by nothing but 0.1.0
-# against 0.1.0.0. David hit that on 2026-09-04: he picked the one that said
-# Excelano, which was both of them, and removed the package instead of the
-# script install. The package's name is fixed by the manifest and the
-# reservation; this one is ours, so this one is the one that changes.
+# against 0.1.0.0, and a person removing one removes the other. The package's
+# name is fixed by the manifest and the reservation; this one is ours, so this
+# one is the one that changes.
 Set-RegistryValue $uninstallKey 'DisplayName' 'Duckling (user install)'
 Set-RegistryValue $uninstallKey 'DisplayVersion' $version
 Set-RegistryValue $uninstallKey 'Publisher' 'Excelano'

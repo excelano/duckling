@@ -169,14 +169,13 @@ pdfium_src="${root}/.pdfium/lib/libpdfium.dylib"
     exit 1
 }
 
-# **A private symbol in a binary is a rejection, and one cost slipcase-desktop
-# a review cycle.** Its 0.1.1 was refused on 2026-08-31 for referencing
-# `_CGSSetWindowBackgroundBlurRadius`, which arrived through `winit` and which
-# that application neither calls nor had heard of. Review scans the symbol
-# table rather than the call graph, so *unreachable* is not *absent*: the same
-# build with fat LTO and `-Wl,-dead_strip` still carried it. `Cargo.toml`'s
-# `[patch.crates-io]` is what removes it, and this is what notices if it or
-# anything like it comes back.
+# **A private symbol in a binary is a rejection.** Review refuses a bundle for
+# referencing `_CGSSetWindowBackgroundBlurRadius`, which arrives through `winit`
+# and which this application never calls. Review scans the symbol table rather
+# than the call graph, so *unreachable* is not *absent*: a build with fat LTO
+# and `-Wl,-dead_strip` still carries it. `Cargo.toml`'s `[patch.crates-io]` is
+# what removes it, and this is what notices if it or anything like it comes
+# back.
 #
 # **The question it asks is a real one rather than a list of names.** For every
 # undefined symbol a binary imports from a system *framework*, does that
@@ -196,10 +195,10 @@ pdfium_src="${root}/.pdfium/lib/libpdfium.dylib"
 # declared in no header since the macro became a compiler builtin, and present
 # in every Objective-C program ever shipped. It arrives here through the CoreML
 # provider objects inside ONNX Runtime, which slipcase-desktop's binary has no
-# counterpart of, so this is the first copy of the check to meet it. Measured
-# 2026-09-05: with it allowed, both binaries are clean once `Cargo.toml`'s
-# winit pin is in place, and without the pin the executable carries the two
-# `CGS` symbols that pin exists for.
+# counterpart of, so this is the first copy of the check to meet it. With it
+# allowed, both binaries are clean once `Cargo.toml`'s winit pin is in place,
+# and without the pin the executable carries the two `CGS` symbols that pin
+# exists for.
 private_symbols() {
     exe="$1"
     sdk=$(xcrun --sdk macosx --show-sdk-path 2>/dev/null) || sdk=""
@@ -532,7 +531,7 @@ ENTITLEMENTS
     # ask whether a bundle can launch before choosing it, and among copies of
     # one identifier it prefers the newer version, so a submission build
     # sitting here is what `open -a Duckling` would reach - and be killed by
-    # the kernel on the spot. slipcase-desktop measured this on 2026-09-04.
+    # the kernel on the spot.
     # `-u` exits 1 when the bundle was never registered, which is the usual
     # state straight after a build, so its status is not the script's.
     "$lsregister" -u "$app" >/dev/null 2>&1 || true

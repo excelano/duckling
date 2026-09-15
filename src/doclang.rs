@@ -5,9 +5,7 @@
 //! The DocLang specification's archive is `document.xml` plus optional
 //! `pages/N.png` and `assets/`. docling.rs's own archive writer emits the
 //! markup alone, and its markup for a PDF carries no `<page_break/>` where
-//! the reference Python export carries one per page boundary (measured
-//! 2026-09-05 on `normal_4pages.pdf`: four `PageInfo` nodes, no breaks,
-//! against three breaks in the reference archive). DESIGN.md §4.
+//! the reference Python export carries one per page boundary. DESIGN.md §4.
 //!
 //! Author: David M. Anderson
 //! Built with AI assistance (Claude, Anthropic)

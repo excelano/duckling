@@ -178,14 +178,11 @@ fn main() -> eframe::Result {
         }),
     );
 
-    // **A window that fails to open must say so, and until 2026-09-05 this one
-    // did not.** `windows_subsystem = "windows"` above means the process has no
-    // console, so returning the error from `main` prints it to a stderr that
-    // does not exist: the application starts, fails, and vanishes with nothing
-    // on the screen and nothing in a log. David met exactly that on an old
-    // Surface, and the report was "no error, just no app" - which is the worst
-    // possible bug report to receive and was entirely our fault for making it
-    // the only one available.
+    // **A window that fails to open must say so.** `windows_subsystem =
+    // "windows"` above means the process has no console, so returning the error
+    // from `main` prints it to a stderr that does not exist: the application
+    // starts, fails, and vanishes with nothing on the screen and nothing in a
+    // log, and the only bug report available is "no error, just no app".
     //
     // `rfd` is already a dependency, for the Add files dialog, and its message
     // dialog needs no feature and no unsafe. It is used only here: every other

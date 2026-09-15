@@ -35,7 +35,6 @@ ONNX Runtime, pdfium and oniguruma, plus DirectML on Windows; another C dependen
 (`~/notes/pure_rust_preference.md`). `+crt-static` stays absent on Windows, and `check-imports.ps1`
 refusing a DLL goes to David, not into its list. Nothing under `packaging/windows` may write an
 extension's default value or remove a `UserChoice`. `src/lib.rs` is `forbid(unsafe_code)` and
-`src/main.rs` is `deny`; lifting it for a platform module is David's decision. Every source file
-header carries `Author: David M. Anderson` and `Built with AI assistance (Claude, Anthropic)`. Commits
-carry a `Co-Authored-By` trailer for the Claude model in use and a `Signed-off-by` trailer for David,
-and no session URL.
+`src/main.rs` is `deny`; lifting it for a platform module is David's decision. Every source file header
+carries `Author: David M. Anderson` and `Built with AI assistance (Claude, Anthropic)`. Commits carry a
+`Co-Authored-By` trailer for the Claude model in use and a `Signed-off-by` trailer for David, and no session URL.

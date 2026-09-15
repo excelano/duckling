@@ -7,18 +7,16 @@
 #
 # and carries it for a good reason: the Visual C++ runtime is not part of
 # Windows, a binary that imports VCRUNTIME140.dll installs on a clean machine
-# and will not start, and that is how slipcase-desktop 0.1.1 failed Microsoft
-# Store policy 10.2.4.1 on 2026-08-29. Linking the runtime in removes the
-# dependency rather than declaring it.
+# and will not start, and Microsoft Store policy 10.2.4.1 refuses it. Linking
+# the runtime in removes the dependency rather than declaring it.
 #
-# Duckling cannot do that, measured on the Windows lane on 2026-09-05, which is
-# the question the release record sent this lane to answer. The prebuilt ONNX Runtime
-# `ort` fetches for `x86_64-pc-windows-msvc` - `ms@1.28.0`, from pyke's CDN - was
-# compiled against the *dynamic* CRT, so its objects reach the C library through
-# `__imp_` import thunks that the static CRT does not define. The link fails with
-# 63 unresolved externals, every one of them an ordinary C function: `strtoll`,
-# `erff`, `nearbyintf`, `fopen_s`. It is not a flag that can be argued with; the
-# library on the other side of it was built the other way.
+# Duckling cannot do that. The prebuilt ONNX Runtime `ort` fetches for
+# `x86_64-pc-windows-msvc` - `ms@1.28.0`, from pyke's CDN - is compiled against
+# the *dynamic* CRT, so its objects reach the C library through `__imp_` import
+# thunks that the static CRT does not define, and the link fails with unresolved
+# externals, every one of them an ordinary C function: `strtoll`, `erff`,
+# `nearbyintf`, `fopen_s`. It is not a flag that can be argued with; the library
+# on the other side of it was built the other way.
 #
 # So the rule is kept by the other route DESIGN.md 2 already uses for pdfium:
 # **the runtime ships inside the package, beside the executable.**
@@ -33,9 +31,8 @@
 # staged the same way; `packaging/windows/README.md` has that measurement.
 #
 # **Do not add `+crt-static` back without rerunning the link.** If a later
-# `ort` ships a static-CRT build for this target, the flag comes back, four
-# DLLs leave the package, and this comment becomes history in `git log` where
-# it belongs.
+# `ort` ships a static-CRT build for this target, the flag comes back and four
+# DLLs leave the package.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)

@@ -14,7 +14,7 @@
 
   The entitlement does nothing until it is inside a signature. An unsigned
   bundle carrying this file is not sandboxed, which is why every sandbox
-  measurement in CHECKLIST.md is made against a signed one, and why an Apple
+  measurement is made against a signed one, and why an Apple
   Development certificate is enough to make them.
 -->
 <plist version="1.0">

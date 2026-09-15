@@ -34,7 +34,7 @@
   What the association *does* buy is the Windows counterpart of the fifteen
   `MimeType=` entries in `packaging/linux/duckling.desktop`: a person can
   right-click a PDF or a Word file and find Duckling under Open With.
-  CHECKLIST.md item 8 is that check. It cannot take a type over: a packaged
+  It cannot take a type over: a packaged
   association only ever adds itself to `OpenWithProgids` and never claims the
   extension's default, which segler's `packaging/windows/README.md` measured on
   2026-09-04 - there in the course of finding that a *script* install does claim

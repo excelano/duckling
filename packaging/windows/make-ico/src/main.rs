@@ -69,11 +69,10 @@ const TARGET_SIZES: &[u32] = &[16, 24, 32, 48, 256];
 /// The three forms of each target size, and the reason this list exists.
 ///
 /// `BackgroundColor` in `AppxManifest.xml` is `transparent`, so where Windows
-/// draws a *plated* icon it fills the plate with the user's accent colour. On
-/// slipcase-desktop's taskbar that put the drawing on a purple square -
-/// measured there on 2026-08-28 against an accent of `#744DA9` - while the
-/// side-loaded install drew the same icon unplated from the `.ico`. One
-/// application with two faces.
+/// draws a *plated* icon it fills the plate with the user's accent colour: the
+/// taskbar puts the drawing on an accent-coloured square while the side-loaded
+/// install draws the same icon unplated from the `.ico`. One application with
+/// two faces.
 ///
 /// An `altform-unplated` asset is what tells the shell not to plate. The light
 /// variant is the same pixels: this drawing is coloured rather than monochrome,
@@ -211,9 +210,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // The store listing logo, which is not in the package and must not be.
     //
     // Partner Center's *Store logo* field is a listing image rather than a
-    // package asset: it refuses anything but 1080x1080 or 2160x2160, measured
-    // on slipcase-desktop on 2026-08-29 against the live form after that
-    // repository had assumed the 300x300 the older documentation describes.
+    // package asset: it refuses anything but 1080x1080 or 2160x2160, including
+    // the 300x300 the older documentation describes.
     // Writing it beside the package assets rather than into them is deliberate
     // - a file added to `assets` lands in the MSIX, and a package that gains a
     // file has to be certified again for an image no installed copy would ever

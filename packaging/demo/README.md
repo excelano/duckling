@@ -14,7 +14,7 @@ Microsoft Store and the Mac App Store show the same queue.
 ## Why they are ours rather than the corpus
 
 The obvious source was docling.rs's own `tests/data/<format>/sources/`, which is
-what the end-to-end tests draw on and what `CHECKLIST.md` sends a person to.
+what the end-to-end tests draw on.
 David decided against it on 2026-09-05, and the reason is worth keeping: those
 are real third-party documents - arXiv papers, somebody's handbook - and putting
 their content in a commercial store listing is a licence question that would

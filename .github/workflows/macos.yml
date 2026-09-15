@@ -1,11 +1,10 @@
 # The macOS checks a machine can run, on the only kind of machine the release
 # build runs on: the build is Apple silicon only and the Mac lane is Intel, so
 # an arm64 runner is where the shipped architecture converts anything. This
-# fetches the models, runs the suite (the demo documents, a scanned PDF through
-# OCR among them), assembles the bundle with the private-symbol check, opens it
-# with a document, and asks the window server whether a window appeared. It
-# does not reach the sandbox, the folder panel, the icon as a person sees it, or
-# the Store package; `CHECKLIST.md` holds those.
+# fetches the models, runs the suite (a scanned PDF through OCR among the demo
+# documents), assembles the bundle with the private-symbol check, opens it with
+# a document, and asks the window server whether a window appeared. It does not
+# reach the sandbox, the folder panel, the icon, or the Store package.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)

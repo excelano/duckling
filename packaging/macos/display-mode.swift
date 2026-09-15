@@ -3,7 +3,7 @@
 // Author: David M. Anderson
 // Built with AI assistance (Claude, Anthropic)
 //
-// This exists for CHECKLIST.md item 23, the layout at 2x. Every Mac this
+// This exists for the layout at 2x. Every Mac this
 // application had been drawn on was a 1x display over VNC, and a rented Mac
 // mini with no monitor is the same: macOS gives it a 1920 by 1080 virtual
 // display. That display's mode list carries a HiDPI mode of the same size at
