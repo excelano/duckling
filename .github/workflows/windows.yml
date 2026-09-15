@@ -16,13 +16,30 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Nothing here builds a release, so the only reason to ask for this workflow
+  # by hand is the screenshots. A choice rather than a boolean, because there is
+  # a third thing to ask for: `reference` takes the one plain frame a coordinate
+  # gets measured off, and `full` takes the set.
+  workflow_dispatch:
+    inputs:
+      screenshots:
+        description: 'Store screenshots'
+        required: false
+        default: 'reference'
+        type: choice
+        options: ['no', 'reference', 'full']
 
 permissions:
   contents: read
 
 concurrency:
-  group: windows-${{ github.ref }}
-  cancel-in-progress: true
+  # The event as well as the ref: `github.ref` is refs/heads/main for a
+  # workflow_dispatch as much as for a push, so keying on it alone lets a push
+  # to main cancel a dispatched run.
+  group: windows-${{ format('{0}-{1}', github.event_name, github.ref) }}
+  # A superseded check is worth cancelling; a set of screenshots somebody asked
+  # for is not.
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
 
 jobs:
   windows:
@@ -117,3 +134,23 @@ jobs:
           cargo run --release
           cd ../../..
           git diff --exit-code -- packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing
+
+      # Off unless asked for. A bug fix should not pay for a set of Store
+      # screenshots, and a set nobody asked for is a set nobody looks at.
+      # `shots.ps1` carries the recipes and is the same command that retakes
+      # them by hand on the Windows machine.
+      #
+      # Duckling claims no file type, so there is no association to install and
+      # the documents are arguments. The packaged build cannot be assembled
+      # here without an identity, so the frames are of the side-loaded one -
+      # the same commit, and the difference is the package around it.
+      - name: Put the build where -SideLoaded looks for it
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        run: powershell -ExecutionPolicy Bypass -File packaging/windows/install.ps1
+
+      - name: The Store screenshots
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        uses: excelano/.github/.github/actions/store-screenshots@main
+        with:
+          mode: ${{ inputs.screenshots }}
+          args: '-SideLoaded'
