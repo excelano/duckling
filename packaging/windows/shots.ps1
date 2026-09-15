@@ -93,7 +93,7 @@ $FIELD_NOTES_ROW = ''     # the row for field-notes.docx
 $SITE_SURVEY_ROW = ''     # the row for site-survey-report.pdf
 
 # A conversion is not a repaint. The first shot is caught mid-batch and the
-# second waits for the whole of it, which for a scanned PDF is the models
+# second waits for the batch to finish, which for a scanned PDF is the models
 # loading as well as the pages.
 $MID_BATCH = 3
 $WHOLE_BATCH = 90
