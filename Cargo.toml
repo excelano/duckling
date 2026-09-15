@@ -3,7 +3,7 @@
 # of Facebook's Duckling, published since 2026 and nothing to do with this;
 # every other coordinate — the binary, the Debian package, the desktop entry,
 # the Store identity — stays `duckling`. Same shape as xray, which publishes as
-# `x-ray` and installs as `xray`. The release record says what that costs a release.
+# `x-ray` and installs as `xray`. `ship.conf` carries both spellings.
 name = "duckling-converter"
 description = "Convert documents to DocLang, Markdown, JSON, LaTeX and office formats with docling.rs"
 version = "0.2.0"

@@ -106,7 +106,7 @@
          listing language - measured here 2026-09-09, when an `en-us` package
          added an empty English (United States) listing. It cannot rename a
          listing that already exists - that one is deleted and a new one added
-         on the Store listings page. slipcase-desktop's release record recorded
+         on the Store listings page. slipcase-desktop met
          this first, on 2026-08-31; `~/fenster/LIMITS.md` is the long-form
          record. -->
     <Resource Language="en-us" />

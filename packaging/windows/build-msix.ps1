@@ -64,7 +64,7 @@ $ErrorActionPreference = 'Stop'
 #
 # **This is a record of what is known, not a claim that it is acceptable.**
 # Whether to submit with a test failing is a decision, it is David's, and
-# The release record carries it. Recording a finding here does not take it.
+# Recording a finding here does not take it.
 #
 # One entry, from a kit run against this package and not copied from another
 # application's baseline, which would be a list of things somebody else
