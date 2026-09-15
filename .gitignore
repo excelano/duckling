@@ -14,7 +14,6 @@
 /.models
 /.pdfium
 
-/packaging/windows/identity.psd1
 /packaging/windows/SUBMITTING.local.md
 /packaging/windows/PASTE.local.md
 /packaging/macos/SUBMITTING.local.md

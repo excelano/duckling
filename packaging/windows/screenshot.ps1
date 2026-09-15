@@ -146,7 +146,7 @@ if ($SideLoaded) {
     # why.
     $identityFile = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) 'identity.psd1'
     if (-not (Test-Path $identityFile)) {
-        Refuse "no identity at $identityFile - copy identity.psd1.example beside it, or pass -SideLoaded"
+        Refuse "no identity at $identityFile - it is committed beside this script, or pass -SideLoaded"
     }
     $identity = Import-PowerShellDataFile $identityFile
     if (-not $identity.PackageFamilyName) { Refuse 'identity.psd1 has no PackageFamilyName' }
