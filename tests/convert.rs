@@ -34,12 +34,23 @@ fn fresh_dir(name: &str) -> PathBuf {
 
 /// Submit one request and wait for its outcome.
 fn convert(source: &Path, format: OutputFormat, into: &Path) -> Result<duckling::Outcome, String> {
+    convert_as(source, format, into, false)
+}
+
+/// The same, choosing the PDF pipeline's mode.
+fn convert_as(
+    source: &Path,
+    format: OutputFormat,
+    into: &Path,
+    text_only: bool,
+) -> Result<duckling::Outcome, String> {
     let worker = Worker::spawn(|| {});
     worker.submit(Request {
         id: JobId(1),
         source: source.to_path_buf(),
         format,
         destination: Destination::Folder(into.to_path_buf()),
+        text_only,
     });
     let deadline = Instant::now() + Duration::from_secs(300);
     loop {
@@ -113,6 +124,71 @@ fn docx_to_doclang_writes_the_markup_bare() {
     assert!(text.contains("<doclang"), "{}", &text[..80.min(text.len())]);
     assert!(text.ends_with('\n'));
     assert_eq!(text, outcome.preview);
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// The sibling conversions: a spreadsheet into the other ecosystem's
+/// spreadsheet, a deck into the other ecosystem's deck. Part names are
+/// waddle's own, from the writers in `waddle-core/src/{ods,odp,xlsx}`.
+///
+/// These draw on `packaging/demo/documents`, which is in the tree, so they
+/// run wherever the models do rather than only where the corpus is.
+#[test]
+fn a_spreadsheet_and_a_deck_convert_into_their_siblings() {
+    for (source, format, first_part, part) in [
+        (
+            "sample-log.xlsx",
+            OutputFormat::Ods,
+            "mimetype",
+            "content.xml",
+        ),
+        (
+            "orientation-deck.pptx",
+            OutputFormat::Odp,
+            "mimetype",
+            "content.xml",
+        ),
+    ] {
+        let out = fresh_dir(format.extension());
+        let source = Path::new("packaging/demo/documents").join(source);
+        let outcome = convert(&source, format, &out).unwrap();
+        let stem = source.file_stem().unwrap().to_string_lossy();
+        assert_eq!(
+            outcome.output,
+            out.join(format!("{stem}.{}", format.extension()))
+        );
+        let bytes = std::fs::read(&outcome.output).unwrap();
+        assert_eq!(&bytes[..2], b"PK", "a package is a zip");
+        let names = zip_names(&bytes);
+        for want in [first_part, part] {
+            assert!(names.iter().any(|n| n == want), "{format:?} lacks {want}");
+        }
+        std::fs::remove_dir_all(&out).unwrap();
+    }
+}
+
+/// The third leg, ODS to XLSX, which the demo set has no source for. The
+/// fixture is under `odf/`, not a directory of its own.
+#[test]
+fn an_opendocument_spreadsheet_converts_to_xlsx() {
+    let Some(corpus) = corpus() else {
+        eprintln!("skipped: no docling.rs corpus");
+        return;
+    };
+    let out = fresh_dir("xlsx");
+    let outcome = convert(
+        &corpus.join("odf/sources/odf_table_with_title_01.ods"),
+        OutputFormat::Xlsx,
+        &out,
+    )
+    .unwrap();
+    assert_eq!(outcome.output, out.join("odf_table_with_title_01.xlsx"));
+    let bytes = std::fs::read(&outcome.output).unwrap();
+    assert_eq!(&bytes[..2], b"PK", "a package is a zip");
+    let names = zip_names(&bytes);
+    for want in ["[Content_Types].xml", "xl/workbook.xml"] {
+        assert!(names.iter().any(|n| n == want), "no {want}");
+    }
     std::fs::remove_dir_all(&out).unwrap();
 }
 
@@ -320,6 +396,55 @@ fn demo_digital_pdf_converts_through_the_layout_model() {
     let text = std::fs::read_to_string(&outcome.output).unwrap();
     assert!(text.contains("## "), "no headings:\n{text}");
     assert!(text.contains('|'), "no table:\n{text}");
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// Text-only mode: the same digital PDF, read from its text layer with no
+/// model loaded. The words survive; the structure the layout model finds
+/// does not, which is the trade the checkbox offers.
+#[test]
+fn text_only_keeps_the_words_and_drops_the_structure() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("text-only");
+    let outcome = convert_as(
+        &demo().join("site-survey-report.pdf"),
+        OutputFormat::Markdown,
+        &out,
+        true,
+    )
+    .unwrap();
+    let text = std::fs::read_to_string(&outcome.output).unwrap();
+    assert!(!text.trim().is_empty(), "the text layer came back empty");
+    assert!(
+        !text.contains("## "),
+        "headings without the layout model:\n{text}"
+    );
+    assert!(outcome.notes.is_empty(), "{:?}", outcome.notes);
+    std::fs::remove_dir_all(&out).unwrap();
+}
+
+/// A scan has no text layer, so text-only mode has nothing to read. That is
+/// correct and looks like a failure, so the outcome says which it is.
+#[test]
+fn text_only_explains_itself_on_a_file_with_no_text_layer() {
+    if !pipeline_available() {
+        return;
+    }
+    let out = fresh_dir("text-only-scan");
+    let outcome = convert_as(
+        &demo().join("scanned-notice.pdf"),
+        OutputFormat::Markdown,
+        &out,
+        true,
+    )
+    .unwrap();
+    assert!(
+        outcome.notes.iter().any(|n| n.contains("no text layer")),
+        "{:?}",
+        outcome.notes
+    );
     std::fs::remove_dir_all(&out).unwrap();
 }
 

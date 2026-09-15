@@ -80,7 +80,7 @@
     <DisplayName>Duckling</DisplayName>
     <PublisherDisplayName>@PUBLISHER_DISPLAY_NAME@</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
-    <Description>Convert Word, PowerPoint, Excel, PDF and forty other formats into DocLang, Markdown, JSON or LaTeX. The layout, table and OCR models ship inside the app, so it works offline and nothing you convert leaves your machine.</Description>
+    <Description>Convert Word, PowerPoint, Excel, PDF and forty other formats into DocLang, Markdown, JSON, LaTeX or an office document. The layout, table and OCR models ship inside the app, so it works offline and nothing you convert leaves your machine.</Description>
   </Properties>
 
   <Dependencies>
@@ -121,7 +121,7 @@
 
       <uap:VisualElements
         DisplayName="Duckling"
-        Description="Convert documents to DocLang, Markdown, JSON or LaTeX."
+        Description="Convert documents to DocLang, Markdown, JSON, LaTeX or an office format."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">

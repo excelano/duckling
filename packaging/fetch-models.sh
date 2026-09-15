@@ -79,7 +79,7 @@ fetch_member() { # <url> <archive sha256> <member> <path>
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64)
     fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
-      3019ad1cd6980e51d900bb9266f8980cb846cb8e0c1f6553c52a7a1626469020 ;;
+      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b ;;
   Darwin-*)
     fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
       794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
@@ -93,18 +93,18 @@ case "$(uname -s)-$(uname -m)" in
     exit 1 ;;
 esac
 
-fetch "$BASE/layout_heron.onnx"      .models/layout_heron.onnx      2e5d4dd812c46b742a031611ab7ba061bf66937a56fdee266ada4fe1e3073764
-fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 5c7a4685c838b485069b81847f2c9330f7ffc488aefff7a8ceb7f7968c95e410
+fetch "$BASE/layout_heron.onnx"      .models/layout_heron.onnx      97129cc5982735ec024802911b55a913b5fedd75214304e4c5039bc15f5f32f3
+fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 1c53e651ade205ce7d6dfbe54af9730d774af4ec0249832b94860466de0b440b
 fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38fee0dae2c1ccee38241f37df202c9509e3abca02e9217c5ee615
 fetch "$BASE/ppocr_keys_v1.txt"      .models/ppocr_keys_v1.txt      a1c84d9bdb9ab29043c58896224d32941783eb821629618416dcb08f12886492
 fetch "https://huggingface.co/SWHL/RapidOCR/resolve/main/PP-OCRv3/en_PP-OCRv3_rec_infer.onnx" \
       .models/ocr_rec_en.onnx ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea
 fetch "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/main/ppocr/utils/en_dict.txt" \
       .models/en_dict.txt 5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3
-fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         790cb70168e66fcf77136fdd3ba6d0ff527ee366e083e62475e0339a5c811e00
-fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      295e452480e6eddb4ae8972dfff939c1a6a3293bfd8b30fe026c3d7d6ee92037
-fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 7d60a29e01f66108d36075be51c012ff451e70aba83c644a1b59604395f13c10
-fetch "$BASE/bbox.onnx"            .models/tableformer/bbox.onnx            65247bba792830762c89baa5f2e5f06c8df7720181e4d0088107f7d88b06f915
+fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         d6a360e3c7663ebaffa5e578ddb6f0d1806f1b469f85b7c304e7a7de41a43abf
+fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      1a260bbf82a205bfcac64b0a92219ea76aae9faa99dd357bbbefcca5b558db89
+fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 0d567955041b9b62ea95464372ffdf4e05f7a9429f6318401187bb30470275e0
+fetch "$BASE/bbox.onnx"            .models/tableformer/bbox.onnx            40bd7897bef9b1f152ca8132b07691464db6444df7e3c5cb6f5d7451b8356054
 fetch "$BASE/bbox.onnx.data"       .models/tableformer/bbox.onnx.data       7610e2593bfaecd72a535370f06e8c2468f9bf208bd2abe46cc727dda0a11392
 
 # TableFormer's decoder is picked by preference and `decoder_kv.onnx` is the

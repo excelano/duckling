@@ -65,8 +65,19 @@ regions cover too little of it; TableFormer ships the one decoder the
 pipeline resolves, `decoder_kv.onnx`, and nothing behind it in that
 preference order.
 
-Measured 2026-09-11: `.models/` is 613 MB and `.pdfium/` 7 MB on Linux, and
-the package installs 687 MB. Which file each stage resolves to is
+The TableFormer encoder is the fp32 file and not the fp16 repack beside it,
+which is the reverse of the decoder rule and is deliberate. Only one encoder
+is ever loaded, chosen once at startup, so shipping both would carry a file
+nothing opens. docling-pdf ranks fp16 first *unless* it prefers fp32, which
+it does for CUDA, TensorRT, DirectML and CoreML — and in that branch fp16 is
+not a candidate at all. Duckling compiles no GPU execution provider today,
+so either file would resolve; fp32 is the one that still resolves if that
+changes. The 226 MB it used to be became 108 MB upstream when the baked zero
+masks were stripped, bit-identical in output, so the choice costs 54 MB
+against fp16 and nothing at all against last week.
+
+Measured 2026-09-14: `.models/` is 500 MB and `.pdfium/` 7 MB on Linux, and
+the package installs 575 MB. Which file each stage resolves to is
 docling.rs's `model_inventory`, and `tests/convert.rs` asks it: a release
 that reordered a preference or withdrew an export would resolve to a file no
 package carries, and the test says so before a conversion does. What is left
@@ -197,7 +208,7 @@ in folder, and the written text in a read-only monospace editor capped at
 256 KB with a line saying so when the file is longer. A DocLang archive is a
 zip, so its preview is the `document.xml` inside.
 
-**Seven outputs, and DocLang is the default.** Decided 2026-09-04 after the
+**Ten outputs, and DocLang is the default.** Decided 2026-09-04 after the
 first build offered four with the archive as the only DocLang form, because
 that is all the docling.rs command-line tool offers. The library writes the
 bare markup, the archive is that markup plus two fixed OPC parts, and Segler
@@ -205,6 +216,25 @@ opens both, so bare DocLang, `.dclg`, is the first entry and the default:
 it is the format the two applications share, and it is the smaller and
 more readable of the two spellings. The archive stays for whatever
 downstream wants the packaged form.
+
+**Three of the ten are offered only for the input they are a sibling of.**
+ODS appears when every file in the queue is XLSX, XLSX when every file is
+ODS, ODP when every file is PPTX; the other seven are offered whatever the
+queue holds. The three write one sheet per table or one slide per level-1
+heading, so a book converted to XLSX is an empty sheet and a stack of
+dropped-node warnings: an output worth having for the document it was meant
+for and worth nobody's time for anything else. The rule is `common_input`
+and `OutputFormat::offered_for` in `src/lib.rs`, and it is an affordance in
+the picker rather than a check in the engine — a `Request` asking for any
+pairing still converts, which is what lets the tests ask for combinations
+the window would not offer. When the queue stops warranting the selected
+format the picker falls back to the default and the status line says why,
+checked once a frame before anything is drawn so that no later route into
+the queue can get around it.
+
+The slide leg is one-way. waddle writes ODP and no PPTX, so a deck converts
+out of the OOXML ecosystem and not back into it; the spreadsheet pair goes
+both ways.
 
 **The archive carries page images and the pictures, and bare DocLang gets
 its pictures beside it.** Decided 2026-09-05; David: "Yes, I want the
@@ -224,10 +254,11 @@ the file, content-addressed, so an existing file of the same name holds the
 same bytes. A page render that fails is a note on the result, not a failed
 conversion.
 
-**ODT and DOCX come from waddle, added 2026-09-08.** docling.rs writes no
-office format; `waddle-core`, the sibling crate written for this, takes the
-`DoclingDocument` the engine produced and returns an OpenDocument Text or
-Word package. It emits the constructs docling.rs's own reader for that
+**The office packages come from waddle, added 2026-09-08.** docling.rs
+writes no office format; `waddle-core`, the sibling crate written for this,
+takes the `DoclingDocument` the engine produced and returns an OpenDocument
+or OOXML package: ODT and DOCX from the first release, ODS, ODP and XLSX
+from 0.2. It emits the constructs docling.rs's own reader for that
 format recognises, so the package reads back into the document it came
 from as far as the reader allows, and its `DESIGN.md` §6 lists where it
 does not. The output is plain by design: the model carries no styles, page
@@ -241,6 +272,23 @@ reports and Duckling shows as notes on the result, one line per kind with
 a count. The preview for a package is the document as Markdown, since a
 person cannot read a zip. Duckling's principle holds: it adds no conversion
 logic of its own, and a wrong package is waddle's issue.
+
+**One pipeline option reaches the window: text layer only.** Added
+2026-09-14. Every other knob docling.rs offers stays where it is, because a
+window with a preferences panel is a different application from the one `§4`
+argues for. This one earns a checkbox because the cost it removes is
+measured in minutes: a 460-page digital PDF takes about five through the
+models and seconds off its text layer. It is framed as speed and not as
+accuracy — the models read that book correctly once
+docling-project/docling.rs#419 was fixed — and what it gives up is headings,
+tables and any page that needs OCR.
+
+`no_ocr` is a builder rather than a setter, so the engine rebuilds its
+pipeline when the mode changes and remembers which mode the warm one is for.
+A text-only pipeline loads no model at all, so switching to it is free and
+switching back pays the load once. A file with no text layer reads as
+nothing in this mode, which is correct and looks like a failure, so the
+result carries a note saying which it is.
 
 **docling.rs writes no page breaks for a PDF, and Duckling inserts them.**
 Measured 2026-09-05 on `normal_4pages.pdf`: docling.rs's markup carries
@@ -497,13 +545,7 @@ The batch argument in `§4` is why it is there; the first hands-on use by
 somebody who is not David is where the question gets answered.
 
 **Trimming the model set further.** `§2` ships what docling.rs resolves,
-which is 613 MB. Three things are left, in the order they are worth having.
-
-The largest single file is TableFormer's `encoder.onnx` at 226 MB, and
-upstream hosts no int8 variant of it: `models-v1` carries a quantized
-decoder and a quantized layout model and stops there. Their own ratios were
-0.40x on layout and 0.64x on the decoder, so an encoder in int8 would
-plausibly land between 90 and 145 MB. Asked as docling-project/docling.rs#374.
+which is 500 MB. Two things are left, in the order they are worth having.
 
 `layout_heron.onnx` is 172 MB and is loaded only to re-run a page whose int8
 regions cover less than half its text cells, docling-pdf's quant-robustness

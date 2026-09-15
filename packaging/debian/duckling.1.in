@@ -14,7 +14,7 @@
 .\" Built with AI assistance (Claude, Anthropic)
 .TH DUCKLING 1 "2026\-09\-04" "duckling @VERSION@" "User Commands"
 .SH NAME
-duckling \- convert documents to Markdown, JSON, DocLang or LaTeX
+duckling \- convert documents to DocLang, Markdown, JSON, LaTeX or an office format
 .SH SYNOPSIS
 .B duckling
 .RI [ file | folder \ ...]

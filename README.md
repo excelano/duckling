@@ -1,11 +1,12 @@
 # Duckling
 
-Duckling converts documents into DocLang, Markdown, JSON, LaTeX, ODT or DOCX, on your
-own machine, with nothing sent anywhere. Drop in Word, PowerPoint, Excel,
-PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email, Visio and some forty
-other formats, choose what to convert to and where to put it, and press
-Convert. Scanned PDFs and images are read by layout and OCR models that ship
-inside the application, so there is nothing to download after installing.
+Duckling converts documents into DocLang, Markdown, JSON, LaTeX, ODT, ODS, ODP,
+DOCX or XLSX, on your own machine, with nothing sent anywhere. Drop in Word,
+PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, Apple iWork, email,
+Visio and some forty other formats, choose what to convert to and where to
+put it, and press Convert. Scanned PDFs and images are read by layout and OCR
+models that ship inside the application, so there is nothing to download
+after installing.
 
 The converter is [docling.rs](https://github.com/docling-project/docling.rs),
 the Rust port of IBM's Docling. Duckling is the window around it, and adds
