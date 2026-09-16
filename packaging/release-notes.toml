@@ -1,0 +1,32 @@
+# What this release tells the stores it changed, in every language the
+# listing is in. One file, both languages, because a translation is reviewed
+# beside its source.
+#
+# The version is checked against the release being cut: notes left from last
+# time stop the release rather than reaching a listing. A language the listing
+# has and this file does not is also a refusal - a German listing saying
+# something nobody wrote is worse than a release that stops.
+#
+# Nothing else reads this. The GitHub release, the Debian changelog and the
+# AppStream entry take commit subjects.
+
+version = "0.2.0"
+
+[locales."de-de"]
+whats-new = """
+Duckling spricht Deutsch. Auf einem deutsch eingestellten Rechner erscheinen die Leiste, die Warteschlange, die Vorschau und jede Zeile der Statusleiste auf Deutsch, und es gibt nichts auszuwählen: Duckling übernimmt die Sprache, die der Rechner bereits eingestellt hat, und fällt für jede andere auf Englisch zurück.
+
+Was eine Datei ist, bleibt, was die Datei sagt. Das Format, als das eine Zeile gelesen wurde, und die Endungen der Dateien, die docling.rs nicht liest, werden nicht übersetzt.
+"""
+
+[locales."en-us"]
+whats-new = """
+Duckling writes ODS, ODP and XLSX now, alongside ODT and DOCX. The three are offered for the document each is a sibling of: ODS when every file in the queue is XLSX, XLSX when they are all ODS, ODP when they are all PPTX. A book converted to a spreadsheet is an empty sheet and a list of what was dropped, so it is not offered.
+
+A PDF that already has text in it can be converted from that text alone, with no model loaded: seconds rather than minutes, at the cost of the headings, the tables and anything that needs OCR. The checkbox says so.
+
+The download is 114 MB smaller. And a line that used to fall out of a paragraph and reappear after it now stays where it belongs.
+
+Documents are read by docling.rs 1.51.
+"""
+
