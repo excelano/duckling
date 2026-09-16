@@ -99,8 +99,8 @@ $ZOOM = @('key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus')
 # then take a second with `-ListOpen`, which opens the format list before the
 # shutter, and read the two choices off that.
 $FORMAT_CONTROL = '436,50'    # the format control, which opens the list
-$FORMAT_DOCLANG = ''          # the DocLang choice in the open list
-$FORMAT_MARKDOWN = ''         # the Markdown choice in the same list
+$FORMAT_DOCLANG = '440,85'    # the DocLang choice in the open list
+$FORMAT_MARKDOWN = '440,115'  # the Markdown choice in the same list
 $CONVERT = '1066,50'          # the Convert button
 # A row is selectable by its file name and not by the whole row, so these are
 # on the name. The queue is sorted by name, and these are the third and tenth
