@@ -676,6 +676,13 @@ impl App {
     }
 
     fn preview(&mut self, ui: &mut egui::Ui) {
+        // Fill the panel rather than hugging what is drawn. egui takes the
+        // frame's returned rect as the panel's, so a side panel whose content
+        // asks for less renders at less and `default_size` only caps the width
+        // text wraps at: this pane asked for 460 and drew 301, the width of a
+        // file name and a path. Resizing still works in both directions,
+        // because a drag changes the width this reads.
+        ui.set_min_width(ui.available_width());
         let Some(job) = self
             .selected
             .and_then(|id| self.jobs.iter().find(|j| j.id == id))
