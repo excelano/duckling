@@ -411,16 +411,25 @@ if [ -n "$store_profile" ]; then
     # one keychain is an ordinary state - an expiring one beside its replacement
     # - and picking whichever `grep` found first is how a package gets signed
     # with the wrong one.
+    #
+    # Counted by the certificate and not by the line. One certificate in two
+    # keychains is listed once for each, and on a machine whose search list
+    # has two it is listed once per pair - the same certificate four times,
+    # which is not four certificates. `find-identity` prints the SHA-1 first
+    # and that is the certificate, so two of a kind are still caught and two
+    # sightings of one are not.
     find_identity() {
         matches=$(security find-identity -v 2>/dev/null |
-            grep "$1: .*(${store_team})" | sed 's/.*"\(.*\)"/\1/')
+            grep "$1: .*(${store_team})" |
+            sed 's/^ *[0-9]*) *\([0-9A-Fa-f]*\) *"\(.*\)"$/\1 \2/' |
+            sort -u)
         count=$(printf '%s' "$matches" | grep -c . || true)
         [ "$count" = 1 ] || {
-            echo "build-app.sh: expected one \"$1\" identity for team ${store_team}, found ${count}" >&2
+            echo "build-app.sh: expected one \"$1\" certificate for team ${store_team}, found ${count}" >&2
             [ "$count" = 0 ] || echo "$matches" | sed 's/^/  /' >&2
             return 1
         }
-        printf '%s' "$matches"
+        printf '%s' "$matches" | sed 's/^[0-9A-Fa-f]* //'
     }
     app_identity=$(find_identity "Apple Distribution") || exit 1
     # Apple's portal calls this Mac Installer Distribution; the certificate calls
