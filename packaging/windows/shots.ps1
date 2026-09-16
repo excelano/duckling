@@ -76,6 +76,10 @@ if (-not $OutDir) { $OutDir = Join-Path $root 'dist\screenshots' }
 # - legible in the window and not in a thumbnail. It also stops the preview
 # pane wrapping the DocLang into fragments. Nothing persists: eframe's
 # persistence feature is off, so the next launch is back at 100%.
+#
+# Handed to `Take-Shots` as `-EveryShot` rather than written into each recipe,
+# so that the reference frame is taken at this zoom too. Coordinates are read
+# off that frame, and the zoom moves every one of them.
 $ZOOM = @('key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus')
 
 # The controls, by what they do rather than by where they are. Each is "X,Y" in
@@ -158,18 +162,19 @@ function Opens {
 function Get-Shots {
     # Mid-batch: some rows still queued, the scanned PDF spinning, the rest
     # done, and a result selected from a Word file.
-    Shot '01-converting' (
-        $ZOOM + @("click $FORMAT_DOCLANG", "click $CONVERT", "click $FIELD_NOTES_ROW")
+    Shot '01-converting' @(
+        "click $FORMAT_DOCLANG", "click $CONVERT", "click $FIELD_NOTES_ROW"
     ) -Settle $MID_BATCH
 
     # The batch finished, with the preview open on a PDF long enough to have
     # been worth converting, and a row showing `species-list.md` becoming
     # `species-list (1).md` - the never-overwrite rule of DESIGN.md §5 in the
     # picture.
-    Shot '02-converted' (
-        $ZOOM + @("click $FORMAT_MARKDOWN", "click $CONVERT", "click $SITE_SURVEY_ROW")
+    Shot '02-converted' @(
+        "click $FORMAT_MARKDOWN", "click $CONVERT", "click $SITE_SURVEY_ROW"
     ) -Settle $WHOLE_BATCH
 }
 
 Take-Shots -Launch (Opens) -Process $PROCESS `
-    -Width $WIDTH -Height $HEIGHT -OutDir $OutDir -Reference:$Reference
+    -Width $WIDTH -Height $HEIGHT -OutDir $OutDir -Reference:$Reference `
+    -EveryShot $ZOOM
