@@ -28,6 +28,14 @@ on:
         default: 'reference'
         type: choice
         options: ['no', 'reference', 'full']
+      # Two of this repository's coordinates are inside the format list, which
+      # is a popup, so the frame they are measured off is taken with
+      # `-ListOpen`. Nothing else is passed here.
+      shot_args:
+        description: 'Further arguments for shots.ps1, such as -ListOpen'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -193,4 +201,4 @@ jobs:
         uses: excelano/.github/.github/actions/store-screenshots@main
         with:
           mode: ${{ inputs.screenshots }}
-          args: '-SideLoaded'
+          args: -SideLoaded ${{ inputs.shot_args }}

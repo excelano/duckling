@@ -44,7 +44,13 @@ param(
     # The build under %LOCALAPPDATA% rather than the packaged one. The packaged
     # application is what a person gets and is the default; this is for looking
     # at a build that is not packaged yet.
-    [switch] $SideLoaded
+    [switch] $SideLoaded,
+    # Open the format list before the reference frame, so that the two choices
+    # inside it can be measured. egui draws the list in a popup that exists
+    # only while it is open, and its items take no keyboard: pressing Down and
+    # Return with the list open leaves the selection where it was, so each of
+    # the two shots clicks its choice and each choice needs a coordinate.
+    [switch] $ListOpen
 )
 
 $ErrorActionPreference = 'Stop'
@@ -84,17 +90,23 @@ $ZOOM = @('key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus')
 
 # The controls, by what they do rather than by where they are. Each is "X,Y" in
 # the frame, at the size above and *after* the zoom, since the zoom moves
-# everything. None has been measured: the Windows set predates the driver
-# growing actions and was taken by hand. Take a reference frame, read them off
-# it, and fill them in:
+# everything. Read off a reference frame:
 #
 #     powershell -ExecutionPolicy Bypass -File packaging\windows\shots.ps1 -Reference
 #
-$FORMAT_DOCLANG = ''      # the DocLang choice in the format control
-$FORMAT_MARKDOWN = ''     # the Markdown choice in the same control
-$CONVERT = ''             # the Convert button
-$FIELD_NOTES_ROW = ''     # the row for field-notes.docx
-$SITE_SURVEY_ROW = ''     # the row for site-survey-report.pdf
+# In two passes, because two of them are inside a popup and no plain frame
+# shows them. The first pass gives the toolbar and the rows; fill those in,
+# then take a second with `-ListOpen`, which opens the format list before the
+# shutter, and read the two choices off that.
+$FORMAT_CONTROL = '436,50'    # the format control, which opens the list
+$FORMAT_DOCLANG = ''          # the DocLang choice in the open list
+$FORMAT_MARKDOWN = ''         # the Markdown choice in the same list
+$CONVERT = '1066,50'          # the Convert button
+# A row is selectable by its file name and not by the whole row, so these are
+# on the name. The queue is sorted by name, and these are the third and tenth
+# of the twelve.
+$FIELD_NOTES_ROW = '60,201'   # the row for field-notes.docx
+$SITE_SURVEY_ROW = '60,437'   # the row for site-survey-report.pdf
 
 # A conversion is not a repaint. The first shot is caught mid-batch and the
 # second waits for the batch to finish, which for a scanned PDF is the models
@@ -163,7 +175,8 @@ function Get-Shots {
     # Mid-batch: some rows still queued, the scanned PDF spinning, the rest
     # done, and a result selected from a Word file.
     Shot '01-converting' @(
-        "click $FORMAT_DOCLANG", "click $CONVERT", "click $FIELD_NOTES_ROW"
+        "click $FORMAT_CONTROL", "click $FORMAT_DOCLANG",
+        "click $CONVERT", "click $FIELD_NOTES_ROW"
     ) -Settle $MID_BATCH
 
     # The batch finished, with the preview open on a PDF long enough to have
@@ -171,10 +184,17 @@ function Get-Shots {
     # `species-list (1).md` - the never-overwrite rule of DESIGN.md §5 in the
     # picture.
     Shot '02-converted' @(
-        "click $FORMAT_MARKDOWN", "click $CONVERT", "click $SITE_SURVEY_ROW"
+        "click $FORMAT_CONTROL", "click $FORMAT_MARKDOWN",
+        "click $CONVERT", "click $SITE_SURVEY_ROW"
     ) -Settle $WHOLE_BATCH
+}
+
+$everyShot = $ZOOM
+if ($ListOpen) {
+    if (-not $Reference) { Write-Error 'shots.ps1: -ListOpen is for taking a reference frame' }
+    $everyShot += "click $FORMAT_CONTROL"
 }
 
 Take-Shots -Launch (Opens) -Process $PROCESS `
     -Width $WIDTH -Height $HEIGHT -OutDir $OutDir -Reference:$Reference `
-    -EveryShot $ZOOM
+    -EveryShot $everyShot
