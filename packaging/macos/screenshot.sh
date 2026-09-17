@@ -242,7 +242,7 @@ if args.contains("--type") {
 // reaching for a layout API.
 if args.contains("--key") {
     let codes: [String: CGKeyCode] = [
-        "a": 0, "s": 1, "z": 6, "return": 36, "escape": 53, "tab": 48,
+        "a": 0, "s": 1, "z": 6, "g": 5, "return": 36, "escape": 53, "tab": 48,
         "delete": 51, "left": 123, "right": 124, "down": 125, "up": 126,
         "home": 115, "end": 119,
     ]
