@@ -129,11 +129,13 @@ appearance() {
 # rather than shared: "Umwandeln in" is wider than "Convert to", so everything
 # after it sits further right in a German window.
 
+en_add_files='43,43'
 en_add_folder='128,43'
 en_format_control='310,43'
 en_convert='761,43'
 en_row=''
 
+de_add_files='76,43'
 de_add_folder='220,43'
 de_format_control='450,43'
 de_convert='944,43'
@@ -148,12 +150,14 @@ de_row=''
 for_language() {
     case "$1" in
         en|en-US|en-us)
+            ADD_FILES=$en_add_files
             ADD_FOLDER=$en_add_folder
             FORMAT_CONTROL=$en_format_control
             CONVERT=$en_convert
             ROW=$en_row
             ;;
         de|de-DE|de-de)
+            ADD_FILES=$de_add_files
             ADD_FOLDER=$de_add_folder
             FORMAT_CONTROL=$de_format_control
             CONVERT=$de_convert
@@ -187,19 +191,21 @@ for_language() {
 
 # --- the shots --------------------------------------------------------------
 
-# THE DOCUMENTS GO IN THROUGH ADD FOLDER
+# THE DOCUMENTS GO IN THROUGH THE OPEN PANEL
 #
 # Not by launching the bundle with them. Duckling takes documents as arguments
 # rather than through the Finder open-document event, which is what `open -a app
 # doc` sends and what the driver does; a reference frame taken that way came
 # back with an empty queue. `packaging/submission-notes.md` has the rest of it:
-# under the Store sandbox the argument route is blocked too, so the folder goes
-# in through Add folder, which is also what a person does.
+# under the Store sandbox the argument route is blocked too.
 #
-# `Add folder...` opens a chooser. Cmd-Shift-G is the path field, the first
-# Return accepts the path and the second accepts the folder.
-add_the_documents() {
-    printf '%s' "--click ${ADD_FOLDER} --key cmd+shift+g --type ${staged}/ --key return --key return"
+# `Add files...` and a whole file path, rather than `Add folder...` and a
+# directory. Cmd-Shift-G takes a path; a path that names a file leaves that file
+# selected, and the panel's Open button acts on a selection. A path that names a
+# directory navigates into it and selects nothing, which is what the first
+# attempt did: the panel opened, took the path, closed, and added nothing.
+add_a_document() {
+    printf '%s' "--click ${ADD_FILES} --key cmd+shift+g --type ${1} --key return --key return"
 }
 
 # Each frame relaunches the application, so each one adds the folder again.
@@ -209,20 +215,20 @@ shots() {
     # The queue with a conversion running: the layout model working, the status
     # column reading Converting. This is the frame guideline 2.3.3 asks for.
     # shellcheck disable=SC2046
-    shot 01-light-converting $(add_the_documents) --click "$CONVERT"
+    shot 01-light-converting $(add_a_document "$converting") --click "$CONVERT"
 
     # The output formats, listed. Measured off this frame on 2026-09-17: the
     # control offers seven - DocLang, Markdown, JSON, DocLang archive, LaTeX,
     # ODT, DOCX - and this is the only frame that shows them.
     # shellcheck disable=SC2046
-    shot 02-light-the-output-formats $(add_the_documents) --click "$FORMAT_CONTROL"
+    shot 02-light-the-output-formats $(add_a_document "$converting") --click "$FORMAT_CONTROL"
 
     appearance dark
 
     # The same queue in the dark appearance, so a reader comparing them sees the
     # application rather than two different demonstrations.
     # shellcheck disable=SC2046
-    shot 03-dark-converting $(add_the_documents) --click "$CONVERT"
+    shot 03-dark-converting $(add_a_document "$converted") --click "$CONVERT"
 }
 
 . "${here}/take-shots.sh"
