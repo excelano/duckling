@@ -22,9 +22,26 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
+      # Optional, because a screenshots run has no tag to give. With one the
+      # release binary is built and attached; without one this is the checks
+      # and, if asked for, the pictures.
       tag:
         description: 'Tag to build the release binary for'
-        required: true
+        required: false
+        type: string
+      # A choice rather than a boolean, because there is a third thing to ask
+      # for: `reference` takes the one plain frame per language that a
+      # coordinate gets measured off, and `full` takes the set.
+      screenshots:
+        description: 'Mac App Store screenshots'
+        required: false
+        default: 'no'
+        type: choice
+        options: ['no', 'reference', 'full']
+      shot_args:
+        description: 'Further arguments for shots.sh'
+        required: false
+        default: ''
         type: string
 
 permissions:
@@ -153,12 +170,31 @@ jobs:
           path: ${{ runner.temp }}/screen.png
           if-no-files-found: warn
 
+      # The Mac App Store set, off unless asked for. A bug fix should not pay
+      # for a set of screenshots, and a set nobody asked for is a set nobody
+      # looks at. `packaging/macos/shots.sh` carries the recipes; everything
+      # around it - raising the desktop past the 1024x768 a runner comes up at,
+      # running the recipes once per language, keeping what they wrote - is the
+      # shared action's.
+      #
+      # Both languages. Duckling reads POTEXT_LANG before it asks the platform,
+      # so the German set is a German window, and the demo documents are the
+      # same in both.
+      - name: The Store screenshots
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        uses: excelano/.github/.github/actions/mac-store-screenshots@main
+        with:
+          app: dist/Duckling.app
+          mode: ${{ inputs.screenshots }}
+          languages: en de
+          args: ${{ inputs.shot_args }}
+
       # Built here and signed on the Mac: the Distribution certificate stays
       # where it is, and the slow half plus the two checks that cost a review
       # cycle happen before anybody is waiting. The steps are excelano/.github's,
       # because every repository with this target needs the same ones.
       - name: The binary the Store package is built from
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
         uses: excelano/.github/.github/actions/mac-release-binary@main
         with:
           binary: duckling
