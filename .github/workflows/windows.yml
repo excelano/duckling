@@ -2,8 +2,9 @@
 # platform, the shipped binary imports nothing that is neither in-box nor in the
 # package, and the committed icons match the drawing they are generated from.
 # The suite, clippy and formatting are repeated from `ci.yml` because that runs
-# on Linux and four things here compile only for this target. Nothing reaches
-# the window, the installer scripts, an MSIX, an Open With entry, the
+# on Linux and four things here compile only for this target. On a release it
+# also fetches the models and assembles the unsigned Store package. Nothing
+# reaches the window, the installer scripts, an Open With entry, the
 # certification kit or the icon as a person sees it.
 #
 # Author: David M. Anderson
@@ -16,12 +17,19 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # Nothing here builds a release, so the only reason to ask for this workflow
-  # by hand is the screenshots. A choice rather than a boolean, because there is
-  # a third thing to ask for: `reference` takes the one plain frame a coordinate
-  # gets measured off, and `full` takes the set.
+  # The release event is what attaches the package. A person's token creates
+  # the release, so the event fires.
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
+      # Optional: a screenshots run has no tag to give. With one the package is
+      # attached to that release; without one it is built and kept as an
+      # artefact.
+      tag:
+        description: 'Tag to attach the Store package to'
+        required: false
+        type: string
       screenshots:
         description: 'Store screenshots'
         required: false
@@ -38,13 +46,13 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   # The event as well as the ref: `github.ref` is refs/heads/main for a
   # workflow_dispatch as much as for a push, so keying on it alone lets a push
   # to main cancel a dispatched run.
-  group: windows-${{ format('{0}-{1}', github.event_name, github.ref) }}
+  group: windows-${{ format('{0}-{1}', github.event_name, github.event.release.tag_name || inputs.tag || github.ref) }}
   # A superseded check is worth cancelling; a set of screenshots somebody asked
   # for is not.
   cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
@@ -68,6 +76,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
 
       # The packaging scripts are the only code here that nothing else compiles
       # or runs, and there is no PowerShell on the Linux lane. The step is
@@ -176,7 +186,7 @@ jobs:
       # the same switch as the screenshots. Keyed on the fetch script, which is
       # where every pin lives, the way the Linux and macOS lanes key theirs.
       - name: The models, cached by their pins
-        if: inputs.screenshots && inputs.screenshots != 'no'
+        if: (inputs.screenshots && inputs.screenshots != 'no') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
         uses: actions/cache@v6
         with:
           path: |
@@ -188,7 +198,7 @@ jobs:
       # `scanned-notice.pdf` converted, which is the offline-OCR claim
       # photographed, and it cannot convert without the models.
       - name: Fetch and verify the models
-        if: inputs.screenshots && inputs.screenshots != 'no'
+        if: (inputs.screenshots && inputs.screenshots != 'no') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
         shell: bash
         run: ./packaging/fetch-models.sh
 
@@ -202,3 +212,15 @@ jobs:
         with:
           mode: ${{ inputs.screenshots }}
           args: -SideLoaded ${{ inputs.shot_args }}
+
+      # The Store takes the package unsigned, and the runner assembles the one
+      # that is uploaded. The publisher is the organisation secret, being the
+      # one value in the identity that is an account's rather than this
+      # product's.
+      - name: The Store package
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
+        uses: excelano/.github/.github/actions/store-package@main
+        with:
+          publisher: ${{ secrets.STORE_PUBLISHER }}
+          tag: ${{ github.event.release.tag_name || inputs.tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
