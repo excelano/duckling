@@ -3,7 +3,7 @@
 
 WHY THESE EXIST AT ALL
 
-`packaging/store-listing.md` asks the screenshots to show a queue with a mix of
+`packaging/submission-notes.md` asks the screenshots to show a queue with a mix of
 formats. The obvious source was docling.rs's own test corpus, and David decided
 against it on 2026-09-05: those files are real third-party documents - arXiv
 papers, somebody's handbook - and putting their content in a commercial store
@@ -614,7 +614,7 @@ def trend_csv(path):
 def notice_rtf(path):
     """An RTF, written by hand.
 
-    RTF is one of the formats `packaging/store-listing.md` singles out as one
+    RTF is one of the formats `packaging/store-listing.toml` singles out as one
     nothing else touches, so it earns a row. The format is plain text with
     braces; a library for it would be a dependency to read rather than to trust,
     the same call the EPUB above makes.
@@ -697,7 +697,7 @@ def species_md(path):
 # Twelve, and the count is deliberate: six left the queue panel three quarters
 # empty in a 1366x768 screenshot, which is the size the Store asks for. Measured
 # 2026-09-05. The set is also nine distinct extensions rather than six, which is
-# the breadth `store-listing.md` claims doing some work instead of being
+# the breadth `store-listing.toml` claims doing some work instead of being
 # asserted.
 DOCUMENTS = [
     ("site-survey-report.pdf", report_pdf),

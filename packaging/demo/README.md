@@ -47,7 +47,7 @@ only one long enough that the queue shows a page count while the layout model
 works. Measured the same day: twelve headings, the readings table with its
 column heads, and a page break.
 
-The other four are breadth. `store-listing.md` claims some forty formats; four
+The other four are breadth. `store-listing.toml` claims some forty formats; four
 more rows in the queue is the cheapest honest way to show that the claim is
 about more than PDF.
 

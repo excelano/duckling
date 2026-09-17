@@ -108,7 +108,7 @@ $ErrorActionPreference = 'Stop'
 #                            `opener::open` and `opener::reveal` at
 #                            `src/main.rs:478` and `:483` are the preview pane's
 #                            Open and Show in folder buttons, which
-#                            `packaging/store-listing.md` advertises. Duckling
+#                            `packaging/store-listing.toml` advertises. Duckling
 #                            does launch something: the file a person just
 #                            converted, in whatever opens it, when they ask.
 #                            This is where Duckling's finding genuinely differs

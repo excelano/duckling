@@ -1,0 +1,171 @@
+# The copy both store listings are filled in from.
+#
+# Every line of this is a claim about the code, and a claim like that goes
+# stale silently in a web form nobody diffs. So it lives here, is reviewed and
+# committed like anything else, and `ship` pushes it to both stores on every
+# release. Edit here; do not edit a listing in a browser.
+#
+# The fields both stores take sit at the top of a language. The rest sit under
+# the store that takes them, because the two do not take the same fields and do
+# not count them the same way. The name is under each store because the two can
+# disagree about it.
+#
+# Limits, which ship checks before the tag and counts in characters rather than
+# bytes: apple.name and apple.subtitle 30, apple.promotional-text 170,
+# apple.keywords 100 including the commas, description 4,000 - the Microsoft
+# Store allows 10,000 and this is written to Apple's - microsoft.short-description
+# 500, microsoft.features 20 of 200, microsoft.keywords 7 of 30.
+#
+# What is *not* here is what changed in this release. That is
+# release-notes.toml, which is rewritten every time; this changes when the
+# product does.
+#
+# No URLs reach the Microsoft Store from here. Its submission document has no
+# field for them: Partner Center keeps the website, the privacy policy and the
+# support contact against the product. Measured 2026-09-16.
+#
+# THE GERMAN HALF
+#
+# Terminology is the application's own, out of the catalogue at `po/de.po`. A
+# listing that calls a thing something the window does not teaches a reader a
+# word the product has no use for, so where the catalogue has a term it wins.
+#
+# German runs longer than English, which is what the limits above are for:
+# `ship` counts every field before the tag, in characters rather than bytes,
+# and a release stops rather than a submission failing.
+
+[locales."de-de"]
+website = "https://excelano.com/duckling/"
+support = "https://excelano.com/duckling/#support"
+privacy = "https://excelano.com/legal/#duckling"
+description = """
+Dokumente kommen als Word-Dateien, Foliensätze, Arbeitsmappen, PDFs und Scans. Was ein Sprachmodell, ein Suchindex oder ein versioniertes Repository will, ist einfacher, strukturierter Text. Duckling ist der Schritt dazwischen.
+
+WAS HINEINGEHT
+
+Word, PowerPoint und Excel, aktuelle wie alte. PDF, digital oder gescannt. HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers und Keynote, E-Mail, Visio, Markdown, CSV und rund vierzig Formate insgesamt, gelesen von docling.rs, der quelloffenen Rust-Portierung von IBMs Docling.
+
+WAS HERAUSKOMMT
+
+DocLang, die offene Dokumentauszeichnung für Sprachmodelle, fertig zum Öffnen in Segler, bloß oder als Archiv, das ein Seitenbild je Seite und jedes Bild mitführt. Markdown, mit Überschriften, Listen und Tabellen. Doclings JSON, das alles behält, was docling.rs gefunden hat. Oder LaTeX. Oder ein Office-Dokument — ODT, ODS, ODP, DOCX oder XLSX — schlicht und gut gegliedert, mit den Bildern in der Datei; was dieses Format nicht halten kann, steht am Ergebnis, statt still wegzufallen.
+
+WIE ES ARBEITET
+
+Dateien oder Ordner auf das Fenster ziehen. Das Ausgabeformat wählen und ob die Ergebnisse neben jede Datei oder in einen Ordner gehen. Umwandeln drücken. Jede Zeile berichtet, während sie läuft, bei einem PDF Seite für Seite, und die Vorschau zeigt jedes Ergebnis mit einer Schaltfläche zum Öffnen oder zum Zeigen im Ordner. Eine vorhandene Datei wird nie überschrieben: aus einer zweiten report.md wird report (1).md.
+
+Ein gescanntes PDF oder ein Bild lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Sie sind der größte Teil des Downloads, und sie sind der Grund, warum danach nichts nachgeladen werden muss und die Anwendung ohne Netz arbeitet.
+
+WAS ES NICHT TUT
+
+Keinerlei Netzwerkverbindung. Kein Konto. Keine Telemetrie, keine Analyse, keine Absturzberichte. Nichts über Sie oder Ihre Dokumente wird irgendwohin gesendet, weil es nirgendwohin zu senden gibt.
+
+Es bearbeitet nicht. Duckling wandelt um; zu berichtigen, was ein Modell falsch gelesen hat, ist Seglers Aufgabe, und die DocLang-Ausgabe ist, was die beiden verbindet.
+
+OPEN SOURCE
+
+Duckling ist Open Source unter der MIT-Lizenz, ebenso wie docling.rs, worauf es aufbaut: github.com/excelano/duckling.
+"""
+
+[locales."de-de".apple]
+name = "Duckling Converter"
+subtitle = "Dokumente zu DocLang, offline"
+promotional-text = "Hinein: Word, PowerPoint, Excel, PDF und vierzig weitere Formate. Heraus: DocLang, Markdown, JSON, LaTeX oder Office-Formate — auf Ihrem Rechner, nichts wird gesendet."
+keywords = "Markdown,umwandeln,PDF,Word,DOCX,ODT,ODS,ODP,XLSX,OCR,docling,DocLang,JSON,LaTeX"
+
+[locales."de-de".microsoft]
+name = "Duckling"
+short-description = """
+Duckling wandelt Dokumente in einfachen, strukturierten Text für Sprachmodelle und Suchindizes um: DocLang, Markdown, docling-JSON, LaTeX, ODT, ODS, ODP, DOCX oder XLSX. Hinein: Word, PowerPoint, Excel, PDF, HTML, EPUB, OpenDocument, E-Mail und vierzig weitere Formate.
+
+Gescannte Seiten lesen mitgelieferte OCR-Modelle: Duckling arbeitet offline, nichts verlässt Ihren Rechner. Sie sind der größte Teil des Downloads.
+
+Gelesen wird mit docling.rs, der Rust-Portierung von IBMs Docling.
+"""
+features = [
+  "Schreibt DocLang, Markdown, docling-JSON, ein DocLang-Archiv oder LaTeX. Oder ODT, ODS, ODP, DOCX und XLSX, ein schlichtes Office-Dokument mit den Bildern in der Datei.",
+  "Wandelt eine Tabelle oder eine Präsentation in das jeweils andere Format um: XLSX zu ODS, ODS zu XLSX, PPTX zu ODP — angeboten, wenn jede Datei in der Warteschlange von dieser Art ist.",
+  "Nur Textebene, für ein PDF, das bereits Text enthält: Sekunden statt Minuten, ohne die Überschriften und Tabellen, die die Modelle finden.",
+  "Wandelt stapelweise um: Dateien oder einen ganzen Ordner hineinziehen, einmal wählen, Umwandeln drücken.",
+  "Gescannte PDFs und Bilder lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Nach der Installation ist nichts nachzuladen.",
+  "Ausgabe neben jede Datei oder in einen Ordner, und nie über eine vorhandene Datei.",
+  "Eine Vorschau jedes Ergebnisses, mit Öffnen und Im Ordner zeigen.",
+  "Arbeitet offline. Kein Konto, keine Telemetrie, nichts wird irgendwohin gesendet.",
+  "Open Source, und quelloffen ist auch docling.rs, das die Dokumente liest.",
+]
+keywords = [
+  "Markdown",
+  "umwandeln",
+  "PDF",
+  "Word",
+  "OCR",
+  "docling",
+  "DocLang",
+]
+
+[locales."en-us"]
+website = "https://excelano.com/duckling/"
+support = "https://excelano.com/duckling/#support"
+privacy = "https://excelano.com/legal/#duckling"
+description = """
+Documents arrive as Word files, slide decks, workbooks, PDFs and scans. What a language model, a search index or a version-controlled repository wants is plain, structured text. Duckling is the step between.
+
+WHAT GOES IN
+
+Word, PowerPoint and Excel, current and legacy. PDF, digital or scanned. HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote, email, Visio, Markdown, CSV, and some forty formats in all, read by docling.rs, the open-source Rust port of IBM's Docling.
+
+WHAT COMES OUT
+
+DocLang, the open document markup for language models, ready to open in Segler, bare or as an archive that carries a page image per page and every picture. Markdown, with headings, lists and tables. Docling's JSON, which keeps everything the converter found. Or LaTeX. Or an office document - ODT, ODS, ODP, DOCX or XLSX - plain and well structured, with the pictures inside the file; what that format cannot hold is listed on the result rather than dropped in silence.
+
+HOW IT WORKS
+
+Drop files or folders on the window. Choose the output format and whether the results go beside each file or into one folder. Press Convert. Each row reports as it goes, page by page for a PDF, and the preview shows every result with a button to open it or show it in its folder. An existing file is never overwritten: a second report.md becomes report (1).md.
+
+A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of the download, and they are why nothing has to be fetched afterwards and why the app works with the network off.
+
+WHAT IT DOES NOT DO
+
+No network connection of any kind. No account. No telemetry, no analytics, no crash reporting. Nothing about you or your documents is sent anywhere, because there is nowhere for it to be sent.
+
+It does not edit. Duckling converts; correcting what a model got wrong is Segler's job, and the DocLang output is how the two connect.
+
+OPEN SOURCE
+
+Duckling is open source under the MIT licence, the same as the converter it is built on: github.com/excelano/duckling.
+"""
+
+[locales."en-us".apple]
+name = "Duckling Converter"
+subtitle = "Documents to DocLang, offline"
+promotional-text = "Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markdown, JSON, LaTeX or an office file back, on your own machine, with nothing sent anywhere."
+keywords = "markdown,convert,pdf,word,docx,odt,ocr,docling,doclang,json,latex"
+
+[locales."en-us".microsoft]
+name = "Duckling"
+short-description = """
+Duckling converts documents into the plain, structured text that language models and search indexes want: DocLang, Markdown, docling JSON, a DocLang archive, LaTeX, ODT, ODS, ODP, DOCX or XLSX. In go Word, PowerPoint, Excel, PDF, HTML, EPUB, RTF, OpenDocument, email and forty more.
+
+Scanned pages are read by OCR models that ship inside the app, so it works offline and nothing leaves your machine. They are most of the download.
+
+The converter is docling.rs, the Rust port of IBM's Docling.
+"""
+features = [
+  "Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT, ODS, ODP, DOCX and XLSX, a plain office document with the pictures inside it.",
+  "Converts a spreadsheet or a deck into the other ecosystem: XLSX to ODS, ODS to XLSX, PPTX to ODP, offered when every file in the queue is that kind.",
+  "Text layer only, for a PDF that already has text in it: seconds rather than minutes, without the headings and tables the models find.",
+  "Converts in batches: drop files or a whole folder, choose once, press Convert.",
+  "Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.",
+  "Output beside each file or into one folder, and never over an existing file.",
+  "A preview of every result, with Open and Show in folder.",
+  "Works offline. No account, no telemetry, nothing sent anywhere.",
+  "Open source, on an open-source converter.",
+]
+keywords = [
+  "markdown",
+  "convert",
+  "PDF",
+  "Word",
+  "OCR",
+  "docling",
+  "DocLang",
+]

@@ -20,7 +20,7 @@
 #
 # WHAT THE TWO SHOTS SHOW, AND WHY EACH CHOICE
 #
-# `packaging/store-listing.md` carries the reasoning and this file carries the
+# `packaging/submission-notes.md` carries the reasoning and this file carries the
 # recipe; they are the same two frames. In short: DocLang is selected in the
 # first, where the preview is not the subject, because its preview is markup
 # carrying four `<location>` elements per node. Markdown is selected in the

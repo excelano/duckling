@@ -40,7 +40,7 @@
 	  It is not reached by translating the application - `po/de.po` is the
 	  window's words and this is the package's claim about them - and it is
 	  not the store listing either, which is written separately in
-	  `packaging/store-listing.de-de.md`. The pair has to agree with the
+	  `packaging/store-listing.toml`. The pair has to agree with the
 	  catalogues `CATALOGUES` in `src/main.rs` names, minus the pseudolocale,
 	  which is a debug build's and never ships.
 	-->

@@ -96,7 +96,7 @@ The certification kit's `Blocked executables` test is optional on a
 `dnx` inside ONNX weights, pdfium and DirectML, the Rust standard library's
 `cmd.exe` spawn path, and `ShellExecuteW`, which is `opener::open` and
 `opener::reveal` behind the preview pane's Open and Show in folder buttons.
-The certification note in `store-listing.md` says so; submitting with the test
+The certification note in `submission-notes.md` says so; submitting with the test
 failing is David's decision.
 
 ## The icons and the manifest

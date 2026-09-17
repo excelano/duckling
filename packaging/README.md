@@ -4,8 +4,10 @@ One directory per platform, plus `debian` for the way Linux is distributed, and
 the files shared by all of them: `fetch-models.sh`, which puts the pinned models
 and pdfium under `.models/` and `.pdfium/` at the repository root and is what
 every package copies from; `version.sh`, the only thing that reads the version
-out of `Cargo.toml`; `store-listing.md` and `store-listing.de-de.md`, the text
-both stores are given; and `privacy-entry.html`, the privacy section pasted
+out of `Cargo.toml`; `store-listing.toml`, the text both stores are given in
+both languages, which `ship` pushes to both on every release;
+`submission-notes.md`, what a submission needs from a person that no file
+supplies; and `privacy-entry.html`, the privacy section pasted
 into the legal page. `DESIGN.md` §8 has the reasoning behind each package's
 shape.
 
