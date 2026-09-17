@@ -1,3 +1,40 @@
+duckling (0.2.1) unstable; urgency=medium
+
+  * The store notes are 0.2.1's
+  * Duckling takes a Mac App Store set, in both languages
+  * Take the generated screenshot files ship rewrote
+  * The listing copy is a file both lanes push
+  * Take the macOS screenshot driver from ship
+  * Count certificates, not lines
+  * What a release tells the stores, in both languages
+  * The two format choices are measured, so the Windows set can be taken
+  * The Windows frames have their coordinates, except the two in the popup
+  * The result pane fills the width it asks for
+  * The reference frame is taken in the state the set is measured in
+  * The ONNX Runtime distribution is cached with the build that names it
+  * The models come from a release here, not from a tag upstream overwrites
+  * An executable that starts and stops says its exit code and what it printed
+  * A mismatched download says what arrived before throwing it away
+  * ship sync: a missing window says which of three things happened
+  * The screenshots need the models, so the Windows lane fetches them too
+  * The runner takes the store screenshots, and the step is the org's
+  * The packaging scripts parse, and the step is the org's
+  * A phrase, not a change of meaning
+  * The screenshot driver is ship's, and the two frames are recipes
+  * The release binary is built here and signed on the Mac
+  * The publisher is a secret, so the log does not carry it
+  * The identity splits on what is actually an account's
+  * Say what is true rather than pointing at a deleted document
+  * Prose to present tense; the checklist goes
+  * The profile is targets and names
+  * Dependabot: monthly, grouped, merged when every run on the commit is green
+  * Delete the changelog and the preflight script: ship does both
+  * Delete the release document: ship is the procedure
+  * Ignore the demo folder's .dclg output
+  * deps: bump eframe in the cargo group across 1 directory (#4)
+
+ -- David M. Anderson <david.anderson@excelano.com>  Thu, 17 Sep 2026 09:59:56 -0500
+
 duckling (0.2.0) unstable; urgency=medium
 
   * Writes ODS, ODP and XLSX as well as ODT and DOCX, each offered for the

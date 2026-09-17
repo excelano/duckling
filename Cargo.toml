@@ -6,7 +6,7 @@
 # `x-ray` and installs as `xray`. `ship.conf` carries both spellings.
 name = "duckling-converter"
 description = "Convert documents to DocLang, Markdown, JSON, LaTeX and office formats with docling.rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["David M. Anderson"]
 license = "MIT"
