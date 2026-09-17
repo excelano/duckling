@@ -176,6 +176,26 @@ jobs:
           cd ../../..
           git diff --exit-code -- packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing
 
+      # Unconditional: `build-msix.ps1` refuses without them, so the package
+      # below needs them on every push, not only when screenshots are asked
+      # for. The Linux lane already fetches them this way, and the cache is
+      # keyed on the script where every pin lives.
+      - name: The models, cached by their pins
+        uses: actions/cache@v6
+        with:
+          path: |
+            .models
+            .pdfium
+          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
+
+      # `install.ps1` refuses without them, and rightly: the second frame is
+      # `scanned-notice.pdf` converted, which is the offline-OCR claim
+      # photographed, and it cannot convert without the models.
+      - name: Fetch and verify the models
+        shell: bash
+        run: ./packaging/fetch-models.sh
+
+
       # Off unless asked for. A bug fix should not pay for a set of Store
       # screenshots, and a set nobody asked for is a set nobody looks at.
       # `shots.ps1` carries the recipes and is the same command that retakes
@@ -205,23 +225,6 @@ jobs:
           publisher: ${{ secrets.STORE_PUBLISHER }}
           tag: ${{ github.event.release.tag_name || inputs.tag }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: The models, cached by their pins
-        if: inputs.screenshots && inputs.screenshots != 'no'
-        uses: actions/cache@v6
-        with:
-          path: |
-            .models
-            .pdfium
-          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
-
-      # `install.ps1` refuses without them, and rightly: the second frame is
-      # `scanned-notice.pdf` converted, which is the offline-OCR claim
-      # photographed, and it cannot convert without the models.
-      - name: Fetch and verify the models
-        if: inputs.screenshots && inputs.screenshots != 'no'
-        shell: bash
-        run: ./packaging/fetch-models.sh
 
       - name: Put the build where -SideLoaded looks for it
         if: inputs.screenshots && inputs.screenshots != 'no'
