@@ -16,12 +16,25 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # Nothing here builds a release, so the only reason to ask for this workflow
-  # by hand is the screenshots. A choice rather than a boolean, because there is
-  # a third thing to ask for: `reference` takes the one plain frame a coordinate
-  # gets measured off, and `full` takes the set.
+  # The release event is what attaches the package. A person's token creates
+  # the release, so the event fires; a release created by a workflow using the
+  # default GITHUB_TOKEN would fire nothing, which is what the tag input below
+  # covers.
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
+      # Optional, because a screenshots run has no tag to give. With one the
+      # package is attached to that release; without one it is built and kept
+      # as an artefact, so the packaging is exercised without spending a
+      # release.
+      tag:
+        description: 'Tag to package for (e.g. v0.2.1)'
+        required: false
+        type: string
+      # A choice rather than a boolean, because there is a third thing to ask
+      # for: `reference` takes the one plain frame a coordinate gets measured
+      # off, and `full` takes the set.
       screenshots:
         description: 'Store screenshots'
         required: false
@@ -37,8 +50,9 @@ on:
         default: ''
         type: string
 
+# Write, for the release upload alone. Everything else here reads.
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   # The event as well as the ref: `github.ref` is refs/heads/main for a
@@ -175,6 +189,23 @@ jobs:
       # the tree and the import tables and needs none of it, so this is behind
       # the same switch as the screenshots. Keyed on the fetch script, which is
       # where every pin lives, the way the Linux and macOS lanes key theirs.
+      # The Store package, on every push and attached where there is a release
+      # to attach it to. Duckling had none: the walk reached the msix step, the
+      # release carried no .msix, and it stopped there. `build-msix.ps1`,
+      # `AppxManifest.xml.in` and `identity.psd1` were all already here; what
+      # was missing was anything that ran them.
+      #
+      # The publisher is the organisation secret, being the one value in the
+      # identity that is an account's rather than this product's. Without it a
+      # release refuses and a push packages under a throwaway, so the packaging
+      # is still proved on every commit.
+      - name: The Store package
+        uses: excelano/.github/.github/actions/store-package@main
+        with:
+          publisher: ${{ secrets.STORE_PUBLISHER }}
+          tag: ${{ github.event.release.tag_name || inputs.tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: The models, cached by their pins
         if: inputs.screenshots && inputs.screenshots != 'no'
         uses: actions/cache@v6
