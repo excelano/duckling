@@ -211,8 +211,9 @@ shots() {
     # shellcheck disable=SC2046
     shot 01-light-converting $(add_the_documents) --click "$CONVERT"
 
-    # The output formats, listed. The claim on the listing page is that one
-    # queue converts to any of ten, and this is the only frame that shows them.
+    # The output formats, listed. Measured off this frame on 2026-09-17: the
+    # control offers seven - DocLang, Markdown, JSON, DocLang archive, LaTeX,
+    # ODT, DOCX - and this is the only frame that shows them.
     # shellcheck disable=SC2046
     shot 02-light-the-output-formats $(add_the_documents) --click "$FORMAT_CONTROL"
 
