@@ -122,12 +122,21 @@ appearance() {
 #   ROW             the queue's one row, on the file name: a row is selectable
 #                   by its name and not by the whole row
 
-en_format_control=''
-en_convert=''
+# Measured off 00-reference.png in each language's own directory, taken by
+# `--reference` at 1440x900 on a hosted runner, 2026-09-17.
+#
+# The toolbar is laid out by its own text, which is why these are per language
+# rather than shared: "Umwandeln in" is wider than "Convert to", so everything
+# after it sits further right in a German window.
+
+en_add_folder='128,43'
+en_format_control='310,43'
+en_convert='761,43'
 en_row=''
 
-de_format_control=''
-de_convert=''
+de_add_folder='220,43'
+de_format_control='450,43'
+de_convert='944,43'
 de_row=''
 
 # --- which document each frame opens, and where its controls are -------------
@@ -139,11 +148,13 @@ de_row=''
 for_language() {
     case "$1" in
         en|en-US|en-us)
+            ADD_FOLDER=$en_add_folder
             FORMAT_CONTROL=$en_format_control
             CONVERT=$en_convert
             ROW=$en_row
             ;;
         de|de-DE|de-de)
+            ADD_FOLDER=$de_add_folder
             FORMAT_CONTROL=$de_format_control
             CONVERT=$de_convert
             ROW=$de_row
@@ -176,33 +187,41 @@ for_language() {
 
 # --- the shots --------------------------------------------------------------
 
-# DocLang is the format the window opens on, so the two frames that convert
-# press Convert and nothing else: a recipe that set the format would need the
-# list's two choices measured as well, for a frame that shows the same result.
-shots() {
-    # A PDF part-way through: the layout model working, the status column
-    # reading Converting, and the preview pane on the row it belongs to. This is
-    # the frame guideline 2.3.3 asks for.
-    appearance light
-    document=$converting
-    shot 01-light-converting --click "$CONVERT" --click "$ROW"
+# THE DOCUMENTS GO IN THROUGH ADD FOLDER
+#
+# Not by launching the bundle with them. Duckling takes documents as arguments
+# rather than through the Finder open-document event, which is what `open -a app
+# doc` sends and what the driver does; a reference frame taken that way came
+# back with an empty queue. `packaging/submission-notes.md` has the rest of it:
+# under the Store sandbox the argument route is blocked too, so the folder goes
+# in through Add folder, which is also what a person does.
+#
+# `Add folder...` opens a chooser. Cmd-Shift-G is the path field, the first
+# Return accepts the path and the second accepts the folder.
+add_the_documents() {
+    printf '%s' "--click ${ADD_FOLDER} --key cmd+shift+g --type ${staged}/ --key return --key return"
+}
 
-    # The same act finished: the preview naming the file that was written, with
-    # Open and Show in folder under it.
-    document=$converted
-    shot 02-light-converted --click "$CONVERT" --click "$ROW"
+# Each frame relaunches the application, so each one adds the folder again.
+shots() {
+    appearance light
+
+    # The queue with a conversion running: the layout model working, the status
+    # column reading Converting. This is the frame guideline 2.3.3 asks for.
+    # shellcheck disable=SC2046
+    shot 01-light-converting $(add_the_documents) --click "$CONVERT"
 
     # The output formats, listed. The claim on the listing page is that one
-    # queue converts to any of ten, and this is the only frame that shows all
-    # ten at once.
-    shot 03-light-the-output-formats \
-        --click "$CONVERT" --click "$ROW" --click "$FORMAT_CONTROL"
+    # queue converts to any of ten, and this is the only frame that shows them.
+    # shellcheck disable=SC2046
+    shot 02-light-the-output-formats $(add_the_documents) --click "$FORMAT_CONTROL"
 
-    # The same conversion in the dark appearance. The only difference from 02 is
-    # the desktop's, so a reader comparing them sees the application rather than
-    # two different demonstrations.
     appearance dark
-    shot 04-dark-converted --click "$CONVERT" --click "$ROW"
+
+    # The same queue in the dark appearance, so a reader comparing them sees the
+    # application rather than two different demonstrations.
+    # shellcheck disable=SC2046
+    shot 03-dark-converting $(add_the_documents) --click "$CONVERT"
 }
 
 . "${here}/take-shots.sh"
