@@ -326,17 +326,68 @@ sleep 5
 # here-document inside a command substitution. That reads as though it would
 # work and does not: the body of a here-document opened inside `$( )` is not
 # inside it, so the shell runs those lines itself and osascript gets nothing.
+# The largest window, not `window 1`. An application may have more than one -
+# a panel, a progress sheet, something it opens while it starts - and the order
+# System Events lists them in is not the order they were made. Duckling read
+# back 260x228 from `window 1` while the frame photographed was 1100x728, so
+# the resize and the read-back were talking about different windows.
 osa=$(cat <<OSA
 tell application "System Events"
     set p to first process whose name contains "${process}"
     set frontmost of p to true
     tell p
-        set position of window 1 to {$x, $y}
-        set size of window 1 to {$width, $height}
+        set biggest to my widest(every window)
+        set position of biggest to {$x, $y}
+        set size of biggest to {$width, $height}
     end tell
+end tell
+
+on widest(ws)
+    set best to item 1 of ws
+    set most to -1
+    repeat with w in ws
+        set {ww, hh} to size of w
+        if ww * hh > most then
+            set most to ww * hh
+            set best to contents of w
+        end if
+    end repeat
+    return best
+end widest
+OSA
+)
+# The same choice of window, asked for its size, and a listing of them all for
+# a refusal that has to explain itself.
+sizes=$(cat <<OSA
+tell application "System Events" to tell (first process whose name contains "${process}")
+    set best to missing value
+    set most to -1
+    repeat with w in every window
+        set {ww, hh} to size of w
+        if ww * hh > most then
+            set most to ww * hh
+            set best to contents of w
+        end if
+    end repeat
+    if best is missing value then return "no window"
+    set {ww, hh} to size of best
+    return (ww as text) & "," & (hh as text)
 end tell
 OSA
 )
+
+listing=$(cat <<OSA
+tell application "System Events" to tell (first process whose name contains "${process}")
+    set out to ""
+    repeat with w in every window
+        set {ww, hh} to size of w
+        set out to out & name of w & " " & (ww as text) & "x" & (hh as text) & "; "
+    end repeat
+    return out
+end tell
+OSA
+)
+
 said=$(printf '%s\n' "$osa" | osascript 2>&1 >/dev/null) ||
     refuse "could not size the window: ${said}"
 sleep 1
@@ -353,14 +404,17 @@ sleep 1
 # leaving a set of frames App Store Connect will refuse.
 took=""
 for _ in 1 2 3 4 5 6 7 8 9 10; do
-    got=$(osascript -e "tell application \"System Events\" to tell (first process whose name contains \"${process}\") to get size of window 1" 2>/dev/null) || got=""
+    got=$(printf '%s\n' "$sizes" | osascript 2>/dev/null) || got=""
     took=$(printf '%s' "$got" | tr -d ' ')
     [ "$took" = "${width},${height}" ] && break
     printf '%s\n' "$osa" | osascript >/dev/null 2>&1 || true
     sleep 1
 done
-[ "$took" = "${width},${height}" ] ||
-    refuse "the window would not take ${width}x${height} and is ${took:-unreadable}; it may be remembering a size of its own"
+if [ "$took" != "${width},${height}" ]; then
+    printf '%s\n' "$sizes" >&2
+    said=$(printf '%s\n' "$listing" | osascript 2>&1) || said="(could not list the windows)"
+    refuse "the window would not take ${width}x${height} and is ${took:-unreadable}; ${process} has: ${said}"
+fi
 
 # Pointer coordinates are given in the frame and posted on the screen, so the
 # window's own origin is added here and nowhere else.
