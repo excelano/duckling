@@ -6,6 +6,9 @@
 # a document, and asks the window server whether a window appeared. It does not
 # reach the sandbox, the folder panel, the icon, or the Store package.
 #
+# A screenshots run skips all of that and builds the release bundle alone: it
+# is asked for to get frames, and the checks ran on the commit already.
+#
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
 
@@ -22,9 +25,24 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
+      # Optional: a screenshots run has no tag to give.
       tag:
         description: 'Tag to build the release binary for'
-        required: true
+        required: false
+        type: string
+      screenshots:
+        description: 'Store screenshots'
+        required: false
+        default: 'no'
+        type: choice
+        options: ['no', 'reference', 'full']
+      # Two of this repository's coordinates are inside the format list, which
+      # is a popup, so the frame they are measured off is taken with
+      # `--list-open`. Nothing else is passed here.
+      shot_args:
+        description: 'Further arguments for shots.sh'
+        required: false
+        default: ''
         type: string
 
 permissions:
@@ -79,25 +97,30 @@ jobs:
       # `ort` downloads its prebuilt ONNX Runtime here and `onig_sys` compiles
       # oniguruma. The deployment target is the bundle's floor.
       - name: Build
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: cargo build --all-targets
         env:
           MACOSX_DEPLOYMENT_TARGET: "13.4"
 
       # The demo documents go through the worker here, models and all.
       - name: Test
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: cargo test
         env:
           MACOSX_DEPLOYMENT_TARGET: "13.4"
 
       - name: Clippy
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Formatting
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: cargo fmt --check
 
       # `build-app.sh` holds the private-symbol check. The debug binary, since
       # the symbol table asked about is the same either way.
       - name: Assemble the bundle, and no private symbol is in it
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: |
           target=$(cargo metadata --format-version 1 --no-deps |
               sed -n 's/.*"target_directory":"\([^"]*\)".*/\1/p')
@@ -110,6 +133,7 @@ jobs:
       # launch path. The window server is asked rather than a screenshot taken;
       # `packaging/macos/window-probe.swift` says why.
       - name: A document opens, and a window appears
+        if: inputs.screenshots == '' || inputs.screenshots == 'no'
         run: |
           swiftc -O packaging/macos/window-probe.swift -o "${RUNNER_TEMP}/window-probe"
           open -a "$PWD/dist/Duckling.app" --args "$PWD/packaging/demo/documents/field-notes.docx"
@@ -140,25 +164,46 @@ jobs:
 
       # For eyes, not for the verdict.
       - name: Photograph it, for a person
-        if: always()
+        if: always() && (inputs.screenshots == '' || inputs.screenshots == 'no')
         run: |
           screencapture -x "${RUNNER_TEMP}/screen.png" || true
           ls -l "${RUNNER_TEMP}/screen.png" || true
 
       - name: Keep the photograph
-        if: always()
+        if: always() && (inputs.screenshots == '' || inputs.screenshots == 'no')
         uses: actions/upload-artifact@v7
         with:
           name: arm64-window
           path: ${{ runner.temp }}/screen.png
           if-no-files-found: warn
 
+      # The frames are of a release build: a debug one converts a scanned PDF
+      # slowly enough that the batch is still running when the shutter goes.
+      - name: The bundle the screenshots are of
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        run: |
+          cargo build --release
+          target=$(cargo metadata --format-version 1 --no-deps |
+              sed -n 's/.*"target_directory":"\([^"]*\)".*/\1/p')
+          ./packaging/macos/build-app.sh --binary "${target}/release/duckling"
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "13.4"
+
+      - name: The Store screenshots
+        if: inputs.screenshots && inputs.screenshots != 'no'
+        uses: excelano/.github/.github/actions/mac-store-screenshots@main
+        with:
+          app: dist/Duckling.app
+          mode: ${{ inputs.screenshots }}
+          languages: en de
+          args: ${{ inputs.shot_args }}
+
       # Built here and signed on the Mac: the Distribution certificate stays
       # where it is, and the slow half plus the two checks that cost a review
       # cycle happen before anybody is waiting. The steps are excelano/.github's,
       # because every repository with this target needs the same ones.
       - name: The binary the Store package is built from
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
         uses: excelano/.github/.github/actions/mac-release-binary@main
         with:
           binary: duckling
