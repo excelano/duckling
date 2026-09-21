@@ -49,7 +49,7 @@ retire() { # <path>
 # platform's Git Bash it is the same answer and on a future one it may not be,
 # and a checksum that depends on how the reader felt about line endings is not
 # a checksum.
-fetch() { # <url> <path> <sha256> <size>
+fetch() { # <url> <path> <sha256>
   if [ -f "$2" ] && echo "$3 *$2" | sha256sum -c --quiet - 2>/dev/null; then
     echo "  = $2"
     return
@@ -57,13 +57,6 @@ fetch() { # <url> <path> <sha256> <size>
   mkdir -p "$(dirname "$2")"
   echo "  > $2"
   curl -fsSL --connect-timeout 30 --retry 3 --retry-delay 2 -o "$2.part" "$1"
-  # macOS's `wc` pads its count with spaces; the pin has none.
-  got=$(wc -c < "$2.part" | tr -d ' ')
-  if [ "$got" != "$4" ]; then
-    echo "fetch-models: $2 arrived as $got bytes and the pin says $4; not kept" >&2
-    rm -f "$2.part"
-    exit 1
-  fi
   if echo "$3 *$2.part" | sha256sum -c --quiet -; then
     mv "$2.part" "$2"
   else
@@ -76,7 +69,7 @@ fetch() { # <url> <path> <sha256> <size>
     echo "fetch-models: $2 did not match its pinned SHA-256; not kept" >&2
     echo "  pinned   $3" >&2
     echo "  received $(sha256sum "$2.part" | cut -d' ' -f1)" >&2
-    echo "  bytes    $got" >&2
+    echo "  bytes    $(wc -c < "$2.part" | tr -d ' ')" >&2
     rm -f "$2.part"
     exit 1
   fi
@@ -115,7 +108,7 @@ fetch_member() { # <url> <archive sha256> <member> <path>
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64)
     fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
-      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b 7824656 ;;
+      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b ;;
   Darwin-*)
     fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
       794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
@@ -129,16 +122,16 @@ case "$(uname -s)-$(uname -m)" in
     exit 1 ;;
 esac
 
-fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 1c53e651ade205ce7d6dfbe54af9730d774af4ec0249832b94860466de0b440b  68695321
-fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38fee0dae2c1ccee38241f37df202c9509e3abca02e9217c5ee615  10690752
-fetch "$BASE/ppocr_keys_v1.txt"      .models/ppocr_keys_v1.txt      a1c84d9bdb9ab29043c58896224d32941783eb821629618416dcb08f12886492     26250
-fetch "$BASE/ocr_rec_en.onnx"        .models/ocr_rec_en.onnx        ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea   8967018
-fetch "$BASE/en_dict.txt"            .models/en_dict.txt            5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3       190
-fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         d6a360e3c7663ebaffa5e578ddb6f0d1806f1b469f85b7c304e7a7de41a43abf 107827334
-fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      1a260bbf82a205bfcac64b0a92219ea76aae9faa99dd357bbbefcca5b558db89    350270
-fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 0d567955041b9b62ea95464372ffdf4e05f7a9429f6318401187bb30470275e0 115605504
-fetch "$BASE/bbox.onnx"            .models/tableformer/bbox.onnx            40bd7897bef9b1f152ca8132b07691464db6444df7e3c5cb6f5d7451b8356054     52225
-fetch "$BASE/bbox.onnx.data"       .models/tableformer/bbox.onnx.data       7610e2593bfaecd72a535370f06e8c2468f9bf208bd2abe46cc727dda0a11392  39649280
+fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 1c53e651ade205ce7d6dfbe54af9730d774af4ec0249832b94860466de0b440b
+fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38fee0dae2c1ccee38241f37df202c9509e3abca02e9217c5ee615
+fetch "$BASE/ppocr_keys_v1.txt"      .models/ppocr_keys_v1.txt      a1c84d9bdb9ab29043c58896224d32941783eb821629618416dcb08f12886492
+fetch "$BASE/ocr_rec_en.onnx"        .models/ocr_rec_en.onnx        ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea
+fetch "$BASE/en_dict.txt"            .models/en_dict.txt            5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3
+fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         d6a360e3c7663ebaffa5e578ddb6f0d1806f1b469f85b7c304e7a7de41a43abf
+fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      1a260bbf82a205bfcac64b0a92219ea76aae9faa99dd357bbbefcca5b558db89
+fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 0d567955041b9b62ea95464372ffdf4e05f7a9429f6318401187bb30470275e0
+fetch "$BASE/bbox.onnx"            .models/tableformer/bbox.onnx            40bd7897bef9b1f152ca8132b07691464db6444df7e3c5cb6f5d7451b8356054
+fetch "$BASE/bbox.onnx.data"       .models/tableformer/bbox.onnx.data       7610e2593bfaecd72a535370f06e8c2468f9bf208bd2abe46cc727dda0a11392
 
 # TableFormer's decoder is picked by preference and `decoder_kv.onnx` is the
 # first candidate upstream hosts, so it is the only decoder a package needs.
