@@ -39,16 +39,33 @@ release on this repository and not upstream's, because upstream publishes its
 models to one tag it overwrites: a hash pinned against a moving reference
 breaks on somebody else's schedule, and a build cache hides the change until
 the day it does not. Taking a new upstream set is a new dated release, new
-hashes, and a look at what the change does to conversion quality. The layout model
-ships in both precisions, because the pipeline runs int8 and re-runs a page on
-fp32 when int8's regions cover too little of it; TableFormer ships the one
-decoder the pipeline resolves, `decoder_kv.onnx`, and nothing behind it in
-that preference order, and its encoder is the fp32 file rather than the fp16
-repack, because docling-pdf drops fp16 from the candidates whenever it prefers
-fp32 and fp32 is the file that still resolves if a GPU provider is ever
-compiled in. `tests/convert.rs` asks docling.rs's `model_inventory` which file
-each stage resolved to, so a release that reordered a preference or withdrew
-an export fails the test before it fails a conversion.
+hashes, and a look at what the change does to conversion quality.
+
+**The layout model ships int8 alone.** The fp32 file is loaded only by
+`predict_fp32_fallback`, which re-runs a page whose int8 detections cover less
+than half its text cells, and without it that call returns `Ok(None)` and the
+page keeps the int8 result, which docling.rs supports. It is not shipped
+because it is 172 MB for a guard that did not fire once over the 2,018 pages
+of docling.rs's PDF corpus. The exposure this accepts is that the guard is
+written for a class of machine rather than a class of page — docling-pdf's own
+comment has a different processor's quantized kernels flipping a whole page's
+detections — so a count taken here cannot speak for a processor this one
+cannot reproduce, and a report of collapsed layout on a machine that is
+otherwise fine is what puts the file back.
+
+**TableFormer ships the decoder the pipeline resolves and the encoder that
+resolves everywhere.** The decoder is `decoder_kv.onnx`, first candidate
+upstream hosts, and nothing behind it in that preference order. The encoder is
+the fp32 file rather than the fp16 repack docling-pdf ranks ahead of it on the
+CPU path, because `prefer_fp32()` drops fp16 from the candidates entirely: a
+build that ever compiles in a GPU execution provider would resolve to a file
+no package carries and lose ML table structure behind one stderr note, which
+is a silent loss rather than a broken build. That costs 54 MB, and the two
+produce byte-identical output over the whole corpus, so the fp32 file buys the
+configuration and not the conversion. `tests/convert.rs` asks docling.rs's `model_inventory`
+which file each stage resolved to and names the file each must be, so a
+release that reordered a preference, promoted a candidate above the shipped
+file, or withdrew an export fails the test before it fails a conversion.
 
 **On Windows, `+crt-static` cannot be used and five DLLs ship in the package.**
 The prebuilt ONNX Runtime `ort` fetches for `x86_64-pc-windows-msvc` is

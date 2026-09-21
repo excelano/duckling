@@ -22,7 +22,7 @@
 #
 # This is segler's script, which is slipcase-desktop's, with the names changed,
 # four assets where it checks six, an empty findings baseline, and one thing
-# neither of those has: **the package carries 620 MB of models and a shared
+# neither of those has: **the package carries 352 MB of models and a shared
 # library**, staged into `models\` and `pdfium\` beside the executable, which is
 # where `locate_assets` in `src/lib.rs` looks. DESIGN.md 8. Every measurement in
 # the comments below was taken on one of those two repositories unless it says
@@ -73,15 +73,16 @@ $ErrorActionPreference = 'Stop'
 # `Blocked executables` reports messages that are four different things, every
 # one traced before it was baselined:
 #
-#   The model files          Forty of the fifty-eight. `layout_heron.onnx`,
+#   The model files          Most of them. `layout_heron_int8.onnx`,
 #                            `bbox.onnx.data` and the rest "contain a blocked
 #                            executable reference to" reg, cmd, csi, cdb, dnx -
 #                            with casings like `cSI`, `DnX`, `REg`. The kit
 #                            scans for those three-letter names case-insensitively
 #                            and these are ONNX weights, so it is finding bytes.
-#                            Measured rather than asserted: `layout_heron.onnx`
-#                            is 172 MB and holds 20 occurrences of `cmd` where
-#                            uniform random bytes would give 82. Every count in
+#                            Measured rather than asserted:
+#                            `decoder_kv.onnx.data` is 116 MB and holds 11
+#                            occurrences of `cmd` where uniform random bytes
+#                            would give 55. Every count in
 #                            every model file came in *under* chance, which is
 #                            what floating-point weights should do. There is
 #                            nothing in them to remove.

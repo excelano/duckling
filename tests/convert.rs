@@ -472,12 +472,19 @@ fn demo_scanned_pdf_comes_back_through_ocr() {
     std::fs::remove_dir_all(&out).unwrap();
 }
 
-/// The package ships one TableFormer decoder, and which one is docling.rs's
-/// choice rather than ours: `tableformer::resolved_paths` walks a preference
-/// order and `decoder_kv.onnx` is the first candidate upstream hosts. The
-/// candidates behind it are not fetched, so a docling.rs that reordered that
-/// preference, or withdrew the KV export, would resolve to a file no package
-/// carries and every table would fail at run time. Ask it what it resolved.
+/// The package ships one TableFormer decoder and one encoder, and which files
+/// those are is docling.rs's choice rather than ours: `resolved_paths` walks a
+/// preference order per stage. The candidates behind the chosen ones are not
+/// fetched, so a docling.rs that reordered a preference, or withdrew an
+/// export, would resolve to a file no package carries and every table would
+/// fail at run time. Ask it what it resolved.
+///
+/// `entry.found` alone catches a withdrawal and not a promotion: a candidate
+/// added *above* the shipped file leaves the shipped one resolving and found.
+/// docling-pdf ranks `encoder_fp16.onnx` ahead of the fp32 encoder this
+/// package ships on purpose (DESIGN.md §2), and `found` cannot tell that
+/// apart from the same thing arriving by accident. So each stage names the
+/// file it must resolve to.
 #[test]
 fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
     if !pipeline_available() {
@@ -491,13 +498,18 @@ fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
             entry.stage, entry.path
         );
     }
-    let decoder = docling::model_inventory()
-        .into_iter()
-        .find(|e| e.stage == "tableformer.decoder")
-        .expect("the inventory names the decoder");
-    assert!(
-        decoder.path.ends_with("decoder_kv.onnx"),
-        "the decoder resolved to {}, not the KV export the package ships",
-        decoder.path
-    );
+    for (stage, file) in [
+        ("tableformer.decoder", "decoder_kv.onnx"),
+        ("tableformer.encoder", "encoder.onnx"),
+    ] {
+        let entry = docling::model_inventory()
+            .into_iter()
+            .find(|e| e.stage == stage)
+            .unwrap_or_else(|| panic!("the inventory names {stage}"));
+        assert!(
+            entry.path.ends_with(file),
+            "{stage} resolved to {}, not the {file} the package ships",
+            entry.path
+        );
+    }
 }
