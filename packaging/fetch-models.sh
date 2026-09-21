@@ -57,7 +57,8 @@ fetch() { # <url> <path> <sha256> <size>
   mkdir -p "$(dirname "$2")"
   echo "  > $2"
   curl -fsSL --connect-timeout 30 --retry 3 --retry-delay 2 -o "$2.part" "$1"
-  got=$(wc -c < "$2.part")
+  # macOS's `wc` pads its count with spaces; the pin has none.
+  got=$(wc -c < "$2.part" | tr -d ' ')
   if [ "$got" != "$4" ]; then
     echo "fetch-models: $2 arrived as $got bytes and the pin says $4; not kept" >&2
     rm -f "$2.part"
@@ -75,7 +76,7 @@ fetch() { # <url> <path> <sha256> <size>
     echo "fetch-models: $2 did not match its pinned SHA-256; not kept" >&2
     echo "  pinned   $3" >&2
     echo "  received $(sha256sum "$2.part" | cut -d' ' -f1)" >&2
-    echo "  bytes    $(wc -c < "$2.part")" >&2
+    echo "  bytes    $got" >&2
     rm -f "$2.part"
     exit 1
   fi
@@ -114,7 +115,7 @@ fetch_member() { # <url> <archive sha256> <member> <path>
 case "$(uname -s)-$(uname -m)" in
   Linux-x86_64)
     fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
-      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b ;;
+      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b 7824656 ;;
   Darwin-*)
     fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
       794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
