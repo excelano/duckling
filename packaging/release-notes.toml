@@ -10,23 +10,22 @@
 # Nothing else reads this. The GitHub release, the Debian changelog and the
 # AppStream entry take commit subjects.
 
-version = "0.2.1"
+version = "0.2.2"
 
 [locales."de-de"]
 whats-new = """
-Duckling spricht Deutsch. Auf einem deutsch eingestellten Rechner erscheinen die Leiste, die Warteschlange, die Vorschau und jede Zeile der Statusleiste auf Deutsch, und es gibt nichts auszuwählen: Duckling übernimmt die Sprache, die der Rechner bereits eingestellt hat, und fällt für jede andere auf Englisch zurück.
+Der Download ist rund 172 MB kleiner: Die Installation belegt jetzt etwa 430 MB statt 602 MB.
 
-Was eine Datei ist, bleibt, was die Datei sagt. Das Format, als das eine Zeile gelesen wurde, und die Endungen der Dateien, die docling.rs nicht liest, werden nicht übersetzt.
+Entfallen ist eine zweite Kopie des Layout-Modells, die in voller Genauigkeit mitgeliefert wurde, damit eine Seite, deren erster Durchgang unstimmig aussah, noch einmal gelesen werden konnte. Über den gesamten Testbestand von docling.rs - 2.018 Seiten - wurde sie kein einziges Mal gebraucht. Was dieser Bestand abdeckt, wird unverändert konvertiert.
+
+Dokumente liest docling.rs 1.51.
 """
 
 [locales."en-us"]
 whats-new = """
-Duckling writes ODS, ODP and XLSX now, alongside ODT and DOCX. The three are offered for the document each is a sibling of: ODS when every file in the queue is XLSX, XLSX when they are all ODS, ODP when they are all PPTX. A book converted to a spreadsheet is an empty sheet and a list of what was dropped, so it is not offered.
+The download is about 172 MB smaller: the install is around 430 MB now rather than 602 MB.
 
-A PDF that already has text in it can be converted from that text alone, with no model loaded: seconds rather than minutes, at the cost of the headings, the tables and anything that needs OCR. The checkbox says so.
-
-The download is 114 MB smaller. And a line that used to fall out of a paragraph and reappear after it now stays where it belongs.
+What came out is a second copy of the page-layout model, carried at full precision so that a page whose first pass looked wrong could be read again. Over the whole of docling.rs's test corpus - 2,018 pages - it was never once needed. Everything that corpus covers converts exactly as it did.
 
 Documents are read by docling.rs 1.51.
 """
-
