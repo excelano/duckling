@@ -1,11 +1,9 @@
-# The Windows checks a machine can run: the tree builds and passes on this
-# platform, the shipped binary imports nothing that is neither in-box nor in the
-# package, and the committed icons match the drawing they are generated from.
-# The suite, clippy and formatting are repeated from `ci.yml` because that runs
-# on Linux and four things here compile only for this target. On a release it
-# also fetches the models and assembles the unsigned Store package. Nothing
-# reaches the window, the installer scripts, an Open With entry, the
-# certification kit or the icon as a person sees it.
+# Run the suite on Windows, check the things only a Windows machine can say,
+# and assemble the Store package, attaching it to a published release. The
+# checks themselves live in excelano/.github so every desktop-app repo in the
+# fleet runs the same ones and a correction reaches all of them at once; what
+# stays here is this product's own names, paths, its ONNX Runtime build cache
+# and the OCR models it fetches for packaging.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
@@ -17,8 +15,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  # The release event is what attaches the package. A person's token creates
-  # the release, so the event fires.
+  # The release event is what attaches the package.
   release:
     types: [published]
   workflow_dispatch:
@@ -48,180 +45,56 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  # The event as well as the ref: `github.ref` is refs/heads/main for a
-  # workflow_dispatch as much as for a push, so keying on it alone lets a push
-  # to main cancel a dispatched run.
-  group: windows-${{ format('{0}-{1}', github.event_name, github.event.release.tag_name || inputs.tag || github.ref) }}
-  # A superseded check is worth cancelling; a set of screenshots somebody asked
-  # for is not.
-  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
-
 jobs:
   windows:
-    runs-on: windows-latest
-
-    # `ort` extracts the prebuilt ONNX Runtime it links into a cache directory
-    # and prints that path for the linker; `runtime-files.ps1` reads the path
-    # back, because `DirectML.dll` has to be the copy from the distribution
-    # `onnxruntime.lib` was built against. Left to itself that directory is
-    # under `%LOCALAPPDATA%`, which nothing here carries between runs, while
-    # `rust-cache` does carry `target` - build script output and all. A
-    # restored build is then a build whose recorded link path names a
-    # directory that never existed on this machine. Extracting into the
-    # workspace puts the distribution in the same cache entry as the output
-    # that names it, so the two arrive together or not at all.
-    env:
-      ORT_CACHE_DIR: ${{ github.workspace }}\.ort
-
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
-
-      # The packaging scripts are the only code here that nothing else compiles
-      # or runs, and there is no PowerShell on the Linux lane. The step is
-      # excelano/.github's because it is the same one in every repository that
-      # has them.
-      - name: The packaging scripts parse
-        uses: excelano/.github/.github/actions/powershell-parses@main
-
-      - name: Install Rust
-        run: rustup toolchain install stable --profile minimal
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          cache-directories: ${{ github.workspace }}\.ort
-          # `ORT_CACHE_DIR` in the key, so that a cache saved before the
-          # distribution was part of the entry is not restored into a build
-          # that expects it to be.
-          env-vars: ORT
-
-      - name: What is installed
-        run: rustc -V; cargo -V
-
-      # `ort` downloads a prebuilt ONNX Runtime and `onig_sys` compiles oniguruma
-      # from C, so this needs the network and a C compiler. DESIGN.md 2.
-      - name: Build
-        run: cargo build --all-targets
-
-      - name: Test
-        run: cargo test
-
-      # `CLAUDE.md` says clippy must be silent, so a warning is an error here.
-      - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings
-
-      - name: Formatting
-        run: cargo fmt --check
-
-      # Every import must be in-box or one of the five DLLs the package ships,
-      # and a dependency added on any platform can pull in a sixth. The release
-      # binary, because its import table is the artefact's.
-      - name: Every import is in-box or ships in the package
-        run: |
-          cargo build --release
-          powershell -ExecutionPolicy Bypass -File packaging/windows/check-imports.ps1
-
-      # The GUI subsystem attribute is off under `debug_assertions`, and the DPI
-      # declaration is the manifest `build.rs` embeds; neither `build-msix.ps1`
-      # nor the kit runs here, so both are read out of the release artefact.
-      - name: The shipped binary is a GUI subsystem one and declares its DPI awareness
-        shell: pwsh
-        run: |
-          $meta = cargo metadata --format-version 1 --no-deps | ConvertFrom-Json
-          $exe = Join-Path $meta.target_directory 'release\duckling.exe'
-          $bytes = [System.IO.File]::ReadAllBytes($exe)
-          $pe = [BitConverter]::ToInt32($bytes, 0x3C)
-          $subsystem = [BitConverter]::ToUInt16($bytes, $pe + 92)
-          if ($subsystem -ne 2) {
-            throw "subsystem $subsystem, and a shipped build must be 2 (Windows GUI)"
-          }
-          $text = [System.Text.Encoding]::UTF8.GetString($bytes)
-          if (-not $text.Contains('PerMonitorV2')) {
-            throw 'no PerMonitorV2 in the binary - build.rs did not embed the application manifest'
-          }
-          Write-Host 'subsystem 2, and the application manifest is embedded'
-
-      # The five DLLs are named in three scripts, and a set that differed between
-      # any two is an application that starts one way and not another.
-      - name: The three lists of shipped DLLs agree
-        shell: pwsh
-        run: |
-          function Names($path, $pattern) {
-            (Select-String -Path $path -Pattern $pattern -AllMatches).Matches |
-              ForEach-Object { $_.Value.ToLowerInvariant() } | Sort-Object -Unique
-          }
-          $dll = "(?i)\b(vcruntime140(_1)?|msvcp140(_1)?|directml)\.dll\b"
-          $check   = Names 'packaging/windows/check-imports.ps1' $dll
-          $runtime = Names 'packaging/windows/runtime-files.ps1' $dll
-          $remove  = Names 'packaging/windows/uninstall.ps1' $dll
-          Write-Host "check-imports:  $($check -join ', ')"
-          Write-Host "runtime-files:  $($runtime -join ', ')"
-          Write-Host "uninstall:      $($remove -join ', ')"
-          if (Compare-Object $check $runtime) { throw 'check-imports.ps1 and runtime-files.ps1 name different DLLs' }
-          if (Compare-Object $check $remove)  { throw 'check-imports.ps1 and uninstall.ps1 name different DLLs' }
-          Write-Host 'all three name the same five'
-
-      # The `.ico`, the manifest PNGs and the listing logo are committed
-      # artifacts, so the generator is run and its output compared to the tree.
-      - name: The committed icon and Store assets still match their generator
-        run: |
-          cd packaging/windows/make-ico
-          cargo run --release
-          cd ../../..
-          git diff --exit-code -- packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing
-
-      # Off unless asked for. A bug fix should not pay for a set of Store
-      # screenshots, and a set nobody asked for is a set nobody looks at.
-      # `shots.ps1` carries the recipes and is the same command that retakes
-      # them by hand on the Windows machine.
-      #
-      # Duckling claims no file type, so there is no association to install and
-      # the documents are arguments. The packaged build cannot be assembled
-      # here without an identity, so the frames are of the side-loaded one -
-      # the same commit, and the difference is the package around it.
-      # 500 MB, and the only step here that wants them. An ordinary push checks
-      # the tree and the import tables and needs none of it, so this is behind
-      # the same switch as the screenshots. Keyed on the fetch script, which is
-      # where every pin lives, the way the Linux and macOS lanes key theirs.
-      - name: The models, cached by their pins
-        if: (inputs.screenshots && inputs.screenshots != 'no') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
-        uses: actions/cache@v6
-        with:
-          path: |
-            .models
-            .pdfium
-          key: models-${{ runner.os }}-${{ hashFiles('packaging/fetch-models.sh') }}
-
-      # `install.ps1` refuses without them, and rightly: the second frame is
-      # `scanned-notice.pdf` converted, which is the offline-OCR claim
-      # photographed, and it cannot convert without the models.
-      - name: Fetch and verify the models
-        if: (inputs.screenshots && inputs.screenshots != 'no') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
-        shell: bash
-        run: ./packaging/fetch-models.sh
-
-      - name: Put the build where -SideLoaded looks for it
-        if: inputs.screenshots && inputs.screenshots != 'no'
-        run: powershell -ExecutionPolicy Bypass -File packaging/windows/install.ps1
-
-      - name: The Store screenshots
-        if: inputs.screenshots && inputs.screenshots != 'no'
-        uses: excelano/.github/.github/actions/store-screenshots@main
-        with:
-          mode: ${{ inputs.screenshots }}
-          args: -SideLoaded ${{ inputs.shot_args }}
-          languages: en de
-
-      # The Store takes the package unsigned, and the runner assembles the one
-      # that is uploaded. The publisher is the organisation secret, being the
-      # one value in the identity that is an account's rather than this
-      # product's.
-      - name: The Store package
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.tag != '')
-        uses: excelano/.github/.github/actions/store-package@main
-        with:
-          publisher: ${{ secrets.STORE_PUBLISHER }}
-          tag: ${{ github.event.release.tag_name || inputs.tag }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+    uses: excelano/.github/.github/workflows/windows-desktop-ci.yml@main
+    with:
+      tag: ${{ inputs.tag }}
+      binary-names: duckling
+      install-rust: true
+      # `ORT_CACHE_DIR` is set in `.cargo/config.toml`, not here - a relative
+      # path Cargo resolves the same way on every platform. This just tells
+      # the Rust build cache to save that directory alongside target/, in the
+      # same cache entry, so a restored build and the runtime it was linked
+      # against always arrive together or not at all.
+      rust-cache-directories: .ort
+      rust-cache-env-vars: ORT
+      gui-subsystem-check: true
+      icon-check: true
+      icon-check-paths: 'packaging/windows/duckling.ico packaging/windows/assets packaging/windows/listing'
+      # Duckling claims no file type, so there is no association to install.
+      # The three lists of shipped DLLs agree - check-imports.ps1,
+      # runtime-files.ps1 and uninstall.ps1 - because a set that differed
+      # between any two is an application that starts one way and not another.
+      extra-verify-script: |
+        function Names($path, $pattern) {
+          (Select-String -Path $path -Pattern $pattern -AllMatches).Matches |
+            ForEach-Object { $_.Value.ToLowerInvariant() } | Sort-Object -Unique
+        }
+        $dll = "(?i)\b(vcruntime140(_1)?|msvcp140(_1)?|directml)\.dll\b"
+        $check   = Names 'packaging/windows/check-imports.ps1' $dll
+        $runtime = Names 'packaging/windows/runtime-files.ps1' $dll
+        $remove  = Names 'packaging/windows/uninstall.ps1' $dll
+        Write-Host "check-imports:  $($check -join ', ')"
+        Write-Host "runtime-files:  $($runtime -join ', ')"
+        Write-Host "uninstall:      $($remove -join ', ')"
+        if (Compare-Object $check $runtime) { throw 'check-imports.ps1 and runtime-files.ps1 name different DLLs' }
+        if (Compare-Object $check $remove)  { throw 'check-imports.ps1 and uninstall.ps1 name different DLLs' }
+        Write-Host 'all three name the same five'
+      # 500 MB, and the only thing here that wants them: the second frame is
+      # scanned-notice.pdf converted, which is the offline-OCR claim
+      # photographed, and install.ps1 refuses without them. Keyed on the fetch
+      # script, which is where every pin lives, the way the Linux and macOS
+      # lanes key theirs.
+      extra-cache-paths: |
+        .models
+        .pdfium
+      extra-cache-key-file: packaging/fetch-models.sh
+      extra-cache-fetch-script: ./packaging/fetch-models.sh
+      # The packaged build cannot be assembled here without an identity, so
+      # the frames are of the side-loaded one - the same commit, and the
+      # difference is the package around it.
+      pre-screenshot-script: powershell -ExecutionPolicy Bypass -File packaging/windows/install.ps1
+      screenshots: ${{ inputs.screenshots }}
+      shot-args: -SideLoaded ${{ inputs.shot_args }}
+    secrets: inherit

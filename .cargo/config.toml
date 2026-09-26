@@ -36,3 +36,12 @@
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
+
+# `ort` extracts the ONNX Runtime it links into `ORT_CACHE_DIR`, or, left
+# unset, some platform cache directory nothing here carries between CI runs.
+# Cargo sets it for every invocation - `cargo build`, `cargo test`, the
+# release build in packaging - so the extraction always lands in the same
+# place a runner can cache, on every platform, without a workflow needing to
+# know the variable exists. `.ort/` is gitignored.
+[env]
+ORT_CACHE_DIR = { value = ".ort", relative = true }
