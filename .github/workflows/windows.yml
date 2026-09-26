@@ -212,6 +212,7 @@ jobs:
         with:
           mode: ${{ inputs.screenshots }}
           args: -SideLoaded ${{ inputs.shot_args }}
+          languages: en de
 
       # The Store takes the package unsigned, and the runner assembles the one
       # that is uploaded. The publisher is the organisation secret, being the

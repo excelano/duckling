@@ -50,7 +50,15 @@ param(
     # only while it is open, and its items take no keyboard: pressing Down and
     # Return with the list open leaves the selection where it was, so each of
     # the two shots clicks its choice and each choice needs a coordinate.
-    [switch] $ListOpen
+    [switch] $ListOpen,
+    # Which language's set to take. `Take-Shots` turns it into `en-US` or
+    # `de-DE`, the subdirectory the Store files a frame by. The queue's own
+    # documents carry no translated content - only the window chrome changes -
+    # so unlike flyleaf there is one set of documents and two sets of
+    # coordinates: `packaging/macos/shots.sh` already measured that German
+    # runs long enough to wrap Duckling's toolbar to a second row.
+    [ValidateSet('en', 'de')]
+    [string] $Lang = 'en'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -98,15 +106,33 @@ $ZOOM = @('key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus', 'key ctrl+plus')
 # shows them. The first pass gives the toolbar and the rows; fill those in,
 # then take a second with `-ListOpen`, which opens the format list before the
 # shutter, and read the two choices off that.
-$FORMAT_CONTROL = '436,50'    # the format control, which opens the list
-$FORMAT_DOCLANG = '440,85'    # the DocLang choice in the open list
-$FORMAT_MARKDOWN = '440,115'  # the Markdown choice in the same list
-$CONVERT = '1066,50'          # the Convert button
-# A row is selectable by its file name and not by the whole row, so these are
-# on the name. The queue is sorted by name, and these are the third and tenth
-# of the twelve.
-$FIELD_NOTES_ROW = '60,201'   # the row for field-notes.docx
-$SITE_SURVEY_ROW = '60,437'   # the row for site-survey-report.pdf
+#
+# German runs long enough to wrap the toolbar to a second row -
+# `packaging/macos/shots.sh` measured that already - which moves every one of
+# these down as well as right, so each language gets its own full set rather
+# than an offset applied to the English one. Read off a reference frame and a
+# `-ListOpen` frame taken on winwork: the format control stays on row one,
+# shifted right; Convert drops to row two and resets to the left edge rather
+# than staying under where it was; and the row list starts lower, by the
+# height that second row added.
+if ($Lang -eq 'de') {
+    $FORMAT_CONTROL = '631,50'
+    $FORMAT_DOCLANG = '640,85'
+    $FORMAT_MARKDOWN = '640,115'
+    $CONVERT = '66,79'
+    $FIELD_NOTES_ROW = '60,230'
+    $SITE_SURVEY_ROW = '60,460'
+} else {
+    $FORMAT_CONTROL = '436,50'    # the format control, which opens the list
+    $FORMAT_DOCLANG = '440,85'    # the DocLang choice in the open list
+    $FORMAT_MARKDOWN = '440,115'  # the Markdown choice in the same list
+    $CONVERT = '1066,50'          # the Convert button
+    # A row is selectable by its file name and not by the whole row, so these
+    # are on the name. The queue is sorted by name, and these are the third
+    # and tenth of the twelve.
+    $FIELD_NOTES_ROW = '60,201'   # the row for field-notes.docx
+    $SITE_SURVEY_ROW = '60,437'   # the row for site-survey-report.pdf
+}
 
 # A conversion is not a repaint. The first shot is caught mid-batch and the
 # second waits for the batch to finish, which for a scanned PDF is the models
@@ -196,5 +222,5 @@ if ($ListOpen) {
 }
 
 Take-Shots -Launch (Opens) -Process $PROCESS `
-    -Width $WIDTH -Height $HEIGHT -OutDir $OutDir -Reference:$Reference `
+    -Width $WIDTH -Height $HEIGHT -OutDir $OutDir -Lang $Lang -Reference:$Reference `
     -EveryShot $everyShot
