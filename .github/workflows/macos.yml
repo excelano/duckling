@@ -63,16 +63,8 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
 
-      # `macos-13` is Intel and `macos-14` onwards is Apple silicon, a mapping
-      # GitHub can change, so the architecture is checked rather than assumed.
       - name: The runner is Apple silicon
-        run: |
-          arch=$(uname -m)
-          echo "runner reports ${arch}"
-          [ "$arch" = arm64 ] || {
-            echo "this workflow exists to run the arm64 build and the runner is ${arch}" >&2
-            exit 1
-          }
+        uses: excelano/.github/.github/actions/mac-arch-check@main
 
       - name: Install Rust
         run: rustup toolchain install stable --profile minimal
@@ -162,20 +154,9 @@ jobs:
               ;;
           esac
 
-      # For eyes, not for the verdict.
       - name: Photograph it, for a person
         if: always() && (inputs.screenshots == '' || inputs.screenshots == 'no')
-        run: |
-          screencapture -x "${RUNNER_TEMP}/screen.png" || true
-          ls -l "${RUNNER_TEMP}/screen.png" || true
-
-      - name: Keep the photograph
-        if: always() && (inputs.screenshots == '' || inputs.screenshots == 'no')
-        uses: actions/upload-artifact@v7
-        with:
-          name: arm64-window
-          path: ${{ runner.temp }}/screen.png
-          if-no-files-found: warn
+        uses: excelano/.github/.github/actions/mac-photograph@main
 
       # The frames are of a release build: a debug one converts a scanned PDF
       # slowly enough that the batch is still running when the shutter goes.
