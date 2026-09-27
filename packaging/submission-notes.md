@@ -45,10 +45,10 @@ Duckling converts documents offline, so about 375 MB of the package is ONNX mode
 ## Screenshots
 
 Each lane takes its own with its platform's script, against the packaged
-application, light theme, with the pointer parked off the window and the window
-photographed by its id. The documents are the ones in `packaging/demo/documents`,
-copied to a folder with a short readable path, since the path shows in the
-preview. Two shots:
+application, with the pointer parked off the window and the window photographed
+by its id. The documents are the ones in `packaging/demo/documents`, copied to a
+folder with a short readable path, since the path shows in the preview. Two
+shots, macOS taking each again in dark for the Mac App Store listing:
 
 | | State to reach |
 | --- | --- |

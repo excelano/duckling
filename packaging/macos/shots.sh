@@ -89,6 +89,8 @@ for_language() {
 # --- the shots --------------------------------------------------------------
 
 shots() {
+    appearance light
+
     # Twelve documents of nine formats converted in the format the window opens
     # on, with a Word file's DocLang in the preview: the structure a converter
     # is for, out of a format that hides it.
@@ -100,6 +102,18 @@ shots() {
     # `species-list (1).md` - the never-overwrite rule of DESIGN.md §5 in the
     # picture.
     shot 02-markdown \
+        --click "$FORMAT_CONTROL" --click "$FORMAT_MARKDOWN" \
+        --click "$CONVERT" --settle "$WHOLE_BATCH" --click "$SITE_SURVEY_ROW"
+
+    # Both earn a second slot: two frames plus their dark repeats is four,
+    # nowhere near either store's limit of ten, and there is no reason to show
+    # less than the whole set in both appearances.
+    appearance dark
+
+    shot 03-doclang-dark \
+        --click "$CONVERT" --settle "$WHOLE_BATCH" --click "$FIELD_NOTES_ROW"
+
+    shot 04-markdown-dark \
         --click "$FORMAT_CONTROL" --click "$FORMAT_MARKDOWN" \
         --click "$CONVERT" --settle "$WHOLE_BATCH" --click "$SITE_SURVEY_ROW"
 }
