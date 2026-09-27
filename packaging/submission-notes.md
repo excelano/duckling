@@ -52,8 +52,8 @@ shots, macOS taking each again in dark for the Mac App Store listing:
 
 | | State to reach |
 | --- | --- |
-| `01-converting` | Convert to **DocLang**, press Convert, select `field-notes.docx` about a second later, capture at about 2.5 s: some rows still Queued, the scanned PDF spinning, the rest done. |
-| `02-converted` | Convert to **Markdown**, let the batch finish, select `site-survey-report.pdf`, capture. |
+| `01-converting` / `01-doclang` | Convert to **DocLang**, press Convert, select `field-notes.docx`. Windows captures a few seconds in, with some rows still Queued and the scanned PDF spinning; macOS waits for the whole batch instead, since on a warm runner the batch can finish in four seconds and a frame caught part way through would then depend on how warm the machine was. |
+| `02-converted` / `02-markdown` | Convert to **Markdown**, let the batch finish, select `site-survey-report.pdf`, capture. |
 
 DocLang is selected in the first shot, where the preview is not the subject,
 because its preview is markup carrying four `<location>` elements per node;
