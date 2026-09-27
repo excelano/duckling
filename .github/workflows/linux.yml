@@ -92,31 +92,11 @@ jobs:
       - name: Build the package
         run: ./packaging/debian/build-deb.sh
 
-      - name: The package holds up
-        run: |
-          deb=$(ls dist/*.deb)
-          echo "checking ${deb} ($(du -h "$deb" | cut -f1))"
+      - uses: excelano/.github/.github/actions/linux-package-integrity-check@main
+        with:
+          allow-symlinks: 'true'
 
-          strange=$(dpkg-deb --contents "$deb" | awk '$2 != "root/root"')
-          [ -z "$strange" ] || { echo "not root/root:"; echo "$strange"; exit 1; }
-
-          strange=$(dpkg-deb --contents "$deb" |
-              awk '$1 !~ /^drwxr-xr-x/ && $1 !~ /^-rw-r--r--/ && $1 !~ /^-rwxr-xr-x/ && $1 !~ /^lrwxrwxrwx/')
-          [ -z "$strange" ] || { echo "unexpected modes:"; echo "$strange"; exit 1; }
-
-          dpkg-deb --ctrl-tarfile "$deb" | tar t | grep -qx './md5sums' ||
-              { echo "the package ships no md5sums" >&2; exit 1; }
-
-          tree="${RUNNER_TEMP}/tree"
-          dpkg-deb -x "$deb" "$tree"
-          dpkg-deb -e "$deb" "${tree}/DEBIAN"
-          ( cd "$tree" && md5sum -c DEBIAN/md5sums --quiet )
-
-      - name: What lintian says
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lintian
-          lintian --info --tag-display-limit 0 --fail-on error,warning dist/*.deb
+      - uses: excelano/.github/.github/actions/linux-lintian-check@main
 
       # GLib drops an entry whose Exec is not on PATH, so the executable is
       # installed first.
@@ -137,26 +117,10 @@ jobs:
       # handlers are registered. The executable opens a window from `main`, so
       # without a display the question is only whether the loader takes it,
       # read from how it fails rather than whether it does.
-      - name: It installs, and the executable loads
-        run: |
-          set -eu
-          deb=$(ls dist/*.deb)
-          sudo apt-get install -y "./${deb#./}"
-
-          command -v duckling
-          file -L "$(command -v duckling)"
-
-          missing=$(ldd "$(command -v duckling)" | grep 'not found' || true)
-          [ -z "$missing" ] || { echo "the package installed but does not resolve:"; echo "$missing"; exit 1; }
-
-          out=$(timeout 30 duckling 2>&1 || true)
-          printf '%s\n' "$out" | sed 's/^/  /'
-          case "$out" in
-              *'error while loading shared libraries'*)
-                  echo "the loader refused the executable" >&2; exit 1 ;;
-              *'cannot execute binary file'*|*'Exec format error'*)
-                  echo "the executable is not this machine's architecture" >&2; exit 1 ;;
-          esac
+      - uses: excelano/.github/.github/actions/linux-install-check@main
+        with:
+          binaries: duckling
+          timeout-seconds: '30'
 
       # Straight to the release from the job that built it. `--clobber` so a
       # dispatched re-run replaces the package rather than refusing.
