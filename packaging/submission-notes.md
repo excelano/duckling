@@ -1,23 +1,16 @@
 # Submission notes
 
-What a store submission needs from a person and no file supplies: the notes an
-App Review or certification reader is handed, the answers a form asks that no
-build can give, and the reasoning behind the screenshots.
+What a store submission needs from a person and no file supplies: the notes a
+certification reader is handed, the answers a form asks that no build can
+give, and the reasoning behind the screenshots.
 
 The listing text itself is not here. It is `store-listing.toml` beside this,
 which `ship` checks before the tag and pushes to both stores on every release,
 and what a release tells them changed is `release-notes.toml`. A field edited
-in this file would reach nobody.
-
-## App Review notes
-
-Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT, ODS, ODP, DOCX or XLSX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.
-
-There is nothing a tester must be handed before the window does anything. Duckling claims no file type and opens with an empty queue: drop any Word file or PDF you already have onto the window, or use Add files, pick an output format, and convert. If you would rather have ours, the twelve documents the screenshots were taken from are at https://github.com/excelano/duckling/tree/v0.2.0/packaging/demo/documents — invented for the purpose, MIT licensed like the rest of the repository, and between them they exercise every format claimed above.
-
-The App Sandbox is on with exactly two entitlements: the sandbox itself and read-write access to user-selected files. That grant is what a person gives by dropping a file or a folder on the window, picking one in the Add dialogs, or choosing a destination folder. What it does not cover is the folder around a file that arrived on its own, so Duckling asks for that folder before writing beside such a file rather than failing quietly. There is no network entitlement, no Downloads-folder entitlement, and no temporary exception.
-
-Conversion is local. Documents are read by docling.rs, the open-source Rust port of IBM's Docling, compiled into the application; nothing is uploaded and no model is fetched. The full privacy statement is at https://excelano.com/legal/#duckling and the complete source is at https://github.com/excelano/duckling.
+in this file would reach nobody. Apple's Notes for Review are there too, as
+`apple-review-notes`, which `ship` pushes to `appStoreReviewDetail` on every
+Mac App Store submission - Microsoft's Notes for certification below have no
+such field and are still typed in by hand.
 
 ## Notes for certification
 
