@@ -1,32 +1,19 @@
 # Submission notes
 
-What a store submission needs from a person and no file supplies: the notes a
-certification reader is handed, the answers a form asks that no build can
-give, and the reasoning behind the screenshots.
+What a store submission needs from a person and no file supplies: the answers
+a form asks that no build can give, and the reasoning behind the screenshots.
 
 The listing text itself is not here. It is `store-listing.toml` beside this,
 which `ship` checks before the tag and pushes to both stores on every release,
 and what a release tells them changed is `release-notes.toml`. A field edited
-in this file would reach nobody. Apple's Notes for Review are there too, as
-`apple-review-notes`, which `ship` pushes to `appStoreReviewDetail` on every
-Mac App Store submission - Microsoft's Notes for certification below have no
-such field and are still typed in by hand.
+in this file would reach nobody. Apple's Notes for Review and Microsoft's
+Notes for certification are there too, as `apple-review-notes` and
+`microsoft-review-notes`, which `ship` pushes to `appStoreReviewDetail` and
+`NotesForCertification` on every submission.
 
-## Notes for certification
-
-What the Microsoft Store shows a certification tester. The message count in
-the second paragraph changes with the binary: reread it off the kit report
-before a submission.
-
-```
-Five DLLs ship inside the package beside duckling.exe: four Visual C++ runtime files and DirectML. The runtime files are app-local because +crt-static cannot link the ONNX Runtime this application uses - the link fails with 63 unresolved externals. DirectML is linked in by the ONNX Runtime distribution whether or not the application asks for it, at the version that library was built against rather than whatever the machine has.
-
-The optional "Blocked executables" test reports 57 matches and the kit's overall result is PASS. Most are the three-letter scan for reg, cmd, csi, cdb and dnx finding those byte sequences inside binary weight data: decoder_kv.onnx.data is 116 MB and contains 11 occurrences of "cmd", fewer than the 55 that uniform random bytes would produce.
-
-The "cmd.exe" strings and CreateProcessW in duckling.exe are the Rust standard library's process module, linked in because the GUI framework uses the webbrowser crate to open hyperlinks; the application contains no call that spawns a process. ShellExecuteW is used deliberately and only on a button press: the preview pane's Open and Show in folder buttons hand the file the user just converted to the shell's default handler.
-
-Duckling converts documents offline, so about 375 MB of the package is ONNX model weights plus pdfium and DirectML. It makes no network connection of any kind and its import table contains no ws2_32, winhttp, wininet or iphlpapi. It claims no file type, so any Word file or PDF exercises it; the twelve documents the screenshots use are at github.com/excelano/duckling/tree/v0.1.1/packaging/demo/documents
-```
+`microsoft-review-notes`'s message count in its second paragraph changes with
+the binary: reread it off the Windows App Certification Kit report before a
+submission and update `store-listing.toml`.
 
 ## The answers a form asks
 
