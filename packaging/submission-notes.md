@@ -15,6 +15,21 @@ Notes for certification are there too, as `apple-review-notes` and
 the binary: reread it off the Windows App Certification Kit report before a
 submission and update `store-listing.toml`.
 
+## Capability justification
+
+The package declares `runFullTrust`, and Partner Center's justification field
+for it is asked once when the capability is first declared on the product
+rather than on every resubmission - it is not part of the submission document
+`ship` reads and writes, and this repo's own resubmissions have gone to
+certification since without one being sent. 500-character limit, which counts
+newlines.
+
+> Duckling is a full-trust Win32 desktop application packaged as MSIX. It
+> needs this capability to run at all. It converts the files and folders a
+> person drops on it or chooses through Add, writing results to a folder they
+> pick, entirely offline against bundled models. It makes no network
+> connection, and uses no device.
+
 ## The answers a form asks
 
     Copyright and trademark   Excelano LLC
