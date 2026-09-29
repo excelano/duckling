@@ -119,10 +119,11 @@ The application bundle the Mac App Store distributes:
     ./packaging/macos/build-app.sh --store PROFILE         # dist/Duckling.pkg, what is uploaded
 
 The build is Apple silicon only, because no prebuilt ONNX Runtime exists for
-an Intel Mac; an Intel lane machine packages what it cannot run, `macos.yml`
-runs it, and the `intel-mac` feature builds a runtime-less application for
-measuring the rest. The models are resources and pdfium is a framework,
-because a signed bundle will not carry them beside the executable. The sandbox
+an Intel Mac; an Intel lane machine packages what it cannot run,
+`apple-silicon.yml` runs it, and the `intel-mac` feature builds a
+runtime-less application for measuring the rest. The models are resources and
+pdfium is a framework, because a signed bundle will not carry them beside the
+executable. The sandbox
 grants a file and not its folder, so the application asks for the folder
 before writing beside a file that arrived alone. No document types are
 declared, so no Open With on this platform. `check-install.sh` asks an

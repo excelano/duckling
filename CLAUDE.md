@@ -23,7 +23,7 @@ aarch64-apple-darwin`, then `packaging/macos/build-app.sh`; an Intel Mac adds `-
 to every `cargo` command. Each `packaging/` README has its lane. A screenshot proves a code path
 draws; it does not replace David's keyboard walkthrough.
 
-Releases: run `ship duckling`. There is no release document.
+Releases: the apps in excelano/shipping, run from this directory. There is no release document.
 
 ## Rules
 
