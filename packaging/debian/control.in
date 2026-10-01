@@ -12,7 +12,7 @@ Description: Convert documents to DocLang, Markdown, JSON, LaTeX or an office fo
  OpenDocument, Apple iWork, email, Visio and some forty other document
  formats into DocLang, Markdown, docling JSON, a DocLang archive, LaTeX or an
  office document - ODT, ODS, ODP, DOCX or XLSX - on the machine it runs on,
- with nothing sent anywhere. Drop files or folders on the window, choose the
+ with nothing sent anywhere. Add files or folders, choose the
  format and where the output goes, and press Convert. The converter is
  docling.rs, the Rust port of IBM's Docling.
  .

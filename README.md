@@ -43,8 +43,8 @@ which that library brings whether or not anything asks for it.
 cargo run --release -- [FILE|FOLDER ...]
 ```
 
-Files and folders given on the command line, dropped on the window, or
-picked with the buttons are queued. A folder contributes every file under it
+Files and folders given on the command line or picked with the buttons are
+queued. A folder contributes every file under it
 that docling.rs can read. Nothing is converted until Convert is pressed, so
 the format and destination chosen at that moment apply to the whole batch.
 Output goes beside each source file or into one folder, and an existing file

@@ -26,7 +26,7 @@ newlines.
 
 > Duckling is a full-trust Win32 desktop application packaged as MSIX. It
 > needs this capability to run at all. It converts the files and folders a
-> person drops on it or chooses through Add, writing results to a folder they
+> person chooses through Add, writing results to a folder they
 > pick, entirely offline against bundled models. It makes no network
 > connection, and uses no device.
 

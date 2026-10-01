@@ -38,9 +38,9 @@
 apple-review-notes = """
 Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT, ODS, ODP, DOCX or XLSX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.
 
-There is nothing a tester must be handed before the window does anything. Duckling claims no file type and opens with an empty queue: drop any Word file or PDF you already have onto the window, or use Add files, pick an output format, and convert. If you would rather have ours, the twelve documents the screenshots were taken from are at https://github.com/excelano/duckling/tree/v0.2.0/packaging/demo/documents — invented for the purpose, MIT licensed like the rest of the repository, and between them they exercise every format claimed above.
+There is nothing a tester must be handed before the window does anything. Duckling claims no file type and opens with an empty queue: use Add files to choose any Word file or PDF you already have, pick an output format, and convert. If you would rather have ours, the twelve documents the screenshots were taken from are at https://github.com/excelano/duckling/tree/v0.2.0/packaging/demo/documents — invented for the purpose, MIT licensed like the rest of the repository, and between them they exercise every format claimed above.
 
-The App Sandbox is on with exactly two entitlements: the sandbox itself and read-write access to user-selected files. That grant is what a person gives by dropping a file or a folder on the window, picking one in the Add dialogs, or choosing a destination folder. What it does not cover is the folder around a file that arrived on its own, so Duckling asks for that folder before writing beside such a file rather than failing quietly. There is no network entitlement, no Downloads-folder entitlement, and no temporary exception.
+The App Sandbox is on with exactly two entitlements: the sandbox itself and read-write access to user-selected files. That grant is what a person gives by picking a file or a folder in the Add dialogs or choosing a destination folder. What it does not cover is the folder around a file that arrived on its own, so Duckling asks for that folder before writing beside such a file rather than failing quietly. There is no network entitlement, no Downloads-folder entitlement, and no temporary exception.
 
 Conversion is local. Documents are read by docling.rs, the open-source Rust port of IBM's Docling, compiled into the application; nothing is uploaded and no model is fetched. The full privacy statement is at https://excelano.com/legal/#duckling and the complete source is at https://github.com/excelano/duckling.
 """
@@ -142,7 +142,7 @@ DocLang, the open document markup for language models, ready to open in Segler, 
 
 HOW IT WORKS
 
-Drop files or folders on the window. Choose the output format and whether the results go beside each file or into one folder. Press Convert. Each row reports as it goes, page by page for a PDF, and the preview shows every result with a button to open it or show it in its folder. An existing file is never overwritten: a second report.md becomes report (1).md.
+Add files or folders. Choose the output format and whether the results go beside each file or into one folder. Press Convert. Each row reports as it goes, page by page for a PDF, and the preview shows every result with a button to open it or show it in its folder. An existing file is never overwritten: a second report.md becomes report (1).md.
 
 A scanned PDF or an image is read by layout, table-structure and OCR models that ship inside the app. They are most of the download, and they are why nothing has to be fetched afterwards and why the app works with the network off.
 
@@ -176,7 +176,7 @@ features = [
   "Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT, ODS, ODP, DOCX and XLSX, a plain office document with the pictures inside it.",
   "Converts a spreadsheet or a deck into the other ecosystem: XLSX to ODS, ODS to XLSX, PPTX to ODP, offered when every file in the queue is that kind.",
   "Text layer only, for a PDF that already has text in it: seconds rather than minutes, without the headings and tables the models find.",
-  "Converts in batches: drop files or a whole folder, choose once, press Convert.",
+  "Converts in batches: add files or a whole folder, choose once, press Convert.",
   "Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.",
   "Output beside each file or into one folder, and never over an existing file.",
   "A preview of every result, with Open and Show in folder.",

@@ -84,10 +84,10 @@ pub fn locate_assets() -> Option<PathBuf> {
 /// creating one and removing it.
 ///
 /// Asked before a conversion is sent to be written beside its source, and
-/// asked at all because of the macOS sandbox: a file a person drops or picks
+/// asked at all because of the macOS sandbox: a file a person picks
 /// on its own is granted on its own, and its folder is not, so the write
 /// beside it fails after the conversion rather than before. A folder a
-/// person dropped or picked is granted whole. The probe is the write the
+/// person picked is granted whole. The probe is the write the
 /// conversion is about to make, one directory entry long, under a name
 /// nothing else uses and with `create_new` so it can never touch a file that
 /// exists. Anything that stops the probe stops the conversion, so a `false`
@@ -399,7 +399,7 @@ pub fn common_input(jobs: &[Job]) -> Option<InputFormat> {
 
 /// Every convertible file under `dir`, depth first, files before
 /// subdirectories, each level in name order. Files docling.rs does not read
-/// are skipped silently: a folder drop is a request for what can be
+/// are skipped silently: a folder is a request for what can be
 /// converted, not a report on what cannot.
 pub fn walk(dir: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();

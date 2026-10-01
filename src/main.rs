@@ -48,7 +48,7 @@ use duckling::{
     common_input, detect, walk, Destination, Event, InputFormat, Job, JobId, JobState,
     OutputFormat, Rejection, Request, Worker,
 };
-use eframe::egui::{self, Align2, Color32, FontId, RichText};
+use eframe::egui::{self, RichText};
 
 /// Reverse-DNS on macOS, the desktop entry's basename on Linux, the window
 /// class a Wayland compositor matches an icon against.
@@ -401,9 +401,9 @@ impl App {
     /// The folders of queued files that this process may not write into,
     /// after asking the person for each one once.
     ///
-    /// The App Sandbox grants a file that was dropped or picked on its own,
+    /// The App Sandbox grants a file that was picked on its own,
     /// and not the folder around it, so a conversion written beside such a
-    /// file fails at the write. A folder that was dropped or picked is
+    /// file fails at the write. A folder that was picked is
     /// granted whole and never reaches the panel. The panel is the sandbox's
     /// own way of extending a grant: choosing the folder in it makes the
     /// folder writable for the rest of the session. The person may choose
@@ -592,7 +592,7 @@ impl App {
         if self.jobs.is_empty() {
             ui.centered_and_justified(|ui| {
                 ui.label(
-                    RichText::new(t("Drop files or folders here, or use Add files."))
+                    RichText::new(t("Use Add files to queue documents."))
                         .size(18.0)
                         .weak(),
                 );
@@ -805,40 +805,10 @@ impl App {
             ui.label(&self.status);
         });
     }
-
-    fn drops(&mut self, ctx: &egui::Context) {
-        let hovering = ctx.input(|i| !i.raw.hovered_files.is_empty());
-        if hovering {
-            let rect = ctx.content_rect();
-            let painter = ctx.layer_painter(egui::LayerId::new(
-                egui::Order::Foreground,
-                egui::Id::new("drop"),
-            ));
-            painter.rect_filled(rect, 0.0, Color32::from_black_alpha(110));
-            painter.text(
-                rect.center(),
-                Align2::CENTER_CENTER,
-                t("Drop to add"),
-                FontId::proportional(28.0),
-                Color32::WHITE,
-            );
-        }
-        let dropped: Vec<PathBuf> = ctx.input(|i| {
-            i.raw
-                .dropped_files
-                .iter()
-                .map(|f| f.path().to_path_buf())
-                .collect()
-        });
-        if !dropped.is_empty() {
-            self.add_paths(&dropped);
-        }
-    }
 }
 
 impl eframe::App for App {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        let ctx = ui.ctx().clone();
         self.apply_events();
         self.revalidate_format();
         // egui 0.36 folded `TopBottomPanel` and `SidePanel` into one `Panel`.
@@ -853,6 +823,5 @@ impl eframe::App for App {
             .default_size(460.0)
             .show(ui, |ui| self.preview(ui));
         egui::CentralPanel::default().show(ui, |ui| self.queue(ui));
-        self.drops(&ctx);
     }
 }

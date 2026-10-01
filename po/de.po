@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-09-14 16:39-0500\n"
+"POT-Creation-Date: 2026-10-01 18:01-0500\n"
 "PO-Revision-Date: 2026-09-09 13:21-0500\n"
 "Last-Translator: David M. Anderson <david.anderson@excelano.com>\n"
 "Language-Team: German\n"
@@ -72,11 +72,11 @@ msgstr ""
 msgid "Built without ONNX Runtime: PDFs and images will not convert"
 msgstr "Ohne ONNX Runtime gebaut: PDFs und Bilder werden nicht umgewandelt"
 
-#: src/main.rs:202
+#: src/main.rs:199
 msgid "Duckling could not start"
 msgstr "Duckling konnte nicht starten"
 
-#: src/main.rs:204
+#: src/main.rs:201
 msgid ""
 "The window could not be opened.\n"
 "\n"
@@ -94,42 +94,42 @@ msgstr ""
 "konnte. Duckling braucht keine bestimmte Grafikkarte, aber eine, mit der das "
 "System sprechen kann."
 
-#: src/main.rs:268
+#: src/main.rs:265
 msgid ""
 "{format} is offered only when every file is {input}; the format is back to "
 "{default}"
 msgstr ""
-"{format} wird nur angeboten, wenn alle Dateien {input} sind; das Format steht "
-"wieder auf {default}"
+"{format} wird nur angeboten, wenn alle Dateien {input} sind; das Format "
+"steht wieder auf {default}"
 
-#: src/main.rs:296
+#: src/main.rs:293
 msgid "Nothing to add"
 msgstr "Nichts hinzuzufügen"
 
-#: src/main.rs:297
+#: src/main.rs:294
 msgid "Added {n}"
 msgstr "{n} hinzugefügt"
 
-#: src/main.rs:313
+#: src/main.rs:310
 msgid "Added {n}; skipped {k} docling.rs does not read"
 msgstr "{n} hinzugefügt; {k} übersprungen, die docling.rs nicht liest"
 
-#: src/main.rs:318
+#: src/main.rs:315
 msgid "Added {n}; skipped {k} docling.rs does not read ({extensions})"
 msgstr ""
 "{n} hinzugefügt; {k} übersprungen, die docling.rs nicht liest ({extensions})"
 
-#: src/main.rs:386
+#: src/main.rs:383
 msgid "Converting {count} to {format}"
 msgstr "{count} werden zu {format} umgewandelt"
 
-#: src/main.rs:390
+#: src/main.rs:387
 msgid "{n} left queued until their folder is allowed, or choose Into a folder"
 msgstr ""
 "{n} bleiben in der Warteschlange, bis ihr Ordner freigegeben ist, oder "
 "wählen Sie In einen Ordner"
 
-#: src/main.rs:394
+#: src/main.rs:391
 msgid ""
 "Converting {count} to {format}; {n} left queued until their folder is "
 "allowed, or choose Into a folder"
@@ -137,34 +137,34 @@ msgstr ""
 "{count} werden zu {format} umgewandelt; {n} bleiben in der Warteschlange, "
 "bis ihr Ordner freigegeben ist, oder wählen Sie In einen Ordner"
 
-#: src/main.rs:434
+#: src/main.rs:431
 msgid ""
 "Allow Duckling to write beside the files in {folder}: choose that folder"
 msgstr ""
 "Duckling erlauben, neben den Dateien in {folder} zu schreiben: diesen Ordner "
 "wählen"
 
-#: src/main.rs:468 src/main.rs:660
+#: src/main.rs:465 src/main.rs:657
 msgid "Wrote {file}"
 msgstr "{file} geschrieben"
 
-#: src/main.rs:476
+#: src/main.rs:473
 msgid "{file}: {reason}"
 msgstr "{file}: {reason}"
 
-#: src/main.rs:517
+#: src/main.rs:514
 msgid "Add files…"
 msgstr "Dateien hinzufügen …"
 
-#: src/main.rs:520
+#: src/main.rs:517
 msgid "Add folder…"
 msgstr "Ordner hinzufügen …"
 
-#: src/main.rs:524
+#: src/main.rs:521
 msgid "Convert to"
 msgstr "Umwandeln in"
 
-#: src/main.rs:540
+#: src/main.rs:537
 msgid ""
 "Seconds rather than minutes on a PDF that already has text in it. No "
 "headings, no tables, nothing from a scan."
@@ -172,101 +172,104 @@ msgstr ""
 "Sekunden statt Minuten bei einem PDF, das bereits Text enthält. Keine "
 "Überschriften, keine Tabellen, nichts aus einem Scan."
 
-#: src/main.rs:541
+#: src/main.rs:538
 msgid "Text layer only"
 msgstr "Nur Textebene"
 
-#: src/main.rs:545
+#: src/main.rs:542
 msgid "Beside each file"
 msgstr "Neben jede Datei"
 
-#: src/main.rs:548
+#: src/main.rs:545
 msgid "Into a folder"
 msgstr "In einen Ordner"
 
-#: src/main.rs:558
+#: src/main.rs:555
 msgid "Choose another folder"
 msgstr "Einen anderen Ordner wählen"
 
-#: src/main.rs:570
+#: src/main.rs:567
 msgid "Convert"
 msgstr "Umwandeln"
 
-#: src/main.rs:579
+#: src/main.rs:576
 msgid "Clear finished"
 msgstr "Fertige entfernen"
 
-#: src/main.rs:598
-msgid "Drop files or folders here, or use Add files."
-msgstr "Dateien oder Ordner hierher ziehen, oder Dateien hinzufügen verwenden."
+#: src/main.rs:595
+msgid "Use Add files to queue documents."
+msgstr "Mit „Dateien hinzufügen“ Dokumente in die Warteschlange stellen."
 
-#: src/main.rs:613
+#: src/main.rs:610
 msgid "File"
 msgstr "Datei"
 
-#: src/main.rs:614
+#: src/main.rs:611
 msgid "Read as"
 msgstr "Gelesen als"
 
-#: src/main.rs:615
+#: src/main.rs:612
 msgid "Status"
 msgstr "Status"
 
-#: src/main.rs:630
+#: src/main.rs:627
 msgid "Queued"
 msgstr "In Warteschlange"
 
-#: src/main.rs:641
+#: src/main.rs:638
 msgid "{done} of {total} pages"
 msgstr "{done} von {total} Seiten"
 
-#: src/main.rs:666
+#: src/main.rs:663
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-#: src/main.rs:687
+#: src/main.rs:691
 msgid "Select a file to see its result."
 msgstr "Eine Datei auswählen, um ihr Ergebnis zu sehen."
 
-#: src/main.rs:700
+#: src/main.rs:704
 msgid "Queued. Press Convert."
 msgstr "In der Warteschlange. Umwandeln drücken."
 
-#: src/main.rs:705
+#: src/main.rs:709
 msgid "Converting…"
 msgstr "Wird umgewandelt …"
 
-#: src/main.rs:722
+#: src/main.rs:726
 msgid "Open"
 msgstr "Öffnen"
 
-#: src/main.rs:725
+#: src/main.rs:729
 msgid "Could not open: {reason}"
 msgstr "Konnte nicht geöffnet werden: {reason}"
 
-#: src/main.rs:728
+#: src/main.rs:732
 msgid "Show in folder"
 msgstr "Im Ordner zeigen"
 
-#: src/main.rs:731
+#: src/main.rs:735
 msgid "Could not show: {reason}"
 msgstr "Konnte nicht gezeigt werden: {reason}"
 
-#: src/main.rs:736
+#: src/main.rs:740
 msgid "Converted with parts skipped"
 msgstr "Umgewandelt, Teile übersprungen"
 
-#: src/main.rs:746
+#: src/main.rs:750
 msgid "Preview shows the beginning; the file has the rest."
 msgstr "Die Vorschau zeigt den Anfang; die Datei hat den Rest."
 
-#: src/main.rs:790
+#: src/main.rs:794
 msgid ""
 "{queued} queued · {converting} converting · {done} done · {failed} failed"
 msgstr ""
 "{queued} in Warteschlange · {converting} werden umgewandelt · {done} fertig "
 "· {failed} fehlgeschlagen"
 
-#: src/main.rs:817
-msgid "Drop to add"
-msgstr "Zum Hinzufügen loslassen"
+#~ msgid "Drop files or folders here, or use Add files."
+#~ msgstr ""
+#~ "Dateien oder Ordner hierher ziehen, oder Dateien hinzufügen verwenden."
+
+#~ msgid "Drop to add"
+#~ msgstr "Zum Hinzufügen loslassen"

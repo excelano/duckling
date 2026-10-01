@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-09-14 16:39-0500\n"
+"POT-Creation-Date: 2026-10-01 18:04-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,11 +70,11 @@ msgstr ""
 msgid "Built without ONNX Runtime: PDFs and images will not convert"
 msgstr ""
 
-#: src/main.rs:202
+#: src/main.rs:199
 msgid "Duckling could not start"
 msgstr ""
 
-#: src/main.rs:204
+#: src/main.rs:201
 msgid ""
 "The window could not be opened.\n"
 "\n"
@@ -85,166 +85,162 @@ msgid ""
 "to."
 msgstr ""
 
-#: src/main.rs:268
+#: src/main.rs:265
 msgid ""
 "{format} is offered only when every file is {input}; the format is back to "
 "{default}"
 msgstr ""
 
-#: src/main.rs:296
+#: src/main.rs:293
 msgid "Nothing to add"
 msgstr ""
 
-#: src/main.rs:297
+#: src/main.rs:294
 msgid "Added {n}"
 msgstr ""
 
-#: src/main.rs:313
+#: src/main.rs:310
 msgid "Added {n}; skipped {k} docling.rs does not read"
 msgstr ""
 
-#: src/main.rs:318
+#: src/main.rs:315
 msgid "Added {n}; skipped {k} docling.rs does not read ({extensions})"
 msgstr ""
 
-#: src/main.rs:386
+#: src/main.rs:383
 msgid "Converting {count} to {format}"
 msgstr ""
 
-#: src/main.rs:390
+#: src/main.rs:387
 msgid "{n} left queued until their folder is allowed, or choose Into a folder"
 msgstr ""
 
-#: src/main.rs:394
+#: src/main.rs:391
 msgid ""
 "Converting {count} to {format}; {n} left queued until their folder is "
 "allowed, or choose Into a folder"
 msgstr ""
 
-#: src/main.rs:434
+#: src/main.rs:431
 msgid ""
 "Allow Duckling to write beside the files in {folder}: choose that folder"
 msgstr ""
 
-#: src/main.rs:468 src/main.rs:660
+#: src/main.rs:465 src/main.rs:657
 msgid "Wrote {file}"
 msgstr ""
 
-#: src/main.rs:476
+#: src/main.rs:473
 msgid "{file}: {reason}"
 msgstr ""
 
-#: src/main.rs:517
+#: src/main.rs:514
 msgid "Add files…"
 msgstr ""
 
-#: src/main.rs:520
+#: src/main.rs:517
 msgid "Add folder…"
 msgstr ""
 
-#: src/main.rs:524
+#: src/main.rs:521
 msgid "Convert to"
 msgstr ""
 
-#: src/main.rs:540
+#: src/main.rs:537
 msgid ""
 "Seconds rather than minutes on a PDF that already has text in it. No "
 "headings, no tables, nothing from a scan."
 msgstr ""
 
-#: src/main.rs:541
+#: src/main.rs:538
 msgid "Text layer only"
 msgstr ""
 
-#: src/main.rs:545
+#: src/main.rs:542
 msgid "Beside each file"
 msgstr ""
 
-#: src/main.rs:548
+#: src/main.rs:545
 msgid "Into a folder"
 msgstr ""
 
-#: src/main.rs:558
+#: src/main.rs:555
 msgid "Choose another folder"
 msgstr ""
 
-#: src/main.rs:570
+#: src/main.rs:567
 msgid "Convert"
 msgstr ""
 
-#: src/main.rs:579
+#: src/main.rs:576
 msgid "Clear finished"
 msgstr ""
 
-#: src/main.rs:598
-msgid "Drop files or folders here, or use Add files."
+#: src/main.rs:595
+msgid "Use Add files to queue documents."
 msgstr ""
 
-#: src/main.rs:613
+#: src/main.rs:610
 msgid "File"
 msgstr ""
 
-#: src/main.rs:614
+#: src/main.rs:611
 msgid "Read as"
 msgstr ""
 
-#: src/main.rs:615
+#: src/main.rs:612
 msgid "Status"
 msgstr ""
 
-#: src/main.rs:630
+#: src/main.rs:627
 msgid "Queued"
 msgstr ""
 
-#: src/main.rs:641
+#: src/main.rs:638
 msgid "{done} of {total} pages"
 msgstr ""
 
-#: src/main.rs:666
+#: src/main.rs:663
 msgid "Failed"
 msgstr ""
 
-#: src/main.rs:687
+#: src/main.rs:691
 msgid "Select a file to see its result."
 msgstr ""
 
-#: src/main.rs:700
+#: src/main.rs:704
 msgid "Queued. Press Convert."
 msgstr ""
 
-#: src/main.rs:705
+#: src/main.rs:709
 msgid "Converting…"
 msgstr ""
 
-#: src/main.rs:722
+#: src/main.rs:726
 msgid "Open"
 msgstr ""
 
-#: src/main.rs:725
+#: src/main.rs:729
 msgid "Could not open: {reason}"
 msgstr ""
 
-#: src/main.rs:728
+#: src/main.rs:732
 msgid "Show in folder"
 msgstr ""
 
-#: src/main.rs:731
+#: src/main.rs:735
 msgid "Could not show: {reason}"
 msgstr ""
 
-#: src/main.rs:736
+#: src/main.rs:740
 msgid "Converted with parts skipped"
 msgstr ""
 
-#: src/main.rs:746
+#: src/main.rs:750
 msgid "Preview shows the beginning; the file has the rest."
 msgstr ""
 
-#: src/main.rs:790
+#: src/main.rs:794
 msgid ""
 "{queued} queued · {converting} converting · {done} done · {failed} failed"
-msgstr ""
-
-#: src/main.rs:817
-msgid "Drop to add"
 msgstr ""

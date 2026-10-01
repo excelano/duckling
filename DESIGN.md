@@ -119,11 +119,11 @@ and whether a PDF is read from its text layer only. Nothing converts until
 Convert is pressed, so the choices apply to a whole batch and a person can
 change their mind after queuing. A folder destination is chosen once and
 remembered. The **queue** is the batch: file, the format docling.rs took it
-for from its extension, and its state. Files arrive from the command line,
-from drops on the window, or from the two Add buttons. A dropped folder
+for from its extension, and its state. Files arrive from the command line
+or from the two Add buttons. A folder
 contributes every file under it that docling.rs reads, in name order, files
 before subfolders, and says nothing about the files it does not read, because
-a folder drop is a request for what can be converted; a single dropped file
+a folder is a request for what can be converted; a single file
 that cannot be read is reported in the status line by extension, because that
 person asked about that file. A file already queued or converting is not
 queued twice; a finished one is, since asking again is how a person converts
@@ -273,14 +273,14 @@ With on macOS, and the listing's Open With claim is scoped to Windows.
 
 **The sandbox grants a file, not its folder, and the application asks for the
 folder.** The open panel's grant covers the file and not its directory, and
-Duckling's default writes beside its input, so a single dropped PDF converted
+Duckling's default writes beside its input, so a single picked PDF converted
 beside itself would fail at the write, after the models had run.
 `can_write_in` in `src/lib.rs` probes each queued file's folder with one empty
 entry, and for each that refuses, `src/main.rs` puts up the standard open
 panel at that folder with a message saying why; choosing it extends the grant
 for the session, which is the panel's purpose under the sandbox. Files whose
 folder is still refused stay queued and the status line says so, naming *Into
-a folder* as the other way out. A dropped or picked folder is granted whole
+a folder* as the other way out. A picked folder is granted whole
 and never sees the panel, and neither does a chosen destination. macOS only;
 elsewhere a folder that refuses a write is a permissions problem a panel would
 misdescribe.
