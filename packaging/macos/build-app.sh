@@ -1,7 +1,7 @@
 #!/bin/sh
 # Assemble the application bundle DESIGN.md §8 describes: the executable, the
-# models and pdfium in the places a signed bundle allows them, the property
-# list, and the icon. Cloned from slipcase-desktop's script of the same name;
+# models in the place a signed bundle allows them, the property list, and the
+# icon. Cloned from slipcase-desktop's script of the same name;
 # `README.md` beside this says what is Duckling's own and why.
 #
 # The bundle is the unit of everything on macOS. A bare executable can draw a
@@ -163,11 +163,6 @@ fi
     echo "build-app.sh: the models are missing or do not match their pins" >&2
     exit 1
 }
-pdfium_src="${root}/.pdfium/lib/libpdfium.dylib"
-[ -f "$pdfium_src" ] || {
-    echo "build-app.sh: no pdfium at ${pdfium_src} - run packaging/fetch-models.sh" >&2
-    exit 1
-}
 
 # **A private symbol in a binary is a rejection.** Review refuses a bundle for
 # referencing `_CGSSetWindowBackgroundBlurRadius`, which arrives through `winit`
@@ -185,9 +180,6 @@ pdfium_src="${root}/.pdfium/lib/libpdfium.dylib"
 # dozen findings that were all noise over there. The whole `.framework`
 # directory is searched and not just its `Headers`, because Carbon and
 # CoreServices are umbrellas whose declarations live beneath them.
-#
-# Asked of pdfium too, because it is nested code in the same bundle and review
-# reads every Mach-O in it.
 #
 # **One symbol is let through by name, and it is the compiler's rather than a
 # framework's.** `___CFConstantStringClassReference` is what clang emits for
@@ -250,7 +242,6 @@ private_symbols() {
     rm -rf "$scratch"
 }
 private_symbols "$binary"
-private_symbols "$pdfium_src"
 
 # Two numbers, not one, and that is the whole reason `version.sh` takes an
 # argument. `CFBundleShortVersionString` is what a person sees in the About box
@@ -262,7 +253,7 @@ build=$("${here}/../version.sh" --build)
 
 app="${outdir}/Duckling.app"
 rm -rf "$app"
-mkdir -p "${app}/Contents/MacOS" "${app}/Contents/Resources" "${app}/Contents/Frameworks"
+mkdir -p "${app}/Contents/MacOS" "${app}/Contents/Resources"
 
 # The icon comes from the one drawing every platform's icon comes from, which
 # `packaging/README.md` names as the source. macOS wants a raster at ten sizes
@@ -312,13 +303,11 @@ plutil -lint "${app}/Contents/Info.plist" >/dev/null
 
 install -m 0755 "$binary" "${app}/Contents/MacOS/duckling"
 
-# **The models and pdfium, in the two places a signed bundle allows them.**
-# Linux and Windows put `models/` and `pdfium/` beside the executable, and a
-# bundle cannot: `codesign` treats everything under `Contents/MacOS` as code
-# and refuses to seal 780 MB of weights there, and a shared library has to be
-# nested code under `Contents/Frameworks` for the Store to accept it. So the
-# models are resources and pdfium is a framework, and `locate_assets` in
-# `src/lib.rs` looks in both places after looking beside the executable.
+# **The models, in the place a signed bundle allows them.** Linux and Windows
+# put `models/` beside the executable, and a bundle cannot: `codesign` treats
+# everything under `Contents/MacOS` as code and refuses to seal 780 MB of
+# weights there. So the models are resources, and `locate_assets` in
+# `src/lib.rs` looks there after looking beside the executable.
 #
 # `cp -c` clones on APFS, which is every Mac this runs on, so 780 MB costs no
 # time and no space; it falls back to a copy on a filesystem that cannot.
@@ -326,18 +315,7 @@ cp -Rc "${root}/.models/." "${app}/Contents/Resources/models/" 2>/dev/null ||
     cp -R "${root}/.models/." "${app}/Contents/Resources/models/"
 find "${app}/Contents/Resources/models" -type f -exec chmod 0644 {} +
 
-# pdfium is fetched universal and the executable is one architecture, so the
-# library is thinned to match: an x86_64 slice in an arm64-only bundle is 7 MB
-# that nothing loads. A bundle made from an `intel-mac` development build gets
-# the x86_64 slice by the same rule.
 arch=$(lipo -archs "$binary" | tr ' ' ',')
-case "$arch" in
-    *,*)
-        cp "$pdfium_src" "${app}/Contents/Frameworks/libpdfium.dylib" ;;
-    *)
-        lipo -thin "$arch" "$pdfium_src" -output "${app}/Contents/Frameworks/libpdfium.dylib" ;;
-esac
-chmod 0755 "${app}/Contents/Frameworks/libpdfium.dylib"
 
 # A released bundle's executable has to agree with the floor its property list
 # declares, and Cargo's default does not: without `MACOSX_DEPLOYMENT_TARGET`
@@ -361,37 +339,17 @@ if [ -n "$store_profile" ]; then
         echo "build-app.sh: no ONNX Runtime is linked into this executable; it was built with the intel-mac feature or without the pdf pipeline" >&2
         exit 1
     }
-    for bin in "${app}/Contents/MacOS/duckling" "${app}/Contents/Frameworks/libpdfium.dylib"; do
-        # Two shapes: a modern build emits LC_BUILD_VERSION with `minos`, and
-        # an old enough deployment target emits LC_VERSION_MIN_MACOSX with
-        # `version`. Both are read, so this cannot pass by finding neither.
-        got=$(otool -arch arm64 -l "$bin" |
-            awk '/LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX/ {want=1; next}
-                 want && ($1 == "minos" || $1 == "version") {print $2; exit}')
-        case "$bin" in
-            *duckling)
-                [ "$got" = "$floor" ] || {
-                    echo "build-app.sh: the executable was built for ${got:-nothing} and Info.plist declares ${floor} - rebuild with MACOSX_DEPLOYMENT_TARGET=${floor}" >&2
-                    exit 1
-                } ;;
-            *)
-                # A library may be older than the bundle's floor, never newer.
-                [ "$(printf '%s\n%s\n' "$got" "$floor" | sort -V | head -1)" = "$got" ] || {
-                    echo "build-app.sh: libpdfium.dylib wants macOS ${got} and Info.plist declares ${floor}" >&2
-                    exit 1
-                } ;;
-        esac
-    done
+    # Two shapes: a modern build emits LC_BUILD_VERSION with `minos`, and an
+    # old enough deployment target emits LC_VERSION_MIN_MACOSX with `version`.
+    # Both are read, so this cannot pass by finding neither.
+    got=$(otool -arch arm64 -l "${app}/Contents/MacOS/duckling" |
+        awk '/LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX/ {want=1; next}
+             want && ($1 == "minos" || $1 == "version") {print $2; exit}')
+    [ "$got" = "$floor" ] || {
+        echo "build-app.sh: the executable was built for ${got:-nothing} and Info.plist declares ${floor} - rebuild with MACOSX_DEPLOYMENT_TARGET=${floor}" >&2
+        exit 1
+    }
 fi
-
-# Signing is inside out: the nested library first, then the bundle, each with
-# the identity the bundle gets. `--deep` is the thing not to use here - Apple
-# deprecated it because it signs whatever it finds with the outer code's
-# entitlements, and a library carrying the sandbox entitlement is wrong.
-sign_nested() {
-    codesign --force --timestamp="${2:-none}" ${3:-} --sign "$1" \
-        "${app}/Contents/Frameworks/libpdfium.dylib"
-}
 
 # The Store path. Everything it needs was validated before the build; what is
 # left is to put the profile inside the bundle, sign what a submission is signed
@@ -481,7 +439,6 @@ if [ -n "$store_profile" ]; then
 </plist>
 ENTITLEMENTS
 
-    sign_nested "$app_identity" "" "--options runtime"
     codesign --force --timestamp --options runtime \
         --sign "$app_identity" \
         --entitlements "$store_ents" \
@@ -556,7 +513,6 @@ fi
 # been sealed. A signature covers what is there when it is made, and adding a
 # file afterwards is how a bundle becomes one macOS reports as damaged.
 if [ -n "$identity" ]; then
-    sign_nested "$identity"
     codesign --force --timestamp=none \
         --sign "$identity" \
         --entitlements "${here}/Duckling.entitlements" \

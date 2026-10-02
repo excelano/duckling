@@ -81,8 +81,7 @@ trap 'rm -rf "$stage"' EXIT INT TERM
 
 # A document to queue, so the run goes through the queue and the preview and
 # not the empty-window path. Conversion is not pressed, so no model loads:
-# what this measures is the window's own dependencies. pdfium is opened from
-# the package's own directory on the first PDF and is not a Depends question.
+# what this measures is the window's own dependencies.
 printf '# Hello\n' > "${stage}/sample.md"
 
 wants_wayland=no

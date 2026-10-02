@@ -2,8 +2,7 @@
 //! Fixtures are the docling.rs conformance corpus, which lives in a clone
 //! beside this repository on David's machine and nowhere in CI; every test
 //! drawing on it skips, loudly, when it is absent. The PDF tests also need
-//! the models under `.models/` and pdfium under `.pdfium/`, which
-//! `packaging/fetch-models.sh` puts there.
+//! the models under `.models/`, which `packaging/fetch-models.sh` puts there.
 //!
 //! The tests at the end draw on `packaging/demo/documents` instead, which is
 //! in the tree, so they run wherever the models are - and on the Apple
@@ -490,7 +489,11 @@ fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
     if !pipeline_available() {
         return;
     }
-    for entry in docling::model_inventory() {
+    // docling.rs lists its optional pdfium renderer whether or not it is built.
+    for entry in docling::model_inventory()
+        .into_iter()
+        .filter(|e| e.stage != "pdfium")
+    {
         assert!(
             entry.found,
             "docling.rs resolves {} to {}, which packaging/fetch-models.sh \

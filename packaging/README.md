@@ -2,8 +2,7 @@
 
 One directory per platform, plus `debian` for the way Linux is distributed, and
 the files shared by all of them: `fetch-models.sh`, which puts the pinned models
-and pdfium under `.models/` and `.pdfium/` at the repository root and is what
-every package copies from; `version.sh`, the only thing that reads the version
+under `.models/` at the repository root and is what every package copies from; `version.sh`, the only thing that reads the version
 out of `Cargo.toml`; `store-listing.toml`, the text both stores are given in
 both languages, which the release apps push to both on every release;
 `release-notes.toml`, what the release being cut changed;
@@ -14,12 +13,12 @@ shape.
 
 ## What every package carries
 
-The executable, and beside it `models/` and `pdfium/`, the PDF and image
-pipeline. The application finds them by looking beside its own executable
+The executable, and beside it `models/`, the PDF and image pipeline. The
+application finds them by looking beside its own executable
 (`locate_assets` in `src/lib.rs`), so every platform's package puts them where
 it looks: `/usr/lib/duckling/` on Linux with a symlink on `PATH`, the
-application directory in an MSIX, and in a bundle `Contents/Resources/models`
-and `Contents/Frameworks`, the second place `locate_assets` looks. There is no
+application directory in an MSIX, and in a bundle `Contents/Resources/models`,
+the second place `locate_assets` looks. There is no
 download at run time and no code for one.
 
 ## linux
@@ -40,8 +39,8 @@ The script installs the executable with the models beside it under
 shared object the process mapped, and refuses any whose package `Depends` in
 `debian/control.in` does not transitively reach. Run it after touching a
 dependency; it needs a display, so it is a command and never a test. It queues
-a file and presses nothing, so pdfium and the models stay unloaded: those are
-the package's own files and not a `Depends` question.
+a file and presses nothing, so the models stay unloaded: those are the
+package's own files and not a `Depends` question.
 
 ## debian
 
@@ -62,10 +61,8 @@ One package, `duckling`, with the models under `/usr/lib/duckling` beside the
 executable that finds them there. It carries no maintainer scripts:
 `desktop-file-utils` and `hicolor-icon-theme` own the dpkg triggers on the
 directories it writes into. `copyright` is DEP-5 because the package carries
-three licences: Duckling's MIT, the models' (Docling's MIT and PaddleOCR's
-Apache-2.0), and pdfium's BSD. lintian runs at error and warning on the built
-package, with the three `embedded-library` tags on
-pdfium overridden in `debian/lintian-overrides`, which says why.
+two licences: Duckling's MIT and the models' (Docling's MIT and PaddleOCR's
+Apache-2.0). lintian runs at error and warning on the built package.
 
 ## The icon
 
@@ -122,9 +119,8 @@ The application bundle the Mac App Store distributes:
 The build is Apple silicon only, because no prebuilt ONNX Runtime exists for
 an Intel Mac; an Intel lane machine packages what it cannot run,
 `apple-silicon.yml` runs it, and the `intel-mac` feature builds a
-runtime-less application for measuring the rest. The models are resources and
-pdfium is a framework, because a signed bundle will not carry them beside the
-executable. The sandbox
+runtime-less application for measuring the rest. The models are resources,
+because a signed bundle will not carry them beside the executable. The sandbox
 grants a file and not its folder, so the application asks for the folder
 before writing beside a file that arrived alone. No document types are
 declared, so no Open With on this platform. `check-install.sh` asks an

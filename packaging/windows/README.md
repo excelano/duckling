@@ -44,8 +44,7 @@ finding the machine.
 that is neither in-box nor one of the five; it prints every name it sees, so
 the listing's claim of no network connection is checkable against the
 artefact: none of `ws2_32`, `winhttp`, `wininet`, `iphlpapi`, `urlmon`,
-`netapi32`, `dnsapi`, `ncrypt` or `secur32` is imported. `pdfium.dll` is loaded
-by name on the first PDF and never appears in the table. To see which copy of
+`netapi32`, `dnsapi`, `ncrypt` or `secur32` is imported. To see which copy of
 each DLL a running install uses, read `Get-Process duckling | Select-Object
 -Expand Modules`: every one of the five resolves inside the package directory
 and none in `System32`. A clean machine, one with no Visual C++
@@ -70,7 +69,7 @@ logos.
 
 ## The package
 
-`models\` and `pdfium\` sit beside `duckling.exe`, where `locate_assets` looks.
+`models\` sits beside `duckling.exe`, where `locate_assets` looks.
 `makeappx` takes minutes rather than seconds, because most of the contents are
 ONNX weights that barely compress. The shell will not accept an unsigned MSIX,
 so the throwaway-signed copy is for installing locally and the unsigned one is
@@ -93,7 +92,7 @@ activation takes:
 
 The certification kit's `Blocked executables` test is optional on a
 `Centennial` package and reports matches for `reg`, `cmd`, `csi`, `cdb` and
-`dnx` inside ONNX weights, pdfium and DirectML, the Rust standard library's
+`dnx` inside ONNX weights and DirectML, the Rust standard library's
 `cmd.exe` spawn path, and `ShellExecuteW`, which is `opener::open` and
 `opener::reveal` behind the preview pane's Open and Show in folder buttons.
 The certification note in `submission-notes.md` says so; submitting with the test

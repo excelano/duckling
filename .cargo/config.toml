@@ -18,7 +18,7 @@
 # `nearbyintf`, `fopen_s`. It is not a flag that can be argued with; the library
 # on the other side of it was built the other way.
 #
-# So the rule is kept by the other route DESIGN.md 2 already uses for pdfium:
+# So the rule is kept by the route DESIGN.md 2 already uses for the models:
 # **the runtime ships inside the package, beside the executable.**
 # `packaging/windows/build-msix.ps1` stages `vcruntime140.dll`,
 # `vcruntime140_1.dll`, `msvcp140.dll` and `msvcp140_1.dll` next to

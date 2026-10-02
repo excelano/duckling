@@ -24,12 +24,12 @@ belongs to.
 it was written for, because this product depends on C. Without the `pdf`
 feature a PDF converts through docling.rs's text-layer path: flat paragraphs in
 reading order, no headings, no tables, nothing from a scanned page. The feature
-brings three C dependencies: ONNX Runtime, which `ort` fetches as a prebuilt
-static library at build time and links into the executable; pdfium, a shared
-library loaded by name at run time; and oniguruma, under the tokenizer
-docling-pdf carries for enrichment models this application never runs, which
-`onig_sys` compiles from C source. So the build needs a C compiler on every
-lane, and the executable links `libstdc++` beyond libc, libgcc and libm.
+brings two C dependencies: ONNX Runtime, which `ort` fetches as a prebuilt
+static library at build time and links into the executable; and oniguruma,
+under the tokenizer docling-pdf carries for enrichment models this application
+never runs, which `onig_sys` compiles from C source. Pages render in pure
+Rust, so no PDF library ships in the package. The build needs a C compiler on
+every lane, and the executable links `libstdc++` beyond libc, libgcc and libm.
 
 **The models ship in the package.** The set is the one docling.rs resolves at
 run time, pinned by URL and SHA-256 in `packaging/fetch-models.sh`, so the
@@ -71,11 +71,11 @@ file, or withdrew an export fails the test before it fails a conversion.
 The prebuilt ONNX Runtime `ort` fetches for `x86_64-pc-windows-msvc` is
 compiled against the dynamic CRT, so the link against the static one fails;
 the four Visual C++ runtime DLLs ship beside the executable instead, where the
-loader finds them first, as pdfium already does. The same dist carries the
+loader finds them first. The same dist carries the
 DirectML execution provider, so `directml.dll` is a hard import although
 docling.rs runs the CPU provider, and the dist's own copy ships as the fifth.
-The C in this application is therefore ONNX Runtime, pdfium and oniguruma, and
-on Windows DirectML as well; `packaging/windows/check-imports.ps1` keeps the
+The C in this application is therefore ONNX Runtime and oniguruma, and on
+Windows DirectML as well; `packaging/windows/check-imports.ps1` keeps the
 shipped list at five and refuses a sixth. `packaging/windows/README.md` has the
 lane.
 
@@ -157,8 +157,8 @@ the document. docling.rs's archive writer emits the markup alone, but the
 markup names each image-bearing picture as `assets/image_NNNNNN_<sha256>.png`,
 and its page renderer and zip packer are public. So `src/doclang.rs` pairs
 every asset name with the picture bytes whose hash it carries, re-encoded to
-PNG because the name says so; for an archive it renders a PDF's pages through
-pdfium at the pipeline's own scale, or takes an image input as its one page,
+PNG because the name says so; for an archive it renders a PDF's pages at the
+pipeline's own scale, or takes an image input as its one page,
 and packs the OPC parts, the markup, the pages and the assets; for a bare
 `.dclg` it writes the assets into `assets/` beside the file,
 content-addressed. A page render that fails is a note on the result.
@@ -219,7 +219,7 @@ the final name.
 
 A file with no extension, or one docling.rs does not read: rejected at
 queueing, by extension, in the status line. A file that cannot be read:
-failed, with the error. A PDF when pdfium or a model is missing beside the
+failed, with the error. A PDF when a model is missing beside the
 executable, which a packaged build never is: failed, with docling.rs's own
 message naming the file it wanted. A backend panic: failed, with the panic's
 text. A conversion docling.rs marks partial: done, marked. A file longer than
@@ -237,25 +237,20 @@ One directory per platform under `packaging/`, cloned from `excelano/segler`,
 which cloned it from `excelano/slipcase-desktop`; `packaging/README.md` says
 what is there and each platform's README has its lane.
 
-**The models and pdfium sit beside the executable, and the executable finds
-them there.** docling.rs looks under the working directory, then under two
-environment variables, then beside the executable under the dotted names
-`.models/` and `.pdfium/`. A package cannot use dotted names in an application
-directory, so `locate_assets` in `src/lib.rs` runs once at startup, before any
-thread exists, and names `models/` and `pdfium/` beside the canonicalized
-executable through the two variables when they are there, or a bundle's
-`Contents/Resources/models` and `Contents/Frameworks`, the two places a signed
-bundle allows. A checkout with `.models/` in its working directory is left
-alone, and so is an environment somebody set by hand.
+**The models sit beside the executable, and the executable finds them
+there.** docling.rs looks under the working directory, then under an
+environment variable, then beside the executable under the dotted name
+`.models/`. A package cannot use a dotted name in an application directory,
+so `locate_assets` in `src/lib.rs` runs once at startup, before any thread
+exists, and names `models/` beside the canonicalized executable through the
+variable when it is there, or a bundle's `Contents/Resources/models`, the
+place a signed bundle allows. A checkout with `.models/` in its working
+directory is left alone, and so is an environment somebody set by hand.
 
 **One package, and the models are in it.** Debian proper would split the
 arch-independent data into `duckling-data`; the fleet's rule is one package
 for one product, and `/usr/lib/duckling` is a private application directory
-where that data may live. pdfium is a prebuilt monolith with FreeType, Little
-CMS and OpenJPEG compiled in, Debian has no pdfium to depend on, and building
-one against the system libraries is a project of its own, so
-`packaging/debian/lintian-overrides` records the three `embedded-library`
-errors with the reason.
+where that data may live.
 
 **Duckling claims no file type, on any platform.** It owns no format. The
 desktop entry lists fifteen of the types it reads and the MSIX one association

@@ -12,7 +12,7 @@ The latest 0.x release receives security fixes. Older versions are not supported
 
 ## What Duckling can access
 
-Duckling runs locally on your machine. It reads the files you queue, holds each in memory while it converts, and writes one output file per conversion where you chose, never over an existing file. Parsing is docling.rs's: Office and EPUB files are ZIP archives it reads member by member, PDFs are rendered by pdfium and read by ONNX models, and nothing found inside a document is executed. It makes no network calls, has no auth layer, and can only read and write files your operating-system user already has access to.
+Duckling runs locally on your machine. It reads the files you queue, holds each in memory while it converts, and writes one output file per conversion where you chose, never over an existing file. Parsing is docling.rs's: Office and EPUB files are ZIP archives it reads member by member, PDFs are rendered in Rust and read by ONNX models, and nothing found inside a document is executed. It makes no network calls, has no auth layer, and can only read and write files your operating-system user already has access to.
 
 ## What Duckling stores
 
@@ -20,7 +20,7 @@ Duckling stores nothing outside the files you explicitly convert. There is no co
 
 ## Third-party code in the package
 
-The package carries ONNX Runtime (linked into the executable), pdfium (a shared library beside it), and the Docling and PaddleOCR models. Each is pinned by version or by SHA-256 in the repository, and a fix in any of them reaches you through a new Duckling release.
+The package carries ONNX Runtime (linked into the executable) and the Docling and PaddleOCR models. Each is pinned by version or by SHA-256 in the repository, and a fix in any of them reaches you through a new Duckling release.
 
 ## Verifying releases
 

@@ -22,9 +22,8 @@
   note-takers do, where Utilities is for tools about the machine itself.
 
   `LSMinimumSystemVersion` is 13.4 because that is what the ONNX Runtime `ort`
-  links was built for, read off `libonnxruntime.a` with `otool -l` on
-  2026-09-05; pdfium says 13.0 and nothing else in the bundle asks for more
-  than 11. It is a measured floor rather than a guess, and `build-app.sh`
+  links was built for, read off `libonnxruntime.a` with `otool -l`; nothing
+  else in the bundle asks for more than 11. It is a measured floor rather than a guess, and `build-app.sh`
   refuses a Store bundle whose executable disagrees with it.
 -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

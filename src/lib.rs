@@ -22,27 +22,23 @@ use std::thread;
 pub use docling::InputFormat;
 use docling::{ConversionStatus, DoclingDocument, DocumentConverter, Pipeline, SourceDocument};
 
-/// Point docling.rs at the models and pdfium a package installed beside the
-/// executable, when they are there and nothing has said otherwise.
+/// Point docling.rs at the models a package installed beside the executable,
+/// when they are there and nothing has said otherwise.
 ///
-/// docling.rs looks for `.models/` and `.pdfium/lib/` under the working
-/// directory, then under `$DOCLING_RS_MODELS_DIR` and `$PDFIUM_DYNAMIC_LIB_PATH`,
-/// then beside the executable under the same dotted names. A package cannot
-/// use the dotted names: Debian wants an application's private data under
-/// `/usr/lib/duckling/` without hidden directories, and a Windows or Mac
-/// package has the same reasons to name them plainly. So a package installs
-/// `models/` and `pdfium/` beside the executable, and this names them
-/// through the two variables, which docling.rs reads before it looks beside
-/// the executable itself.
+/// docling.rs looks for `.models/` under the working directory, then under
+/// `$DOCLING_RS_MODELS_DIR`, then beside the executable under the same dotted
+/// name. A package cannot use the dotted name: Debian wants an application's
+/// private data under `/usr/lib/duckling/` without hidden directories, and a
+/// Windows or Mac package has the same reasons to name it plainly. So a
+/// package installs `models/` beside the executable, and this names it
+/// through the variable, which docling.rs reads before it looks beside the
+/// executable itself.
 ///
 /// A Mac bundle is the one layout where "beside" is not a directory the
 /// package may fill. `codesign` treats everything under `Contents/MacOS` as
-/// code to be signed, so 613 MB of model weights cannot sit there, and a
-/// shared library the Store will accept has to be nested code under
-/// `Contents/Frameworks`. So the second place looked is the bundle's:
-/// `../Resources/models` and `../Frameworks`, where `build-app.sh` puts them.
-/// docling.rs takes the pdfium variable as a directory holding the library
-/// under its platform name, which `Frameworks/libpdfium.dylib` is.
+/// code to be signed, so the model weights cannot sit there. So the second
+/// place looked is the bundle's `../Resources/models`, where `build-app.sh`
+/// puts them.
 ///
 /// Called once at startup, before the worker thread exists. An environment
 /// already set, by a developer pointing at another model set, is left alone;
@@ -59,24 +55,18 @@ pub fn locate_assets() -> Option<PathBuf> {
         .ok()
         .and_then(|p| p.canonicalize().ok())
         .and_then(|p| p.parent().map(Path::to_path_buf))?;
-    let flat = (beside.join("models"), beside.join("pdfium"));
-    let bundle = beside.parent().map(|contents| {
-        (
-            contents.join("Resources").join("models"),
-            contents.join("Frameworks"),
-        )
-    });
-    let (models, pdfium) = if flat.0.is_dir() {
+    let flat = beside.join("models");
+    let bundle = beside
+        .parent()
+        .map(|contents| contents.join("Resources").join("models"));
+    let models = if flat.is_dir() {
         flat
     } else {
-        bundle.filter(|(models, _)| models.is_dir())?
+        bundle.filter(|models| models.is_dir())?
     };
     // Edition 2021: `set_var` is a safe function, and no other thread exists
     // yet to observe the environment changing under it.
     std::env::set_var("DOCLING_RS_MODELS_DIR", &models);
-    if pdfium.is_dir() && std::env::var_os("PDFIUM_DYNAMIC_LIB_PATH").is_none() {
-        std::env::set_var("PDFIUM_DYNAMIC_LIB_PATH", &pdfium);
-    }
     Some(models)
 }
 
@@ -637,9 +627,8 @@ impl Engine {
         })
     }
 
-    /// One PNG per page, for the archive. A PDF is rendered through pdfium at
-    /// the pipeline's own scale, on this thread, which is the only thread
-    /// that touches pdfium. An image is its own single page.
+    /// One PNG per page, for the archive. A PDF is rendered at the pipeline's
+    /// own scale. An image is its own single page.
     fn page_images(&mut self, format: InputFormat, bytes: &[u8]) -> Result<doclang::Pages, String> {
         match format {
             InputFormat::Pdf => docling::render_pdf_pages(bytes, None, None, 2.0)

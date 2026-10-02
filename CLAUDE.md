@@ -31,7 +31,7 @@ Logic another front end would need lives in `src/lib.rs`, never in `src/main.rs`
 catalogue is declared in `src/main.rs`, since only the window speaks. Nothing writes around
 `available_path`: no existing file is overwritten. The models ship in the package from
 `fetch-models.sh`'s pins; there is no download at run time and no code for one. The C in the tree is
-ONNX Runtime, pdfium and oniguruma, plus DirectML on Windows; another C dependency is David's decision
+ONNX Runtime and oniguruma, plus DirectML on Windows; another C dependency is David's decision
 (`~/notes/pure_rust_preference.md`). `+crt-static` stays absent on Windows, and `check-imports.ps1`
 refusing a DLL goes to David, not into its list. Nothing under `packaging/windows` may write an
 extension's default value or remove a `UserChoice`. `src/lib.rs` is `forbid(unsafe_code)` and

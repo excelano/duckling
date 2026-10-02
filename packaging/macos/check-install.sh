@@ -55,27 +55,12 @@ else
     bad "ONNX Runtime is linked in" "not defined - PDFs and images cannot convert"
 fi
 
-# 3. The models and pdfium, in the places `locate_assets` looks for a bundle.
+# 3. The models, in the place `locate_assets` looks for a bundle.
 models="${app}/Contents/Resources/models"
 if [ -f "${models}/layout_heron_int8.onnx" ] && [ -f "${models}/tableformer/decoder_kv.onnx" ]; then
     ok "the models are in Contents/Resources/models" "$(du -sh "$models" | cut -f1)"
 else
     bad "the models are in Contents/Resources/models" "absent or incomplete"
-fi
-pdfium="${app}/Contents/Frameworks/libpdfium.dylib"
-if [ -f "$pdfium" ]; then
-    ok "pdfium is in Contents/Frameworks" "$(lipo -archs "$pdfium" 2>/dev/null)"
-    # The arm64 slice arrives from bblanchon carrying the ad-hoc signature
-    # Apple's linker gives every arm64 binary, which verifies and is not a
-    # signature the Store accepts. What is wanted is the bundle's own team.
-    pdfium_auth=$(codesign -dvv "$pdfium" 2>&1 | sed -n 's/^Authority=//p' | head -1)
-    if [ -n "$pdfium_auth" ]; then
-        ok "  and it is signed by the same team" "$pdfium_auth"
-    else
-        bad "  and it is signed by the same team" "ad-hoc or unsigned - build-app.sh --sign or --store signs it"
-    fi
-else
-    bad "pdfium is in Contents/Frameworks" "no libpdfium.dylib"
 fi
 
 # 4. And whether the machine is actually running the arm64 slice natively,

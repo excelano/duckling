@@ -53,8 +53,8 @@ CGEvent click reach the window, and `window-probe.swift` asks the window server
 whether it drew.
 
 The floor is 13.4 and it is ONNX Runtime's: `otool -l` on the
-`libonnxruntime.a` `ort` fetches reports `minos 13.4`, pdfium's arm64 slice
-13.0, and nothing else more than 11. So `LSMinimumSystemVersion` is 13.4 and
+`libonnxruntime.a` `ort` fetches reports `minos 13.4`, and nothing else
+more than 11. So `LSMinimumSystemVersion` is 13.4 and
 the release build is made with `MACOSX_DEPLOYMENT_TARGET=13.4`, which
 `build-app.sh --store` checks against the executable; Cargo's default for the
 target is 11.0, and a bundle declaring 13.4 over an executable claiming 11.0 is
@@ -67,21 +67,15 @@ carries that provider while docling.rs runs the CPU provider.
 ## The bundle layout
 
 `codesign` treats everything under `Contents/MacOS` as nested code and will not
-seal the ONNX weights there as resources, and a shared library the Store
-accepts has to be nested code under `Contents/Frameworks`, signed with the
-bundle's identity. So:
+seal the ONNX weights there as resources. So:
 
     Duckling.app/Contents/MacOS/duckling
-    Duckling.app/Contents/Frameworks/libpdfium.dylib
     Duckling.app/Contents/Resources/models/...
     Duckling.app/Contents/Resources/duckling.icns
 
-`locate_assets` in `src/lib.rs` looks in `../Resources/models` and
-`../Frameworks` after looking beside the executable; docling.rs takes
-`PDFIUM_DYNAMIC_LIB_PATH` as a directory holding the library under its
-platform name. pdfium is fetched universal and thinned to the executable's
-architecture. `cp -c` clones the models on APFS, so staging costs seconds and
-no disk.
+`locate_assets` in `src/lib.rs` looks in `../Resources/models` after looking
+beside the executable. `cp -c` clones the models on APFS, so staging costs
+seconds and no disk.
 
 ## The sandbox and the folder a file arrived without
 
@@ -124,25 +118,20 @@ not declare, which is the line Mac App Store review draws under Guideline
 2.5.1. `Cargo.toml`'s `[patch.crates-io]` pins winit so that
 `CGSSetWindowBackgroundBlurRadius` and `CGSMainConnectionID` are not in the
 executable; `CGShieldingWindowLevel`, which winit also uses, is declared in
-`CGDirectDisplay.h` and passes. pdfium's imports from libSystem, CoreGraphics
-and CoreFoundation are all declared. One symbol is allowed by name:
+`CGDirectDisplay.h` and passes. One symbol is allowed by name:
 `___CFConstantStringClassReference`, which clang emits for every
 `CFSTR("...")` literal, is exported by CoreFoundation's `.tbd` and declared in
 no header, and reaches this executable through the CoreML provider objects
 inside ONNX Runtime.
 
-## Signing, inside out
+## Signing
 
-`build-app.sh --sign` signs `libpdfium.dylib` first with the identity alone,
-then the bundle with the identity and the entitlements, not `--deep`, which
-would give the library the sandbox entitlement. The Store path does the same
-with `--options runtime` on both and the profile's two identifiers added to the
-bundle's entitlements, then `productbuild` wraps it and `lsregister -u`
-withdraws whatever claim a development build at the same path left, because a
-Store build in `dist/` is what `open -a Duckling` would reach and the kernel
-kills it. pdfium's arm64 slice arrives carrying the ad-hoc signature Apple's
-linker gives every arm64 binary; it verifies, it is not a signature the Store
-accepts, and `check-install.sh` asks for the bundle's own team on it.
+`build-app.sh --sign` signs the bundle with the identity and the entitlements.
+The Store path does the same with `--options runtime` and the profile's two
+identifiers added to the bundle's entitlements, then `productbuild` wraps it
+and `lsregister -u` withdraws whatever claim a development build at the same
+path left, because a Store build in `dist/` is what `open -a Duckling` would
+reach and the kernel kills it.
 
 A Store-signed bundle launches nowhere but through the Store or TestFlight, so
 the walkthrough runs against the arm64 bundle signed with the Apple Development

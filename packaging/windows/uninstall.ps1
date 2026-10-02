@@ -108,12 +108,10 @@ if (-not $KeepFiles) {
         $path = Join-Path $Prefix $name
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force -Confirm:$false }
     }
-    # The models and pdfium, which are most of what is here: about 360 MB that
-    # a person removing this application certainly means to get back.
-    foreach ($dir in 'models', 'pdfium') {
-        $path = Join-Path $Prefix $dir
-        if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force -Confirm:$false }
-    }
+    # The models, which are most of what is here: about 340 MB that a person
+    # removing this application certainly means to get back.
+    $path = Join-Path $Prefix 'models'
+    if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force -Confirm:$false }
     # Add/Remove Programs points at the copy inside the install directory, so
     # the usual run is a script emptying the directory it is itself in, and a
     # running script cannot delete itself. Run from a checkout it is not that

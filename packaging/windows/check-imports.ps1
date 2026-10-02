@@ -37,13 +37,11 @@
     kept it.
 
     **What this does not cover.** A library loaded by name at run time is not in
-    the import table, so this script cannot see it. Duckling ships pdfium, which
-    docling.rs opens through `PDFIUM_DYNAMIC_LIB_PATH` from inside the package,
-    and wgpu reaches Direct3D partly the same way. Neither is a gap worth
-    closing here - a check that tried to follow run-time loading would be
-    guessing at names - but a person reading a green line from this script
-    should know it is a statement about the import table and not about
-    everything the process will open.
+    the import table, so this script cannot see it. wgpu reaches Direct3D
+    partly that way. That is not a gap worth closing here - a check that tried
+    to follow run-time loading would be guessing at names - but a person
+    reading a green line from this script should know it is a statement about
+    the import table and not about everything the process will open.
 
 .PARAMETER Binary
     The executable to read. Defaults to the release build of duckling.

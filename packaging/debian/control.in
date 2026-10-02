@@ -22,10 +22,9 @@ Description: Convert documents to DocLang, Markdown, JSON, LaTeX or an office fo
  .
  The executable links libc, libgcc and libstdc++ (ONNX Runtime's) and
  nothing else the linker records. The display stack, the graphics driver
- loader and the keyboard map libraries are opened by name at run time, and
- so is pdfium from the package's own directory, so Depends is written by
- hand and packaging/linux/check-libraries.sh measures it against a running
- window on both display backends.
+ loader and the keyboard map libraries are opened by name at run time, so
+ Depends is written by hand and packaging/linux/check-libraries.sh measures
+ it against a running window on both display backends.
  .
  There are two keyboard map libraries and not one, because there are two
  display backends. A Wayland session never loads libxkbcommon-x11 and an X11

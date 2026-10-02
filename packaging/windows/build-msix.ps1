@@ -1,5 +1,5 @@
 # Assemble the MSIX package the Microsoft Store distributes: the release
-# executable, the models and pdfium that sit beside it, the manifest with the
+# executable, the models that sit beside it, the manifest with the
 # identity and the version substituted into it, and the four images the manifest
 # names.
 #
@@ -22,9 +22,9 @@
 #
 # This is segler's script, which is slipcase-desktop's, with the names changed,
 # four assets where it checks six, an empty findings baseline, and one thing
-# neither of those has: **the package carries 352 MB of models and a shared
-# library**, staged into `models\` and `pdfium\` beside the executable, which is
-# where `locate_assets` in `src/lib.rs` looks. DESIGN.md 8. Every measurement in
+# neither of those has: **the package carries 336 MB of models**, staged into
+# `models\` beside the executable, which is where `locate_assets` in
+# `src/lib.rs` looks. DESIGN.md 8. Every measurement in
 # the comments below was taken on one of those two repositories unless it says
 # otherwise.
 #
@@ -87,7 +87,7 @@ $ErrorActionPreference = 'Stop'
 #                            what floating-point weights should do. There is
 #                            nothing in them to remove.
 #
-#   pdfium and DirectML      The same scan on two prebuilt C libraries, and the
+#   DirectML                 The same scan on a prebuilt C library, and the
 #                            same answer.
 #
 #   `cmd.exe` in the binary  Two hits, and the bytes around them settle it:
@@ -378,10 +378,10 @@ New-Item -ItemType Directory -Path (Join-Path $stage 'Assets') -Force | Out-Null
 
 Copy-Item $Binary (Join-Path $stage 'duckling.exe')
 
-# --- the models and pdfium --------------------------------------------------
+# --- the models -------------------------------------------------------------
 #
 # The whole reason this package is what it is. `locate_assets` in `src/lib.rs`
-# runs before any thread exists and names `models\` and `pdfium\` beside the
+# runs before any thread exists and names `models\` beside the
 # canonicalized executable, so the layout here is not a choice: it is the same
 # relative layout `/usr/lib/duckling` has on Linux and `Contents/MacOS` has in a
 # bundle. DESIGN.md 2 and 8.
@@ -393,16 +393,10 @@ Copy-Item $Binary (Join-Path $stage 'duckling.exe')
 # installs, launches, and cannot convert a PDF - which is a defect no check
 # after this point would see.
 $models = Join-Path $root '.models'
-$pdfium = Join-Path $root '.pdfium\lib'
 if (-not (Test-Path $models)) {
     Refuse "no models at $models - run packaging/fetch-models.sh (it needs the Git Bash that Git for Windows installs)"
 }
-if (-not (Test-Path (Join-Path $pdfium 'pdfium.dll'))) {
-    Refuse "no pdfium.dll at $pdfium - run packaging/fetch-models.sh"
-}
 Copy-Item $models (Join-Path $stage 'models') -Recurse
-New-Item -ItemType Directory -Path (Join-Path $stage 'pdfium') -Force | Out-Null
-Copy-Item (Join-Path $pdfium '*') (Join-Path $stage 'pdfium')
 
 # --- the runtime DLLs -------------------------------------------------------
 #
@@ -413,7 +407,7 @@ Copy-Item (Join-Path $pdfium '*') (Join-Path $stage 'pdfium')
 # This is the promise `check-imports.ps1` makes and cannot keep. That script
 # reads an import table and lets those five through on the strength of their
 # being shipped; here is where they are shipped, and the check below is what
-# turns the promise into something verified. An empty `pdfium\` would fail a
+# turns the promise into something verified. An empty `models\` would fail a
 # conversion; a missing `vcruntime140.dll` fails the launch, on the tester's
 # machine and not on this one.
 #

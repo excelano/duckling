@@ -71,9 +71,6 @@ driver \(em rather than anything about a document.
 .I /usr/lib/duckling/models
 The ONNX models for the PDF and image pipeline.
 .TP
-.I /usr/lib/duckling/pdfium
-The pdfium library, loaded by name at run time.
-.TP
 .I /usr/share/applications/duckling.desktop
 The desktop entry, which lists the document types Duckling reads so that a
 file manager offers it under Open With.

@@ -8,11 +8,10 @@
 # too, because nothing on Windows rasterizes an SVG.
 /packaging/windows/make-ico/target
 
-# Runtime assets: the ONNX models and pdfium, fetched by
+# Runtime assets: the ONNX models, fetched by
 # packaging/fetch-models.sh from pinned releases and shipped inside every
 # package. Never committed; roughly 750 MB.
 /.models
-/.pdfium
 
 # The prebuilt ONNX Runtime `ort` links, extracted here rather than into a
 # user cache directory so that it and the build output naming it are one

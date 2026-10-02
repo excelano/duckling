@@ -19,7 +19,7 @@
 # extension's default value is never written, no ProgID is created, and
 # `uninstall.ps1` never removes a `UserChoice`.
 #
-# It also copies about 360 MB, which is the models and pdfium. `packaging/linux/install.sh`
+# It also copies about 340 MB, which is the models. `packaging/linux/install.sh`
 # does the same into ~/.local and for the same reason: the application finds
 # them beside its own executable and there is no download at run time.
 #
@@ -168,31 +168,25 @@ if ($foundBinary) {
     }
     Write-Output "installed $installedExe from $foundBinary"
 
-    # --- the models, pdfium, and the runtime --------------------------------
+    # --- the models and the runtime -----------------------------------------
     #
     # The same layout every package uses, because `locate_assets` in
-    # `src/lib.rs` looks beside the executable and nowhere else: `models\` and
-    # `pdfium\` as directories, the five runtime DLLs loose beside the
-    # executable where the loader will find them. DESIGN.md 2 and 8.
+    # `src/lib.rs` looks beside the executable and nowhere else: `models\` as a
+    # directory, the five runtime DLLs loose beside the executable where the
+    # loader will find them. DESIGN.md 2 and 8.
     #
     # A copy without these produces an application that starts, queues a Word
     # file happily, and fails every PDF - or, without the runtime, does not
     # start at all. So this refuses rather than installing half of it.
     $models = Join-Path $root '.models'
-    $pdfium = Join-Path $root '.pdfium\lib'
-    if (-not (Test-Path -LiteralPath $models) -or
-        -not (Test-Path -LiteralPath (Join-Path $pdfium 'pdfium.dll'))) {
+    if (-not (Test-Path -LiteralPath $models)) {
         throw "install.ps1: no models under $root; run packaging/fetch-models.sh first " +
               "(it needs the Git Bash that Git for Windows installs)"
     }
-    foreach ($dir in 'models', 'pdfium') {
-        $destination = Join-Path $Prefix $dir
-        if (Test-Path -LiteralPath $destination) { Remove-Item -LiteralPath $destination -Recurse -Force }
-    }
-    Write-Output "copying the models; this is about 360 MB and takes a moment"
-    Copy-Item -LiteralPath $models -Destination (Join-Path $Prefix 'models') -Recurse -Force
-    New-Item -ItemType Directory -Force -Path (Join-Path $Prefix 'pdfium') | Out-Null
-    Copy-Item -Path (Join-Path $pdfium '*') -Destination (Join-Path $Prefix 'pdfium') -Force
+    $destination = Join-Path $Prefix 'models'
+    if (Test-Path -LiteralPath $destination) { Remove-Item -LiteralPath $destination -Recurse -Force }
+    Write-Output "copying the models; this is about 340 MB and takes a moment"
+    Copy-Item -LiteralPath $models -Destination $destination -Recurse -Force
 
     # `runtime-files.ps1` finds these and says where each comes from;
     # `.cargo/config.toml` says why they are not linked in. The packaged route
@@ -201,7 +195,7 @@ if ($foundBinary) {
     foreach ($file in $runtime) {
         Copy-Item -LiteralPath $file.Path -Destination (Join-Path $Prefix $file.Name) -Force
     }
-    Write-Output "installed the models, pdfium, and $($runtime.Count) runtime DLLs beside it"
+    Write-Output "installed the models and $($runtime.Count) runtime DLLs beside it"
 } elseif (-not (Test-Path -LiteralPath $installedExe)) {
     Write-Warning "no executable installed; the Open With entries will point at $installedExe, which is not there yet"
 }

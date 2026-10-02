@@ -15,14 +15,14 @@ no conversion logic of its own.
 ## Build
 
 ```
-./packaging/fetch-models.sh     # once; about 360 MB of models and pdfium
+./packaging/fetch-models.sh     # once; about 350 MB of models
 cargo build --release
 ```
 
 A Rust toolchain and a C compiler build the application: the PDF pipeline
 links ONNX Runtime, which arrives as a prebuilt static library, and compiles
-oniguruma from source under the tokenizer docling.rs carries. pdfium is loaded
-at run time from `.pdfium/lib` beside the working directory or the executable.
+oniguruma from source under the tokenizer docling.rs carries. Pages render in
+pure Rust.
 `DESIGN.md` §2 says what those dependencies cost and why they are taken.
 
 On macOS the build is Apple silicon only: no prebuilt ONNX Runtime exists for

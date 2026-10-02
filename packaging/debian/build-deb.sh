@@ -1,6 +1,6 @@
 #!/bin/sh
 # Build the binary package the Excelano apt repository ships: the executable
-# with its models and pdfium beside it under /usr/lib/duckling, a symlink on
+# with its models beside it under /usr/lib/duckling, a symlink on
 # PATH, the desktop entry, the icon, the manual page. One package, `duckling`,
 # for one product.
 #
@@ -96,32 +96,25 @@ mkdir -p \
     "${stage}/DEBIAN" \
     "${stage}/usr/bin" \
     "${lib}/models" \
-    "${lib}/pdfium" \
     "${stage}/usr/share/applications" \
     "${stage}/usr/share/icons/hicolor/scalable/apps" \
     "${stage}/usr/share/man/man1" \
-    "${stage}/usr/share/doc/duckling" \
-    "${stage}/usr/share/lintian/overrides"
+    "${stage}/usr/share/doc/duckling"
 
 install -m 0755 "$binary" "${lib}/duckling"
 # `locate_assets` in src/lib.rs canonicalizes the executable's path, so the
 # symlink resolves to the directory the models are in.
 ln -s ../lib/duckling/duckling "${stage}/usr/bin/duckling"
 cp -R "${root}/.models/." "${lib}/models/"
-cp "${root}/.pdfium/lib/"* "${lib}/pdfium/"
-find "${lib}/models" "${lib}/pdfium" -type f -exec chmod 0644 {} +
+find "${lib}/models" -type f -exec chmod 0644 {} +
 
 install -m 0644 "${here}/../linux/duckling.desktop" \
     "${stage}/usr/share/applications/duckling.desktop"
 install -m 0644 "${here}/../linux/icons/duckling.svg" \
     "${stage}/usr/share/icons/hicolor/scalable/apps/duckling.svg"
-# DEP-5, because the package carries three licences: ours, the models', and
-# pdfium's. MIT is not a Debian common licence, so its text is inline.
+# DEP-5, because the package carries two licences: ours and the models'. MIT
+# is not a Debian common licence, so its text is inline.
 install -m 0644 "${here}/copyright" "${stage}/usr/share/doc/duckling/copyright"
-
-# Three tags about what pdfium has compiled into it; the file says why they
-# are overridden rather than fixed.
-install -m 0644 "${here}/lintian-overrides" "${stage}/usr/share/lintian/overrides/duckling"
 
 gzip -9nc "${here}/changelog" > "${stage}/usr/share/doc/duckling/changelog.gz"
 chmod 0644 "${stage}/usr/share/doc/duckling/changelog.gz"
@@ -131,9 +124,8 @@ sed "s/@VERSION@/${version}/" "${here}/duckling.1.in" \
 chmod 0644 "${stage}/usr/share/man/man1/duckling.1.gz"
 
 # Stripped here rather than by the build profile, so a developer's release
-# binary keeps its symbols and only the packaged copy loses them. pdfium
-# arrives stripped from its builder; asking again costs nothing.
-strip --strip-unneeded "${lib}/duckling" "${lib}/pdfium/"*.so 2>/dev/null || true
+# binary keeps its symbols and only the packaged copy loses them.
+strip --strip-unneeded "${lib}/duckling" 2>/dev/null || true
 
 find "$stage" -type d -exec chmod 0755 {} +
 

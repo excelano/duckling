@@ -34,9 +34,9 @@ path = "src/main.rs"
 # on macOS is the only answer there is, a bundle opened from Finder having no
 # environment at all.
 potext = "0.1"
-# The converter. `pdf` is the ML pipeline (pdfium + ONNX Runtime), which is
-# the one C dependency this application takes; DESIGN.md §2 says why and what
-# it costs. The other defaults stay off: `asr` wants Whisper models this
+# The converter. `pdf` is the ML pipeline (a pure-Rust page renderer and ONNX
+# Runtime), which is the one C dependency this application takes beyond
+# oniguruma; DESIGN.md §2 says why and what it costs. The other defaults stay off: `asr` wants Whisper models this
 # application does not ship, `vlm` wants a remote endpoint, `fetch-images`
 # wants the network.
 docling = { version = "1.87", default-features = false, features = ["pdf"] }

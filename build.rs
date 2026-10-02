@@ -2,8 +2,8 @@
 //!
 //! This is the tree's only build script, and `CLAUDE.md` is why it is worth
 //! reading before adding a second thing to it. The rule there is about C: the
-//! application takes ONNX Runtime and pdfium and nothing more, and a third C
-//! dependency is a decision to take with David. This script holds to that by
+//! application takes ONNX Runtime, oniguruma and, on Windows, DirectML, and
+//! nothing more, and another C dependency is a decision to take with David. This script holds to that by
 //! compiling nothing at all - it prints two linker arguments and the linker
 //! that was already linking the binary embeds
 //! `packaging/windows/duckling.manifest`. No resource compiler, no object file.

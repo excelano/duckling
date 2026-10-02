@@ -7,8 +7,8 @@
 #
 # The layout under PREFIX/lib/duckling is the one the package uses, because
 # the application finds its models beside its own executable (src/lib.rs,
-# `locate_assets`): the real binary sits there with `models/` and `pdfium/`,
-# and PREFIX/bin/duckling is a symlink to it.
+# `locate_assets`): the real binary sits there with `models/`, and
+# PREFIX/bin/duckling is a symlink to it.
 #
 # Author: David M. Anderson
 # Built with AI assistance (Claude, Anthropic)
@@ -62,18 +62,17 @@ if [ "$binaries" != "none" ]; then
         if [ -x "$candidate" ]; then found="$candidate"; break; fi
     done
     if [ -n "$found" ]; then
-        [ -d "${root}/.models" ] && [ -d "${root}/.pdfium/lib" ] || {
+        [ -d "${root}/.models" ] || {
             echo "install.sh: no models under ${root}; run packaging/fetch-models.sh first" >&2
             exit 1
         }
         lib="${prefix}/lib/duckling"
-        rm -rf "${lib}/models" "${lib}/pdfium"
-        mkdir -p "${lib}/models" "${lib}/pdfium" "${prefix}/bin"
+        rm -rf "${lib}/models"
+        mkdir -p "${lib}/models" "${prefix}/bin"
         install -m 0755 "$found" "${lib}/duckling"
         cp -R "${root}/.models/." "${lib}/models/"
-        cp "${root}/.pdfium/lib/"* "${lib}/pdfium/"
-        find "${lib}/models" "${lib}/pdfium" -type f -exec chmod 0644 {} +
-        find "${lib}/models" "${lib}/pdfium" -type d -exec chmod 0755 {} +
+        find "${lib}/models" -type f -exec chmod 0644 {} +
+        find "${lib}/models" -type d -exec chmod 0755 {} +
         ln -sfn "${lib}/duckling" "${prefix}/bin/duckling"
         echo "installed ${lib}/duckling from ${found}, with the models beside it"
     else

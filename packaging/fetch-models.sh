@@ -1,9 +1,8 @@
 #!/bin/sh
 # Fetch the runtime assets every package ships: the ONNX models for the PDF
-# and image pipeline, and pdfium for this platform. Into `.models/` and
-# `.pdfium/lib/` at the repository root, which is where docling.rs looks
-# relative to the working directory during development and where the
-# packaging scripts copy from. Every file is pinned by URL and SHA-256; a
+# and image pipeline. Into `.models/` at the repository root, which is where
+# docling.rs looks relative to the working directory during development and
+# where the packaging scripts copy from. Every file is pinned by URL and SHA-256; a
 # file that is present and matches is not fetched again, and a file that
 # arrives and does not match is deleted and reported.
 #
@@ -74,53 +73,6 @@ fetch() { # <url> <path> <sha256>
     exit 1
   fi
 }
-
-# pdfium per platform. Linux x64 takes the build docling.rs pins for its
-# conformance runs, mirrored with the models. Windows and macOS take
-# bblanchon's prebuilts, the same source that Linux build came from, at one
-# release tag for both, pinned by the archive's hash; only the library member
-# is kept. The Mac archive is universal, so one file serves both architectures.
-#
-# Those two are not mirrored, and the difference is the tag: `chromium/8035`
-# names one chromium build, and bblanchon publishes a new tag rather than
-# overwriting that one.
-PDFIUM=https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F8035
-
-fetch_member() { # <url> <archive sha256> <member> <path>
-  if [ -f "$4" ]; then
-    echo "  = $4"
-    return
-  fi
-  mkdir -p "$(dirname "$4")"
-  echo "  > $4"
-  tgz="$4.tgz.part"
-  curl -fsSL --connect-timeout 30 --retry 3 --retry-delay 2 -o "$tgz" "$1"
-  if ! echo "$2  $tgz" | sha256sum -c --quiet -; then
-    rm -f "$tgz"
-    echo "fetch-models: $(basename "$1") did not match its pinned SHA-256; not kept" >&2
-    exit 1
-  fi
-  tar xzf "$tgz" -O "$3" > "$4.part"
-  rm -f "$tgz"
-  mv "$4.part" "$4"
-}
-
-case "$(uname -s)-$(uname -m)" in
-  Linux-x86_64)
-    fetch "$BASE/libpdfium.so" .pdfium/lib/libpdfium.so \
-      b0361f8ba0bc6ffeb2325949a88f08b09356f46abe257ffdf846202999daa27b ;;
-  Darwin-*)
-    fetch_member "$PDFIUM/pdfium-mac-univ.tgz" \
-      794bb5e0d66954a9f61fb1a0224f9e4b8577a792b7f9387d9294c314d6c8bd50 \
-      lib/libpdfium.dylib .pdfium/lib/libpdfium.dylib ;;
-  MINGW*|MSYS*|CYGWIN*)
-    fetch_member "$PDFIUM/pdfium-win-x64.tgz" \
-      61513d611ad200a383456140739be77d156f1e3a2eef22bd89f6c3bda79bdd41 \
-      bin/pdfium.dll .pdfium/lib/pdfium.dll ;;
-  *)
-    echo "fetch-models: no pinned pdfium for $(uname -s)-$(uname -m)" >&2
-    exit 1 ;;
-esac
 
 fetch "$BASE/layout_heron_int8.onnx" .models/layout_heron_int8.onnx 1c53e651ade205ce7d6dfbe54af9730d774af4ec0249832b94860466de0b440b
 fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38fee0dae2c1ccee38241f37df202c9509e3abca02e9217c5ee615
