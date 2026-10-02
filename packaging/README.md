@@ -5,7 +5,8 @@ the files shared by all of them: `fetch-models.sh`, which puts the pinned models
 and pdfium under `.models/` and `.pdfium/` at the repository root and is what
 every package copies from; `version.sh`, the only thing that reads the version
 out of `Cargo.toml`; `store-listing.toml`, the text both stores are given in
-both languages, which `ship` pushes to both on every release;
+both languages, which the release apps push to both on every release;
+`release-notes.toml`, what the release being cut changed;
 `submission-notes.md`, what a submission needs from a person that no file
 supplies; and `privacy-entry.html`, the privacy section pasted
 into the legal page. `DESIGN.md` §8 has the reasoning behind each package's
@@ -62,8 +63,8 @@ executable that finds them there. It carries no maintainer scripts:
 `desktop-file-utils` and `hicolor-icon-theme` own the dpkg triggers on the
 directories it writes into. `copyright` is DEP-5 because the package carries
 three licences: Duckling's MIT, the models' (Docling's MIT and PaddleOCR's
-Apache-2.0), and pdfium's BSD. `.github/workflows/linux.yml` runs lintian at
-error and warning on every push, with the three `embedded-library` tags on
+Apache-2.0), and pdfium's BSD. lintian runs at error and warning on the built
+package, with the three `embedded-library` tags on
 pdfium overridden in `debian/lintian-overrides`, which says why.
 
 ## The icon

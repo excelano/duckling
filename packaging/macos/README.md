@@ -26,9 +26,10 @@ from, ship no `onnxruntime-osx-x86_64` or `onnxruntime-osx-universal2` from
 1.28.0, the version `ort` pins. So there is no Intel slice to join, App Store
 Connect reads the architectures out of the binary and lists the application for
 Apple silicon, and an Intel Mac cannot run the release build. On an Intel lane
-machine the release build cross-compiles and links, `.github/workflows/macos.yml`
-on an arm64 runner is where it converts anything, and `check-install.sh` is
-carried to the machine that can run the bundle.
+machine the release build cross-compiles and links,
+`.github/workflows/apple-silicon.yml` on an arm64 runner is where it converts
+anything, and `check-install.sh` is carried to the machine that can run the
+bundle.
 
 The `intel-mac` feature turns `ort`'s `load-dynamic` on, which links no ONNX
 Runtime and looks for a `libonnxruntime.dylib` at run time that no Intel Mac
