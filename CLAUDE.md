@@ -15,6 +15,8 @@ docling.rs's issue and a wrong office package is `waddle-core`'s. `DESIGN.md` is
     cargo run -- [FILE|FOLDER ...]
     ./po/update-po.sh                           # after changing any sentence a person reads
     ./po/pseudo.sh                              # then a debug build with POTEXT_LANG=en-x-pseudo
+    gh workflow run ci                          # fmt, clippy, tests on a runner; run by hand
+    gh workflow run macos                       # the arm64 suite and bundle; our only Apple silicon
 
 The build directory is the shared one in `~/.cargo/config.toml`, not `target/`. Windows:
 `fetch-models.sh` in Git Bash, `cargo build --release`, then `packaging\windows\check-imports.ps1`
