@@ -27,7 +27,7 @@ from, ship no `onnxruntime-osx-x86_64` or `onnxruntime-osx-universal2` from
 Connect reads the architectures out of the binary and lists the application for
 Apple silicon, and an Intel Mac cannot run the release build. On an Intel lane
 machine the release build cross-compiles and links,
-`.github/workflows/apple-silicon.yml` on an arm64 runner is where it converts
+`.github/workflows/macos.yml` on an arm64 runner is where it converts
 anything, and `check-install.sh` is carried to the machine that can run the
 bundle.
 

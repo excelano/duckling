@@ -3,7 +3,7 @@
 // Author: David M. Anderson
 // Built with AI assistance (Claude, Anthropic)
 //
-// This exists for CI. `.github/workflows/apple-silicon.yml` runs the suite on
+// This exists for CI. `.github/workflows/macos.yml` runs the suite on
 // an Apple silicon runner, which is the only kind of machine the release
 // build runs on at all, and the one thing a test cannot reach is the window.
 //

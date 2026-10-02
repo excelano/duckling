@@ -89,7 +89,7 @@ lane.
 for `x86_64-apple-darwin`, at `ort` or at Microsoft since the version `ort`
 pins, and building one from source is a project of its own; App Store Connect
 lists the application for Apple silicon from the binary. The Mac the lane runs
-on is Intel, so `.github/workflows/apple-silicon.yml` on an arm64 runner is
+on is Intel, so `.github/workflows/macos.yml` on an arm64 runner is
 where the shipped architecture converts anything, and the `intel-mac` feature
 in `Cargo.toml` builds the application with no ONNX Runtime in it for measuring
 the window, the sandbox and the bundle on that machine. The floor is macOS

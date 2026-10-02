@@ -55,19 +55,22 @@ pub fn locate_assets() -> Option<PathBuf> {
         .ok()
         .and_then(|p| p.canonicalize().ok())
         .and_then(|p| p.parent().map(Path::to_path_buf))?;
-    let flat = beside.join("models");
-    let bundle = beside
-        .parent()
-        .map(|contents| contents.join("Resources").join("models"));
-    let models = if flat.is_dir() {
-        flat
-    } else {
-        bundle.filter(|models| models.is_dir())?
-    };
+    let models = models_beside(&beside)?;
     // Edition 2021: `set_var` is a safe function, and no other thread exists
     // yet to observe the environment changing under it.
     std::env::set_var("DOCLING_RS_MODELS_DIR", &models);
     Some(models)
+}
+
+/// The models directory a package installed for an executable in `exe_dir`:
+/// `models/` beside it, else a bundle's `Contents/Resources/models`.
+fn models_beside(exe_dir: &Path) -> Option<PathBuf> {
+    let flat = exe_dir.join("models");
+    if flat.is_dir() {
+        return Some(flat);
+    }
+    let bundle = exe_dir.parent()?.join("Resources").join("models");
+    bundle.is_dir().then_some(bundle)
 }
 
 /// Whether this process may create a file in `dir` right now, learnt by
@@ -901,6 +904,52 @@ mod tests {
             folder.target(source, OutputFormat::DoclangArchive),
             PathBuf::from("/out/report.dclx")
         );
+    }
+
+    fn package_dir(name: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("duckling-test-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn models_are_found_beside_the_executable() {
+        let root = package_dir("flat");
+        std::fs::create_dir_all(root.join("models")).unwrap();
+        assert_eq!(models_beside(&root), Some(root.join("models")));
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn models_are_found_in_a_bundles_resources() {
+        let root = package_dir("bundle");
+        let macos = root.join("Contents").join("MacOS");
+        std::fs::create_dir_all(&macos).unwrap();
+        std::fs::create_dir_all(root.join("Contents").join("Resources").join("models")).unwrap();
+        assert_eq!(
+            models_beside(&macos),
+            Some(root.join("Contents").join("Resources").join("models"))
+        );
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn models_beside_the_executable_win_over_a_bundles() {
+        let root = package_dir("both");
+        let macos = root.join("Contents").join("MacOS");
+        std::fs::create_dir_all(macos.join("models")).unwrap();
+        std::fs::create_dir_all(root.join("Contents").join("Resources").join("models")).unwrap();
+        assert_eq!(models_beside(&macos), Some(macos.join("models")));
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn no_models_anywhere_is_none() {
+        let root = package_dir("none");
+        assert_eq!(models_beside(&root.join("Contents").join("MacOS")), None);
+        assert_eq!(models_beside(&root.join("bin")), None);
+        std::fs::remove_dir_all(&root).unwrap();
     }
 
     #[test]

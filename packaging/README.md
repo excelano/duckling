@@ -118,7 +118,7 @@ The application bundle the Mac App Store distributes:
 
 The build is Apple silicon only, because no prebuilt ONNX Runtime exists for
 an Intel Mac; an Intel lane machine packages what it cannot run,
-`apple-silicon.yml` runs it, and the `intel-mac` feature builds a
+`macos.yml` runs it, and the `intel-mac` feature builds a
 runtime-less application for measuring the rest. The models are resources,
 because a signed bundle will not carry them beside the executable. The sandbox
 grants a file and not its folder, so the application asks for the folder

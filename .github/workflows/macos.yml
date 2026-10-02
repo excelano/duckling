@@ -1,0 +1,61 @@
+name: macos
+
+# The release build is Apple silicon only and no machine we own is one, so this
+# is where the shipped architecture converts a document: the suite runs against
+# the real models on an arm64 runner, then the bundle is assembled, launched
+# with a document, and the window server is asked whether a window appeared.
+# It does not reach signing, the sandbox, the folder panel or the Store package.
+# Run by hand: `gh workflow run macos`.
+on:
+  workflow_dispatch:
+
+# The reusable workflow declares write for its release step, which never runs
+# here because no binary is named.
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    uses: excelano/.github/.github/workflows/mac-desktop-ci.yml@main
+    with:
+      fmt: true
+      deployment-target: "13.4"
+      extra-cache-paths: .models
+      extra-cache-key-file: packaging/fetch-models.sh
+      extra-cache-fetch-script: ./packaging/fetch-models.sh
+      bundle-script: |
+        target=$(cargo metadata --format-version 1 --no-deps |
+            sed -n 's/.*"target_directory":"\([^"]*\)".*/\1/p')
+        ./packaging/macos/build-app.sh --binary "${target}/debug/duckling"
+        du -sh dist/Duckling.app
+        lipo -archs dist/Duckling.app/Contents/MacOS/duckling
+
+        # The bundle carries the models the suite just ran against, no more
+        # and no fewer.
+        diff -rq .models dist/Duckling.app/Contents/Resources/models
+
+        # Duckling claims no document type, so `open --args` is the one launch
+        # path. The window server is asked rather than a screenshot taken;
+        # `packaging/macos/window-probe.swift` says why.
+        swiftc -O packaging/macos/window-probe.swift -o "${RUNNER_TEMP}/window-probe"
+        open -a "$PWD/dist/Duckling.app" --args "$PWD/packaging/demo/documents/field-notes.docx"
+        for _ in $(seq 1 15); do
+          sleep 2
+          "${RUNNER_TEMP}/window-probe" Duckling >/dev/null 2>&1 && break
+        done
+
+        set +e
+        "${RUNNER_TEMP}/window-probe" Duckling
+        verdict=$?
+        set -e
+        case "$verdict" in
+          0) echo "the arm64 bundle drew a window" ;;
+          2)
+            echo "::error::The window server listed nothing, so this run answered nothing about the window."
+            exit 1
+            ;;
+          *)
+            echo "::error::No window appeared for the arm64 bundle launched with a document."
+            exit 1
+            ;;
+        esac
