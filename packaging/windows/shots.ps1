@@ -165,6 +165,9 @@ function Get-Documents {
 }
 
 function Opens {
+    # Each language starts from the committed documents, not the other's outputs.
+    git -C $root checkout -q -- packaging/demo/documents
+    git -C $root clean -fdq -- packaging/demo/documents
     $documents = Get-Documents
     if ($SideLoaded) {
         $exe = Join-Path $env:LOCALAPPDATA 'Programs\Duckling\duckling.exe'

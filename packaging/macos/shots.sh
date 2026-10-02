@@ -42,6 +42,9 @@ AS_ARGS=yes
 EVERY_SHOT="--key cmd+plus --key cmd+plus --key cmd+plus --key cmd+plus"
 
 DOCUMENTS="${root}/packaging/demo/documents"
+# Each language starts from the committed documents, not the other's outputs.
+git -C "$root" checkout -q -- packaging/demo/documents
+git -C "$root" clean -fdq -- packaging/demo/documents
 
 # The queue is copied here first, so the paths in the frame read like somebody's
 # machine rather than like a checkout.
