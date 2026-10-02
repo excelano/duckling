@@ -14,18 +14,18 @@ version = "0.2.2"
 
 [locales."de-de"]
 whats-new = """
-Der Download ist rund 172 MB kleiner: Die Installation belegt jetzt etwa 430 MB statt 602 MB.
+Die Installation ist etwa halb so groß: rund 300 MB statt 602 MB.
 
-Entfallen ist eine zweite Kopie des Layout-Modells, die in voller Genauigkeit mitgeliefert wurde, damit eine Seite, deren erster Durchgang unstimmig aussah, noch einmal gelesen werden konnte. Über den gesamten Testbestand von docling.rs - 2.018 Seiten - wurde sie kein einziges Mal gebraucht. Was dieser Bestand abdeckt, wird unverändert konvertiert.
+Drei Dinge sind entfallen. Eine zweite Kopie des Layout-Modells in voller Genauigkeit, die als Absicherung mitgeliefert wurde und über die 2.018 Seiten des Testbestands von docling.rs kein einziges Mal gebraucht wurde. Die PDF-Bibliothek zum Darstellen von Seiten, weil docling.rs Seiten jetzt selbst zeichnet. Und gut die Hälfte des Platzes der Tabellenmodelle, die jetzt in geringerer Genauigkeit gespeichert sind: Über denselben Bestand und ein Buch mit 1.913 Seiten werden Tabellen unverändert konvertiert, bis auf Leerraum in zwei Zeilen eines Inhaltsverzeichnisses.
 
-Dokumente liest docling.rs 1.51.
+Dokumente liest docling.rs 1.87.
 """
 
 [locales."en-us"]
 whats-new = """
-The download is about 172 MB smaller: the install is around 430 MB now rather than 602 MB.
+The install is about half the size: around 300 MB now rather than 602 MB.
 
-What came out is a second copy of the page-layout model, carried at full precision so that a page whose first pass looked wrong could be read again. Over the whole of docling.rs's test corpus - 2,018 pages - it was never once needed. Everything that corpus covers converts exactly as it did.
+Three things came out. A second copy of the page-layout model, carried at full precision as a safeguard that was never once needed over the 2,018 pages of docling.rs's test corpus. The PDF library that drew pages, because docling.rs now draws them itself. And a little over half the space of the table-reading models, which are now stored at reduced precision: over the same corpus and a 1,913-page book, tables convert exactly as before, apart from spacing in two rows of one table of contents.
 
-Documents are read by docling.rs 1.51.
+Documents are read by docling.rs 1.87.
 """
