@@ -1,0 +1,3 @@
+# The demo PDFs are hand-written and contain no NUL byte, so without this git on
+# Windows would rewrite their line endings and break their cross-reference offsets.
+*.pdf binary
