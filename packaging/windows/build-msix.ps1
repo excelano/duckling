@@ -22,7 +22,7 @@
 #
 # This is segler's script, which is slipcase-desktop's, with the names changed,
 # four assets where it checks six, an empty findings baseline, and one thing
-# neither of those has: **the package carries 336 MB of models**, staged into
+# neither of those has: **the package carries 232 MB of models**, staged into
 # `models\` beside the executable, which is where `locate_assets` in
 # `src/lib.rs` looks. DESIGN.md 8. Every measurement in
 # the comments below was taken on one of those two repositories unless it says
@@ -80,9 +80,9 @@ $ErrorActionPreference = 'Stop'
 #                            scans for those three-letter names case-insensitively
 #                            and these are ONNX weights, so it is finding bytes.
 #                            Measured rather than asserted:
-#                            `decoder_kv.onnx.data` is 116 MB and holds 11
+#                            `layout_heron_int8.onnx` is 69 MB and holds 3
 #                            occurrences of `cmd` where uniform random bytes
-#                            would give 55. Every count in
+#                            would give 33. Every count in
 #                            every model file came in *under* chance, which is
 #                            what floating-point weights should do. There is
 #                            nothing in them to remove.

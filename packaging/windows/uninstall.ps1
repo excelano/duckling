@@ -108,7 +108,7 @@ if (-not $KeepFiles) {
         $path = Join-Path $Prefix $name
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force -Confirm:$false }
     }
-    # The models, which are most of what is here: about 340 MB that a person
+    # The models, which are most of what is here: about 230 MB that a person
     # removing this application certainly means to get back.
     $path = Join-Path $Prefix 'models'
     if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force -Confirm:$false }

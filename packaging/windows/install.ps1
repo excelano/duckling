@@ -19,7 +19,7 @@
 # extension's default value is never written, no ProgID is created, and
 # `uninstall.ps1` never removes a `UserChoice`.
 #
-# It also copies about 340 MB, which is the models. `packaging/linux/install.sh`
+# It also copies about 230 MB, which is the models. `packaging/linux/install.sh`
 # does the same into ~/.local and for the same reason: the application finds
 # them beside its own executable and there is no download at run time.
 #
@@ -185,7 +185,7 @@ if ($foundBinary) {
     }
     $destination = Join-Path $Prefix 'models'
     if (Test-Path -LiteralPath $destination) { Remove-Item -LiteralPath $destination -Recurse -Force }
-    Write-Output "copying the models; this is about 340 MB and takes a moment"
+    Write-Output "copying the models; this is about 230 MB and takes a moment"
     Copy-Item -LiteralPath $models -Destination $destination -Recurse -Force
 
     # `runtime-files.ps1` finds these and says where each comes from;

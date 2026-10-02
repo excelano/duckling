@@ -21,9 +21,9 @@
 #
 # The original sources and their licences are in the mirror release's notes,
 # which is where the attribution those licences require lives.
-# The layout model ships int8 alone; TableFormer ships the one decoder the
-# pipeline resolves and the fp32 encoder, which is the file that resolves in
-# every configuration. DESIGN.md §2 says what each choice costs.
+# The layout model, the TableFormer encoder and the TableFormer decoder ship at
+# reduced precision, each the one file the pipeline resolves on the CPU path.
+# DESIGN.md §2 says what that costs.
 #
 # A file this set does not name is removed from `.models/` when it is found
 # there: the packaging scripts copy that directory whole, so what is on disk
@@ -35,7 +35,7 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-BASE=https://github.com/excelano/duckling/releases/download/models-2026-09-15
+BASE=https://github.com/excelano/duckling/releases/download/models-2026-10-02
 
 retire() { # <path>
   if [ -e "$1" ]; then
@@ -79,30 +79,22 @@ fetch "$BASE/ocr_rec.onnx"           .models/ocr_rec.onnx           897a3ededb38
 fetch "$BASE/ppocr_keys_v1.txt"      .models/ppocr_keys_v1.txt      a1c84d9bdb9ab29043c58896224d32941783eb821629618416dcb08f12886492
 fetch "$BASE/ocr_rec_en.onnx"        .models/ocr_rec_en.onnx        ef7abd8bd3629ae57ea2c28b425c1bd258a871b93fd2fe7c433946ade9b5d9ea
 fetch "$BASE/en_dict.txt"            .models/en_dict.txt            5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3
-fetch "$BASE/encoder.onnx"         .models/tableformer/encoder.onnx         d6a360e3c7663ebaffa5e578ddb6f0d1806f1b469f85b7c304e7a7de41a43abf
-fetch "$BASE/decoder_kv.onnx"      .models/tableformer/decoder_kv.onnx      1a260bbf82a205bfcac64b0a92219ea76aae9faa99dd357bbbefcca5b558db89
-fetch "$BASE/decoder_kv.onnx.data" .models/tableformer/decoder_kv.onnx.data 0d567955041b9b62ea95464372ffdf4e05f7a9429f6318401187bb30470275e0
+fetch "$BASE/encoder_fp16.onnx"    .models/tableformer/encoder_fp16.onnx    d7bc9886f80c40ac5f1286f8de4c03059bd9e8e5d710ac20fefe824c4eeab414
+fetch "$BASE/decoder_int8.onnx"    .models/tableformer/decoder_int8.onnx    e51da7605c47a072e47b385bf3052671c5a66f17a0044723a243fc6ec841087e
 fetch "$BASE/bbox.onnx"            .models/tableformer/bbox.onnx            40bd7897bef9b1f152ca8132b07691464db6444df7e3c5cb6f5d7451b8356054
 fetch "$BASE/bbox.onnx.data"       .models/tableformer/bbox.onnx.data       7610e2593bfaecd72a535370f06e8c2468f9bf208bd2abe46cc727dda0a11392
 
-# TableFormer's decoder is picked by preference and `decoder_kv.onnx` is the
-# first candidate upstream hosts, so it is the only decoder a package needs.
-# The candidates behind it in that order come to 122 MB nothing ever opens,
-# and `tests/convert.rs` asks docling.rs what it resolved so that a release
-# which reordered the preference fails a test rather than a conversion.
-# The fp32 layout model is 172 MB loaded only by `predict_fp32_fallback`, to
-# re-run a page whose int8 detections cover too little of it. Cut 2026-09-21:
-# the guard did not fire once over 2,018 pages of docling.rs's corpus, and
-# without the file `predict_fp32_fallback` returns `Ok(None)` and the page
-# keeps its int8 regions, which docling.rs supports. DESIGN.md §2.
+# The pipeline resolves `encoder_fp16.onnx` and `decoder_int8.onnx` ahead of
+# the fp32 files on the CPU path, and `tests/convert.rs` names the file each
+# TableFormer stage must resolve to. The fp32 files are not shipped, so a build
+# that compiles in a GPU provider, or a caller that sets `DOCLING_RS_FP32`,
+# resolves to files no package carries, as it already does for the layout model.
+# The fp32 layout model is loaded only by `predict_fp32_fallback`; without it a
+# page keeps its int8 regions, which docling.rs supports. DESIGN.md §2.
 retire .models/layout_heron.onnx
-# The fp16 repack is half the encoder and the pipeline prefers it on the CPU
-# path, but `prefer_fp32()` drops it from the candidates entirely, so a build
-# that ever compiles in a GPU provider would resolve to a file no package
-# carries and lose ML table structure behind one stderr line. The fp32 file
-# resolves in both configurations, which is what it is 54 MB for. DESIGN.md §2.
-retire .models/tableformer/encoder_fp16.onnx
-retire .models/tableformer/decoder_int8.onnx
+retire .models/tableformer/encoder.onnx
+retire .models/tableformer/decoder_kv.onnx
+retire .models/tableformer/decoder_kv.onnx.data
 retire .models/tableformer/decoder.onnx
 retire .models/tableformer/decoder.onnx.data
 echo "fetch-models: every asset present and verified"

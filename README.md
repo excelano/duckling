@@ -15,7 +15,7 @@ no conversion logic of its own.
 ## Build
 
 ```
-./packaging/fetch-models.sh     # once; about 350 MB of models
+./packaging/fetch-models.sh     # once; about 230 MB of models
 cargo build --release
 ```
 

@@ -305,11 +305,11 @@ install -m 0755 "$binary" "${app}/Contents/MacOS/duckling"
 
 # **The models, in the place a signed bundle allows them.** Linux and Windows
 # put `models/` beside the executable, and a bundle cannot: `codesign` treats
-# everything under `Contents/MacOS` as code and refuses to seal 780 MB of
+# everything under `Contents/MacOS` as code and refuses to seal 230 MB of
 # weights there. So the models are resources, and `locate_assets` in
 # `src/lib.rs` looks there after looking beside the executable.
 #
-# `cp -c` clones on APFS, which is every Mac this runs on, so 780 MB costs no
+# `cp -c` clones on APFS, which is every Mac this runs on, so 230 MB costs no
 # time and no space; it falls back to a copy on a filesystem that cannot.
 cp -Rc "${root}/.models/." "${app}/Contents/Resources/models/" 2>/dev/null ||
     cp -R "${root}/.models/." "${app}/Contents/Resources/models/"

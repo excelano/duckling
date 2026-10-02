@@ -53,19 +53,25 @@ detections — so a count taken here cannot speak for a processor this one
 cannot reproduce, and a report of collapsed layout on a machine that is
 otherwise fine is what puts the file back.
 
-**TableFormer ships the decoder the pipeline resolves and the encoder that
-resolves everywhere.** The decoder is `decoder_kv.onnx`, first candidate
-upstream hosts, and nothing behind it in that preference order. The encoder is
-the fp32 file rather than the fp16 repack docling-pdf ranks ahead of it on the
-CPU path, because `prefer_fp32()` drops fp16 from the candidates entirely: a
-build that ever compiles in a GPU execution provider would resolve to a file
-no package carries and lose ML table structure behind one stderr note, which
-is a silent loss rather than a broken build. That costs 54 MB, and the two
-produce byte-identical output over the whole corpus, so the fp32 file buys the
-configuration and not the conversion. `tests/convert.rs` asks docling.rs's `model_inventory`
-which file each stage resolved to and names the file each must be, so a
-release that reordered a preference, promoted a candidate above the shipped
-file, or withdrew an export fails the test before it fails a conversion.
+**TableFormer ships its encoder and decoder at reduced precision.** The
+encoder is `encoder_fp16.onnx`, the same graph with its weights stored as fp16
+and cast back to fp32 at load, and the decoder is `decoder_int8.onnx`, the
+autoregressive decoder with its MatMul weights quantized to int8: 104 MB
+together against 223 MB for the fp32 pair. docling-pdf resolves both on the
+CPU path and drops both from its candidates under `prefer_fp32()`, which
+`DOCLING_RS_FP32` and any GPU execution provider turn on, so a build or a
+caller in that state resolves to files no package carries and loses ML table
+structure behind one stderr note, as it does for the layout model. Over
+docling.rs's 22-document PDF corpus and its 1,913-page book, 588 table rows,
+the Markdown matches the fp32 pair's byte for byte except padding in two rows
+of one table of contents. The exposure this accepts is a near-tie token in a
+decode flipping on a table that corpus does not hold, which upstream's own
+notes warn int8 weights can do; a report of a table read wrongly that the fp32
+decoder reads right is what puts `decoder_kv.onnx` back. `tests/convert.rs`
+asks docling.rs's `model_inventory` which file each stage resolved to and
+names the file each must be, so a release that reordered a preference,
+promoted a candidate above the shipped file, or withdrew an export fails the
+test before it fails a conversion.
 
 **On Windows, `+crt-static` cannot be used and five DLLs ship in the package.**
 The prebuilt ONNX Runtime `ort` fetches for `x86_64-pc-windows-msvc` is

@@ -480,10 +480,9 @@ fn demo_scanned_pdf_comes_back_through_ocr() {
 ///
 /// `entry.found` alone catches a withdrawal and not a promotion: a candidate
 /// added *above* the shipped file leaves the shipped one resolving and found.
-/// docling-pdf ranks `encoder_fp16.onnx` ahead of the fp32 encoder this
-/// package ships on purpose (DESIGN.md §2), and `found` cannot tell that
-/// apart from the same thing arriving by accident. So each stage names the
-/// file it must resolve to.
+/// So each stage names the file it must resolve to. These are the reduced
+/// precision files (DESIGN.md §2), which `DOCLING_RS_FP32` and a GPU provider
+/// both drop from the candidates; this test runs with neither.
 #[test]
 fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
     if !pipeline_available() {
@@ -502,8 +501,8 @@ fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
         );
     }
     for (stage, file) in [
-        ("tableformer.decoder", "decoder_kv.onnx"),
-        ("tableformer.encoder", "encoder.onnx"),
+        ("tableformer.decoder", "decoder_int8.onnx"),
+        ("tableformer.encoder", "encoder_fp16.onnx"),
     ] {
         let entry = docling::model_inventory()
             .into_iter()

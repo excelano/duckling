@@ -57,7 +57,7 @@ fi
 
 # 3. The models, in the place `locate_assets` looks for a bundle.
 models="${app}/Contents/Resources/models"
-if [ -f "${models}/layout_heron_int8.onnx" ] && [ -f "${models}/tableformer/decoder_kv.onnx" ]; then
+if [ -f "${models}/layout_heron_int8.onnx" ] && [ -f "${models}/tableformer/decoder_int8.onnx" ]; then
     ok "the models are in Contents/Resources/models" "$(du -sh "$models" | cut -f1)"
 else
     bad "the models are in Contents/Resources/models" "absent or incomplete"
