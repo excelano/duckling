@@ -80,7 +80,8 @@ artifacts.
 `duckling-rounded`, each as an SVG and as PNGs at 256, 512, 1024, 1080 and
 2160, for whichever a submission form wants: a store that masks what it is
 given (the iOS and iPadOS Store, Icon Composer) wants the square, and a form
-that draws what it is handed wants the rounded one. `windows/make-ico` writes
+that draws what it is handed wants the rounded one, as does the Linux desktop,
+which is why `linux/icons/duckling.svg` is the rounded shape. `windows/make-ico` writes
 the directory and clips the rounded shape from the same source; neither is
 edited by hand. The corner is 22.37% of the side drawn as a circular arc, which
 does not tell apart from Apple's continuous curve below about 512 pixels.
