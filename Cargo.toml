@@ -39,12 +39,12 @@ potext = "0.1"
 # oniguruma; DESIGN.md §2 says why and what it costs. The other defaults stay off: `asr` wants Whisper models this
 # application does not ship, `vlm` wants a remote endpoint, `fetch-images`
 # wants the network.
-docling = { version = "1.87", default-features = false, features = ["pdf"] }
+docling = { version = "2.35", default-features = false, features = ["pdf"] }
 # The office writer: ODT, DOCX, ODS, ODP and XLSX from the DoclingDocument
 # docling.rs produced. It depends on docling-core alone, so the two share one
 # model version, and it is pure Rust. Duckling adds no conversion logic of its
 # own; DESIGN.md §4 says what the writer keeps and what it reports.
-waddle-core = "0.2.1"
+waddle-core = "0.3"
 # Same framework as slipcase-desktop and segler on purpose: one set of
 # platform lessons for three applications. Defaults carry accesskit, kept on.
 eframe = "0.36"
@@ -57,8 +57,6 @@ opener = { version = "0.8", features = ["reveal"] }
 # extension the exporter names them by, and page images for an image input.
 # The decoders are docling's own set, already in the tree; each is pure Rust.
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "bmp", "tiff"] }
-# The content hash in an asset's name, computed the way the exporter does.
-sha2 = "0.11"
 
 [features]
 # A build with no ONNX Runtime in it, for the one Mac none is built for.
@@ -93,7 +91,7 @@ ico = "0.5"
 # Named only so that `intel-mac` above can reach its feature. The version is
 # the one docling.rs already resolves, so this adds nothing to the tree, and
 # it is optional so that a default build on any platform never sees it.
-ort = { version = "2.0.0-rc.13", optional = true, default-features = false, features = ["load-dynamic"] }
+ort = { version = "2.0.0-rc.14", optional = true, default-features = false, features = ["load-dynamic"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # The system theme on Linux; `src/system_theme.rs` is slipcase-desktop's

@@ -129,7 +129,9 @@ for from its extension, and its state. Files arrive from the command line
 or from the two Add buttons. A folder
 contributes every file under it that docling.rs reads, in name order, files
 before subfolders, and says nothing about the files it does not read, because
-a folder is a request for what can be converted; a single file
+a folder is a request for what can be converted. Source code and configuration
+files are left out of a folder although docling.rs reads them as plain text; a
+single one added by itself is queued. A single file
 that cannot be read is reported in the status line by extension, because that
 person asked about that file. A file already queued or converting is not
 queued twice; a finished one is, since asking again is how a person converts
@@ -159,10 +161,10 @@ slide leg is one-way: waddle writes ODP and no PPTX.
 **The archive carries page images and the pictures, and bare DocLang gets its
 pictures beside it.** The specification's archive is `document.xml` plus
 optional `pages/N.png` and `assets/`, and Segler shows the page images beside
-the document. docling.rs's archive writer emits the markup alone, but the
-markup names each image-bearing picture as `assets/image_NNNNNN_<sha256>.png`,
-and its page renderer and zip packer are public. So `src/doclang.rs` pairs
-every asset name with the picture bytes whose hash it carries, re-encoded to
+the document. docling.rs's archive writer emits the markup alone, but its
+exporter hands back each picture the markup names as
+`assets/image_NNNNNN_<digest>.png`, and its page renderer and zip packer are
+public. So `src/doclang.rs` takes those assets, re-encoding any that are not
 PNG because the name says so; for an archive it renders a PDF's pages at the
 pipeline's own scale, or takes an image input as its one page,
 and packs the OPC parts, the markup, the pages and the assets; for a bare
