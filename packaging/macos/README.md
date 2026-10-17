@@ -31,7 +31,7 @@ machine the release build cross-compiles and links,
 anything, and `check-install.sh` is carried to the machine that can run the
 bundle.
 
-The `intel-mac` feature turns `ort`'s `load-dynamic` on, which links no ONNX
+The `intel-mac` feature turns docling.rs's `ort-load-dynamic` on, which links no ONNX
 Runtime and looks for a `libonnxruntime.dylib` at run time that no Intel Mac
 has: everything docling.rs converts without a model still converts, a PDF or an
 image fails in its own row with the loader's message, and the status line says

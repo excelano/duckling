@@ -63,19 +63,18 @@ image = { version = "0.25", default-features = false, features = ["png", "jpeg",
 #
 # `ort` links a prebuilt ONNX Runtime and has none for `x86_64-apple-darwin`:
 # pyke's dist list carries only the Apple silicon build, and Microsoft's own
-# releases stopped shipping an Intel or a universal macOS library at 1.28, the
-# version `ort` pins. So a Mac App Store build is Apple silicon only (DESIGN.md
+# releases stopped shipping an Intel or a universal macOS library at 1.28. So a Mac App Store build is Apple silicon only (DESIGN.md
 # §2), and an Intel Mac - which is the Mac this application is developed on -
 # cannot link the release build at all.
 #
-# This feature turns `ort`'s `load-dynamic` on, which links nothing and looks
+# This feature turns docling.rs's `ort-load-dynamic` on, which links nothing and looks
 # for a `libonnxruntime.dylib` at run time that no Intel Mac has. Everything
 # docling.rs converts without a model still converts; a PDF or an image fails
 # in its own row with the loader's message. That is enough to run the window,
 # the sandbox, the bundle and Launch Services on the machine David has, which
 # is what `packaging/macos/README.md` uses it for. It is never a release build
 # and `build-app.sh` refuses to sign one for the Store.
-intel-mac = ["dep:ort"]
+intel-mac = ["docling/ort-load-dynamic"]
 
 [target.'cfg(target_os = "windows")'.dependencies]
 # Reading the window's icon out of the `.ico` the MSIX and install.ps1 also
@@ -86,12 +85,6 @@ intel-mac = ["dep:ort"]
 # entries, which are stored that way. segler and slipcase-desktop carry the same
 # line for the same reason.
 ico = "0.5"
-
-[target.'cfg(all(target_os = "macos", target_arch = "x86_64"))'.dependencies]
-# Named only so that `intel-mac` above can reach its feature. The version is
-# the one docling.rs already resolves, so this adds nothing to the tree, and
-# it is optional so that a default build on any platform never sees it.
-ort = { version = "2.0.0-rc.14", optional = true, default-features = false, features = ["load-dynamic"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # The system theme on Linux; `src/system_theme.rs` is slipcase-desktop's
