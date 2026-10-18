@@ -393,7 +393,9 @@ pub fn common_input(jobs: &[Job]) -> Option<InputFormat> {
 /// Every convertible file under `dir`, depth first, files before
 /// subdirectories, each level in name order. Files docling.rs does not read
 /// are skipped silently: a folder is a request for what can be
-/// converted, not a report on what cannot.
+/// converted, not a report on what cannot. Source code and configuration,
+/// which docling.rs reads as plain text, are skipped too: a folder of
+/// documents carries its scripts and settings, and nobody asked for those.
 pub fn walk(dir: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();
     let mut stack = vec![dir.to_path_buf()];
@@ -404,7 +406,11 @@ pub fn walk(dir: &Path) -> Vec<PathBuf> {
         let mut entries: Vec<_> = entries.flatten().map(|e| e.path()).collect();
         entries.sort();
         let (dirs, files): (Vec<_>, Vec<_>) = entries.into_iter().partition(|p| p.is_dir());
-        found.extend(files.into_iter().filter(|p| detect(p).is_ok()));
+        found.extend(
+            files
+                .into_iter()
+                .filter(|p| detect(p).is_ok_and(|f| f != InputFormat::Text)),
+        );
         // Pushed in reverse so that popping visits them in name order.
         stack.extend(dirs.into_iter().rev());
     }
@@ -539,8 +545,7 @@ impl Engine {
         let rendered = match request.format {
             OutputFormat::Doclang | OutputFormat::DoclangArchive => {
                 doclang::insert_page_breaks(&mut document);
-                let xml = document.export_to_doclang();
-                let assets = doclang::assets(&document, &xml);
+                let (xml, assets) = doclang::export(&document);
                 if request.format == OutputFormat::Doclang {
                     let text = format!("{xml}\n");
                     Rendered {
@@ -982,7 +987,14 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("b-sub")).unwrap();
         std::fs::create_dir_all(dir.join("a-sub")).unwrap();
-        for name in ["z.md", "a.docx", "skip.exe", "b-sub/n.pdf", "a-sub/m.html"] {
+        for name in [
+            "z.md",
+            "a.docx",
+            "skip.exe",
+            "skip.py",
+            "b-sub/n.pdf",
+            "a-sub/m.html",
+        ] {
             std::fs::write(dir.join(name), "x").unwrap();
         }
         let names: Vec<String> = walk(&dir)

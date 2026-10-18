@@ -10,10 +10,7 @@
 //! Author: David M. Anderson
 //! Built with AI assistance (Claude, Anthropic)
 
-use std::collections::HashMap;
-
 use docling::{DoclingDocument, Node};
-use sha2::{Digest, Sha256};
 
 /// Put a `<page_break/>` before every page after the first, when the
 /// converter has marked the pages and written no breaks. A PDF or image
@@ -57,59 +54,17 @@ pub fn page_count(xml: &str) -> usize {
     xml.matches("<page_break/>").count() + 1
 }
 
-/// The `assets/…png` files the markup refers to, with their bytes. The
-/// exporter names each image-bearing picture `assets/image_NNNNNN_<sha256>.png`
-/// with the hash over the picture's source bytes, in document order, and
-/// writes nothing. This finds every picture with an image anywhere in the
-/// tree, hashes it the same way, and pairs each name in the markup with the
-/// bytes whose hash it carries; a name whose hash matches nothing is left
-/// out rather than guessed at. Sources that are not PNG are re-encoded,
-/// because the name says `.png` and a reader is entitled to believe it.
-pub fn assets(document: &DoclingDocument, xml: &str) -> Vec<(String, Vec<u8>)> {
-    let mut by_hash: HashMap<String, &[u8]> = HashMap::new();
-    for node in &document.nodes {
-        collect_images(node, &mut by_hash);
-    }
-    let mut out = Vec::new();
-    let mut rest = xml;
-    while let Some(start) = rest.find("<src uri=\"assets/") {
-        rest = &rest[start + "<src uri=\"".len()..];
-        let Some(end) = rest.find('"') else { break };
-        let name = &rest[..end];
-        rest = &rest[end..];
-        let hash = name
-            .strip_suffix(".png")
-            .and_then(|n| n.rsplit('_').next())
-            .unwrap_or_default();
-        if let Some(bytes) = by_hash.get(hash) {
-            if let Some(png) = as_png(bytes) {
-                out.push((name.to_owned(), png));
-            }
-        }
-    }
-    out
-}
-
-fn collect_images<'a>(node: &'a Node, by_hash: &mut HashMap<String, &'a [u8]>) {
-    match node {
-        Node::Picture {
-            image: Some(img), ..
-        } => {
-            by_hash.insert(sha256_hex(&img.data), &img.data);
-        }
-        Node::Group { children, .. } => children.iter().for_each(|c| collect_images(c, by_hash)),
-        Node::Furniture { inner, .. }
-        | Node::Commented { inner, .. }
-        | Node::Located { inner, .. }
-        | Node::Prov { inner, .. }
-        | Node::DoclangOnly(inner) => collect_images(inner, by_hash),
-        _ => {}
-    }
-}
-
-fn sha256_hex(bytes: &[u8]) -> String {
-    let digest = Sha256::digest(bytes);
-    digest.iter().map(|b| format!("{b:02x}")).collect()
+/// The markup and the `assets/…png` files it names, each as PNG. docling.rs
+/// returns PNG and JPEG pictures as PNG and any other encoding as its own
+/// bytes; those are re-encoded, because the name says `.png` and a reader is
+/// entitled to believe it. A picture that decodes as nothing is left out.
+pub fn export(document: &DoclingDocument) -> (String, Vec<(String, Vec<u8>)>) {
+    let (xml, assets) = document.export_to_doclang_with_assets();
+    let assets = assets
+        .into_iter()
+        .filter_map(|(name, bytes)| Some((name, as_png(&bytes)?)))
+        .collect();
+    (xml, assets)
 }
 
 /// The bytes as PNG: unchanged when they already are, re-encoded when they
@@ -228,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn assets_pair_the_markup_names_with_the_bytes() {
+    fn export_pairs_the_markup_names_with_png_bytes() {
         let png = as_png(&tiny_bmp()).unwrap();
         let mut doc = DoclingDocument::new("t");
         doc.nodes = vec![Node::Picture {
@@ -239,12 +194,14 @@ mod tests {
                 width: 1,
                 height: 1,
                 data: tiny_bmp(),
+                dpi: docling::PictureImage::DEFAULT_DPI,
             }),
             classification: None,
+            description: None,
             caption_parent: Default::default(),
+            caption_location: None,
         }];
-        let xml = doc.export_to_doclang();
-        let found = assets(&doc, &xml);
+        let (xml, found) = export(&doc);
         assert_eq!(found.len(), 1, "{xml}");
         assert!(found[0].0.starts_with("assets/image_000000_"));
         assert!(found[0].0.ends_with(".png"));

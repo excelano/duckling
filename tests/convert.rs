@@ -488,10 +488,12 @@ fn every_model_the_pipeline_resolves_is_one_the_package_ships() {
     if !pipeline_available() {
         return;
     }
-    // docling.rs lists its optional pdfium renderer whether or not it is built.
+    // docling.rs lists its optional pdfium renderer whether or not it is built,
+    // and its text-line orientation model whether or not it is turned on; the
+    // pipeline here leaves it off.
     for entry in docling::model_inventory()
         .into_iter()
-        .filter(|e| e.stage != "pdfium")
+        .filter(|e| e.stage != "pdfium" && e.stage != "ocr.textline_ori")
     {
         assert!(
             entry.found,
