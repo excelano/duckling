@@ -14,14 +14,14 @@ version = "0.3.0"
 
 [locales."de-de"]
 whats-new = """
-Dokumente liest jetzt docling.rs 2.35, das Tabellen, Code und Lesereihenfolge besser erkennt. Tabellen behalten öfter ihre Spaltenköpfe, mit jedem Wert in seiner Spalte. Ein Bild von Programmcode wird als Code ausgegeben. Text, der über eine Spalten- oder Seitengrenze läuft, bleibt ein Absatz. Die JSON-Ausgabe hält fest, wo auf der Seite jeder Text steht.
+Dokumente liest jetzt docling.rs 2.42, das Tabellen, Code und Lesereihenfolge besser erkennt. Tabellen behalten öfter ihre Spaltenköpfe, mit jedem Wert in seiner Spalte. Ein Bild von Programmcode wird als Code ausgegeben. Text, der über eine Spalten- oder Seitengrenze läuft, bleibt ein Absatz. Die JSON-Ausgabe hält fest, wo auf der Seite jeder Text steht.
 
 Jupyter-Notebooks sowie RSS- und Atom-Feeds sind neu. Eine .xml-Datei gilt nicht mehr pauschal als wissenschaftlicher Artikel: Patente, XBRL-Finanzberichte und Feeds werden erkannt, alles andere bleibt XML. Quellcode und Konfigurationsdateien werden konvertiert, wenn man sie einzeln hinzufügt. Ein hinzugefügter Ordner lässt sie aus, weil ein Ordner mit Dokumenten meist auch Skripte und Einstellungen enthält.
 """
 
 [locales."en-us"]
 whats-new = """
-Documents are now read by docling.rs 2.35, which reads tables, code and reading order better. Tables more often keep their column headers, with each value in its own column. A picture of program code comes out as code. Text that runs across a column or page break stays one paragraph. JSON output records where on the page each piece of text sits.
+Documents are now read by docling.rs 2.42, which reads tables, code and reading order better. Tables more often keep their column headers, with each value in its own column. A picture of program code comes out as code. Text that runs across a column or page break stays one paragraph. JSON output records where on the page each piece of text sits.
 
 Jupyter notebooks and RSS and Atom feeds are new. An .xml file is no longer taken for a scientific article by default: patents, XBRL financial reports and feeds are recognized, and anything else is kept as XML. Source code and configuration files convert when added one at a time. A folder leaves them out, since a folder of documents usually carries its scripts and settings too.
 """
