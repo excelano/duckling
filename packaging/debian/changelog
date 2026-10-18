@@ -1,3 +1,16 @@
+duckling (0.3.0) unstable; urgency=medium
+
+  * Release notes for 0.3.0
+  * intel-mac turns on docling's ort-load-dynamic
+  * docling 2.35 and waddle-core 0.3
+  * The per-language reset also removes the ignored outputs
+  * Screenshot recipes start each language from the committed demo documents
+  * Mark PDFs binary so a Windows checkout does not rewrite the demo corpus
+  * packaging/README: the Linux desktop takes the rounded icon
+  * Linux icon: the rounded mark, as Comma's; Windows and Mac keep the square one
+
+ -- David M. Anderson <david.anderson@excelano.com>  Sun, 18 Oct 2026 17:28:09 -0500
+
 duckling (0.2.2) unstable; urgency=medium
 
   * CLAUDE.md lists the two manual workflows
