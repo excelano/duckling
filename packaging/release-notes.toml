@@ -10,22 +10,18 @@
 # Nothing else reads this. The GitHub release, the Debian changelog and the
 # AppStream entry take commit subjects.
 
-version = "0.2.2"
+version = "0.3.0"
 
 [locales."de-de"]
 whats-new = """
-Die Installation ist etwa halb so groß: rund 300 MB statt 602 MB.
+Dokumente liest jetzt docling.rs 2.35, das Tabellen, Code und Lesereihenfolge besser erkennt. Tabellen behalten öfter ihre Spaltenköpfe, mit jedem Wert in seiner Spalte. Ein Bild von Programmcode wird als Code ausgegeben. Text, der über eine Spalten- oder Seitengrenze läuft, bleibt ein Absatz. Die JSON-Ausgabe hält fest, wo auf der Seite jeder Text steht.
 
-Drei Dinge sind entfallen. Eine zweite Kopie des Layout-Modells in voller Genauigkeit, die als Absicherung mitgeliefert wurde und über die 2.018 Seiten des Testbestands von docling.rs kein einziges Mal gebraucht wurde. Die PDF-Bibliothek zum Darstellen von Seiten, weil docling.rs Seiten jetzt selbst zeichnet. Und gut die Hälfte des Platzes der Tabellenmodelle, die jetzt in geringerer Genauigkeit gespeichert sind: Über denselben Bestand und ein Buch mit 1.913 Seiten werden Tabellen unverändert konvertiert, bis auf Leerraum in zwei Zeilen eines Inhaltsverzeichnisses.
-
-Dokumente liest docling.rs 1.87.
+Jupyter-Notebooks sowie RSS- und Atom-Feeds sind neu. Eine .xml-Datei gilt nicht mehr pauschal als wissenschaftlicher Artikel: Patente, XBRL-Finanzberichte und Feeds werden erkannt, alles andere bleibt XML. Quellcode und Konfigurationsdateien werden konvertiert, wenn man sie einzeln hinzufügt. Ein hinzugefügter Ordner lässt sie aus, weil ein Ordner mit Dokumenten meist auch Skripte und Einstellungen enthält.
 """
 
 [locales."en-us"]
 whats-new = """
-The install is about half the size: around 300 MB now rather than 602 MB.
+Documents are now read by docling.rs 2.35, which reads tables, code and reading order better. Tables more often keep their column headers, with each value in its own column. A picture of program code comes out as code. Text that runs across a column or page break stays one paragraph. JSON output records where on the page each piece of text sits.
 
-Three things came out. A second copy of the page-layout model, carried at full precision as a safeguard that was never once needed over the 2,018 pages of docling.rs's test corpus. The PDF library that drew pages, because docling.rs now draws them itself. And a little over half the space of the table-reading models, which are now stored at reduced precision: over the same corpus and a 1,913-page book, tables convert exactly as before, apart from spacing in two rows of one table of contents.
-
-Documents are read by docling.rs 1.87.
+Jupyter notebooks and RSS and Atom feeds are new. An .xml file is no longer taken for a scientific article by default: patents, XBRL financial reports and feeds are recognized, and anything else is kept as XML. Source code and configuration files convert when added one at a time. A folder leaves them out, since a folder of documents usually carries its scripts and settings too.
 """
