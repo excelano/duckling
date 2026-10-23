@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-10-01 18:01-0500\n"
+"POT-Creation-Date: 2026-10-22 21:09-0500\n"
 "PO-Revision-Date: 2026-09-09 13:21-0500\n"
 "Last-Translator: David M. Anderson <david.anderson@excelano.com>\n"
 "Language-Team: German\n"
@@ -166,15 +166,15 @@ msgstr "Umwandeln in"
 
 #: src/main.rs:537
 msgid ""
-"Seconds rather than minutes on a PDF that already has text in it. No "
-"headings, no tables, nothing from a scan."
+"Seconds rather than minutes on a PDF that already has text in it, with no "
+"headings and no tables. A scan still goes through the models."
 msgstr ""
-"Sekunden statt Minuten bei einem PDF, das bereits Text enthält. Keine "
-"Überschriften, keine Tabellen, nichts aus einem Scan."
+"Sekunden statt Minuten bei einem PDF, das bereits Text enthält, ohne "
+"Überschriften und ohne Tabellen. Ein Scan läuft weiter durch die Modelle."
 
 #: src/main.rs:538
-msgid "Text layer only"
-msgstr "Nur Textebene"
+msgid "Text layer when present"
+msgstr "Textebene bevorzugen"
 
 #: src/main.rs:542
 msgid "Beside each file"

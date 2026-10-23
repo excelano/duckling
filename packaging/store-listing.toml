@@ -107,7 +107,7 @@ Gelesen wird mit docling.rs, der Rust-Portierung von IBMs Docling.
 features = [
   "Schreibt DocLang, Markdown, docling-JSON, ein DocLang-Archiv oder LaTeX. Oder ODT, ODS, ODP, DOCX und XLSX, ein schlichtes Office-Dokument mit den Bildern in der Datei.",
   "Wandelt eine Tabelle oder eine Präsentation in das jeweils andere Format um: XLSX zu ODS, ODS zu XLSX, PPTX zu ODP — angeboten, wenn jede Datei in der Warteschlange von dieser Art ist.",
-  "Nur Textebene, für ein PDF, das bereits Text enthält: Sekunden statt Minuten, ohne die Überschriften und Tabellen, die die Modelle finden.",
+  "Textebene bevorzugen: Sekunden statt Minuten bei einem PDF, das bereits Text enthält, ohne die Überschriften und Tabellen der Modelle. Ein Scan läuft weiter durch sie.",
   "Wandelt stapelweise um: Dateien oder einen ganzen Ordner hineinziehen, einmal wählen, Umwandeln drücken.",
   "Gescannte PDFs und Bilder lesen Modelle für Layout, Tabellenstruktur und OCR, die mit der Anwendung geliefert werden. Nach der Installation ist nichts nachzuladen.",
   "Ausgabe neben jede Datei oder in einen Ordner, und nie über eine vorhandene Datei.",
@@ -175,7 +175,7 @@ The converter is docling.rs, the Rust port of IBM's Docling.
 features = [
   "Writes DocLang, Markdown, docling JSON, a DocLang archive, or LaTeX. Or ODT, ODS, ODP, DOCX and XLSX, a plain office document with the pictures inside it.",
   "Converts a spreadsheet or a deck into the other ecosystem: XLSX to ODS, ODS to XLSX, PPTX to ODP, offered when every file in the queue is that kind.",
-  "Text layer only, for a PDF that already has text in it: seconds rather than minutes, without the headings and tables the models find.",
+  "Text layer when present: seconds rather than minutes on a PDF that already has text in it, without the headings and tables the models find. A scan still goes through them.",
   "Converts in batches: add files or a whole folder, choose once, press Convert.",
   "Scanned PDFs and images read by layout, table-structure and OCR models that ship inside the app. Nothing to download after installing.",
   "Output beside each file or into one folder, and never over an existing file.",

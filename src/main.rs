@@ -211,9 +211,9 @@ struct App {
     jobs: Vec<Job>,
     next_id: u64,
     format: OutputFormat,
-    /// Read a PDF's text layer and run no models: seconds rather than
-    /// minutes, at the cost of headings, tables and anything needing OCR.
-    text_only: bool,
+    /// Read a PDF from its text layer when it has one and run no models:
+    /// seconds rather than minutes, at the cost of headings and tables.
+    prefer_text_layer: bool,
     destination: Destination,
     /// The folder last chosen, kept when the destination switches back to
     /// beside-the-source so that switching again does not ask twice.
@@ -229,7 +229,7 @@ impl App {
             jobs: Vec::new(),
             next_id: 1,
             format: OutputFormat::default(),
-            text_only: false,
+            prefer_text_layer: false,
             destination: Destination::BesideSource,
             folder: None,
             selected: None,
@@ -374,7 +374,7 @@ impl App {
                 source: job.source.clone(),
                 format: self.format,
                 destination: self.destination.clone(),
-                text_only: self.text_only,
+                prefer_text_layer: self.prefer_text_layer,
             });
             sent += 1;
         }
@@ -534,8 +534,8 @@ impl App {
             // One literal and no line continuation: `po/update-po.sh` reads
             // these as C, where a continuation keeps the indentation Rust
             // drops, so the msgid would not match what is looked up.
-            let cost = t("Seconds rather than minutes on a PDF that already has text in it. No headings, no tables, nothing from a scan.");
-            ui.checkbox(&mut self.text_only, t("Text layer only"))
+            let cost = t("Seconds rather than minutes on a PDF that already has text in it, with no headings and no tables. A scan still goes through the models.");
+            ui.checkbox(&mut self.prefer_text_layer, t("Text layer when present"))
                 .on_hover_text(cost);
             ui.separator();
             let beside = matches!(self.destination, Destination::BesideSource);

@@ -41,7 +41,7 @@ fn convert_as(
     source: &Path,
     format: OutputFormat,
     into: &Path,
-    text_only: bool,
+    prefer_text_layer: bool,
 ) -> Result<duckling::Outcome, String> {
     let worker = Worker::spawn(|| {});
     worker.submit(Request {
@@ -49,7 +49,7 @@ fn convert_as(
         source: source.to_path_buf(),
         format,
         destination: Destination::Folder(into.to_path_buf()),
-        text_only,
+        prefer_text_layer,
     });
     let deadline = Instant::now() + Duration::from_secs(300);
     loop {
@@ -398,15 +398,15 @@ fn demo_digital_pdf_converts_through_the_layout_model() {
     std::fs::remove_dir_all(&out).unwrap();
 }
 
-/// Text-only mode: the same digital PDF, read from its text layer with no
+/// Preferring the text layer: the same digital PDF, read from it with no
 /// model loaded. The words survive; the structure the layout model finds
 /// does not, which is the trade the checkbox offers.
 #[test]
-fn text_only_keeps_the_words_and_drops_the_structure() {
+fn text_layer_keeps_the_words_and_drops_the_structure() {
     if !pipeline_available() {
         return;
     }
-    let out = fresh_dir("text-only");
+    let out = fresh_dir("text-layer");
     let outcome = convert_as(
         &demo().join("site-survey-report.pdf"),
         OutputFormat::Markdown,
@@ -424,14 +424,14 @@ fn text_only_keeps_the_words_and_drops_the_structure() {
     std::fs::remove_dir_all(&out).unwrap();
 }
 
-/// A scan has no text layer, so text-only mode has nothing to read. That is
-/// correct and looks like a failure, so the outcome says which it is.
+/// A scan has no text layer to prefer, so it goes through OCR as it would
+/// with the checkbox clear.
 #[test]
-fn text_only_explains_itself_on_a_file_with_no_text_layer() {
+fn text_layer_preference_still_reads_a_scan() {
     if !pipeline_available() {
         return;
     }
-    let out = fresh_dir("text-only-scan");
+    let out = fresh_dir("text-layer-scan");
     let outcome = convert_as(
         &demo().join("scanned-notice.pdf"),
         OutputFormat::Markdown,
@@ -439,10 +439,12 @@ fn text_only_explains_itself_on_a_file_with_no_text_layer() {
         true,
     )
     .unwrap();
+    let text = std::fs::read_to_string(&outcome.output)
+        .unwrap()
+        .to_lowercase();
     assert!(
-        outcome.notes.iter().any(|n| n.contains("no text layer")),
-        "{:?}",
-        outcome.notes
+        text.contains("gauge board") && text.contains("meadow gate"),
+        "the notice did not come back through OCR:\n{text}"
     );
     std::fs::remove_dir_all(&out).unwrap();
 }

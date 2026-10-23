@@ -121,9 +121,9 @@ review and correct with Segler.
 
 One window, four regions. The **toolbar** says what the next Convert will do:
 the output format, whether output goes beside each source or into one folder,
-and whether a PDF is read from its text layer only. Nothing converts until
-Convert is pressed, so the choices apply to a whole batch and a person can
-change their mind after queuing. A folder destination is chosen once and
+and whether a PDF with a text layer is read from it alone. Nothing converts
+until Convert is pressed, so the choices apply to a whole batch and a person
+can change their mind after queuing. A folder destination is chosen once and
 remembered. The **queue** is the batch: file, the format docling.rs took it
 for from its extension, and its state. Files arrive from the command line
 or from the two Add buttons. A folder
@@ -180,17 +180,20 @@ package rather than beside the file, because the document the engine holds
 already carries them. What the package cannot hold, waddle reports and
 Duckling shows as notes on the result, one line per kind with a count.
 
-**One pipeline option reaches the window: text layer only.** Every other knob
-docling.rs offers stays where it is, because a window with a preferences panel
-is a different application from this one. This one earns a checkbox because
-the cost it removes is measured in minutes: a long digital PDF takes minutes
-through the models and seconds off its text layer. It is framed as speed and
-not as accuracy, and what it gives up is headings, tables and any page that
-needs OCR. `no_ocr` is a builder rather than a setter, so the engine rebuilds
-its pipeline when the mode changes; a text-only pipeline loads no model, so
-switching to it is free and switching back pays the load once. A file with no
-text layer reads as nothing in this mode, which is correct and looks like a
-failure, so the result carries a note saying which it is.
+**One pipeline option reaches the window: the text layer when present.** Every
+other knob docling.rs offers stays where it is, because a window with a
+preferences panel is a different application from this one. This one earns a
+checkbox because the cost it removes is measured in minutes: a long digital
+PDF takes minutes through the models and seconds off its text layer. It is
+framed as speed and not as accuracy, and what it gives up is headings and
+tables. It is docling.rs's `text_layer_only=auto`, decided per document before
+any model is touched: a PDF whose text layer carries it is read from that
+layer alone, and a scan, or a layer of a few typed-in fields over scanned
+pages, goes through the full pipeline as it would with the box clear. The
+verdict is the whole file's, so scanned pages inside a digital PDF come back
+empty. The setting is per conversion and the pipeline loads each model on the
+first page that needs it, so one warm pipeline serves both modes and switching
+reloads nothing.
 
 **docling.rs writes no page breaks for a PDF, and Duckling inserts them.** Its
 markup for a PDF carries `PageInfo` nodes and no `<page_break/>`, where the
