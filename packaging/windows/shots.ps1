@@ -126,7 +126,7 @@ if ($Lang -eq 'de') {
     $FORMAT_CONTROL = '436,50'    # the format control, which opens the list
     $FORMAT_DOCLANG = '440,85'    # the DocLang choice in the open list
     $FORMAT_MARKDOWN = '440,115'  # the Markdown choice in the same list
-    $CONVERT = '1066,50'          # the Convert button
+    $CONVERT = '1144,50'          # the Convert button
     # A row is selectable by its file name and not by the whole row, so these
     # are on the name. The queue is sorted by name, and these are the third
     # and tenth of the twelve.
