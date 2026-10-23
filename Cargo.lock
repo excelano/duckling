@@ -1400,9 +1400,9 @@ dependencies = [
 
 [[package]]
 name = "docling"
-version = "2.42.0"
+version = "2.49.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a94a5da11d8f3d4646b3179ec9ad1b961065cc357b2e2fdc63d7e5f05e4aeeba"
+checksum = "22d928f399efa5117e5a5b49cda115f73b28b0956ec793112125ba721435156d"
 dependencies = [
  "aes",
  "base64 0.22.1",
@@ -1438,9 +1438,9 @@ dependencies = [
 
 [[package]]
 name = "docling-asr"
-version = "2.42.0"
+version = "2.49.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f33fde7927a55d73051383d4f01ea7026e90bcf04a9ec951e35cacc979b9116c"
+checksum = "310cd59417bcf626a4fce12049b660678dba19d528970a89a620a1a61884872d"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -1451,9 +1451,9 @@ dependencies = [
 
 [[package]]
 name = "docling-core"
-version = "2.42.0"
+version = "2.49.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61b964c5bbf218f9d230260f4bb5887032ead236c23493067f452742dc214e47"
+checksum = "92e24c1a82e270886a64993604ff1ac6e644f29836a1831e33a6619edf3455e9"
 dependencies = [
  "png 0.18.1",
  "regex",
@@ -1464,9 +1464,9 @@ dependencies = [
 
 [[package]]
 name = "docling-onnx"
-version = "2.42.0"
+version = "2.49.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c67903e3bc7ec461a6328eb99da2ccd59bc186f6c7381375206bbb14414f2bc2"
+checksum = "3d27db42f6397ded14151ec81ac157ede69a069741f78fc43b3eedf15141b550"
 dependencies = [
  "docling-core",
  "libloading 0.8.9",
@@ -1475,14 +1475,15 @@ dependencies = [
 
 [[package]]
 name = "docling-pdf"
-version = "2.42.0"
+version = "2.49.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65ee5a8e97dcbc2f0226d563c431a85c4cda339591043537077440930319f7b0"
+checksum = "9298abda18905dda7dc94be82178e095b2badaee35e84d83a122a3f66669a1a3"
 dependencies = [
  "docling-core",
  "docling-onnx",
  "fast_image_resize",
  "flate2",
+ "hayro-jbig2",
  "hayro-jpeg2000",
  "image",
  "libloading 0.8.9",
@@ -2347,6 +2348,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "hayro-ccitt"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2866f0d976e76497480b853d5e258dab6e4b89ecfe991124e08f15dfa8fd03ad"
+
+[[package]]
+name = "hayro-jbig2"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "000e025850f4592ddcaee85640db70704151f2bafd43b6f431aa5b6a2c6a35a9"
+dependencies = [
+ "fearless_simd 1.1.0",
+ "hayro-ccitt",
 ]
 
 [[package]]
@@ -5910,9 +5927,9 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "waddle-core"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6a3e49af5f36a5d2a345191943ee3ddd8204354c402681c3168ae84158d2270"
+checksum = "8098bb59e1e4dd6fee330beed534d12461c970fdfdf1765f150005e2c40f1dac"
 dependencies = [
  "docling-core",
  "zip 8.6.0",

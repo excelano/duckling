@@ -18,18 +18,6 @@ use docling::{DoclingDocument, Node};
 /// and RTF backends write breaks themselves and are left alone. Without
 /// this, a review tool splitting on breaks sees one page, and an archive
 /// may carry one page image.
-/// Whether the document carries nothing a person would read — page markers
-/// and nothing else.
-///
-/// A PDF whose pages are images reads as this when no model is run: docling
-/// still knows how many pages there were, and nothing of what is on them.
-pub fn is_blank(document: &DoclingDocument) -> bool {
-    document
-        .nodes
-        .iter()
-        .all(|node| matches!(node, Node::PageInfo { .. } | Node::PageBreak))
-}
-
 pub fn insert_page_breaks(document: &mut DoclingDocument) {
     if document.nodes.iter().any(|n| matches!(n, Node::PageBreak)) {
         return;
@@ -135,16 +123,6 @@ mod tests {
     }
 
     #[test]
-    fn page_markers_alone_are_blank_and_any_text_is_not() {
-        let mut doc = DoclingDocument::new("t");
-        assert!(is_blank(&doc), "nothing at all is blank");
-        doc.nodes = vec![page(1), Node::PageBreak, page(2)];
-        assert!(is_blank(&doc), "a scan with no text layer reads as blank");
-        doc.nodes.push(Node::Paragraph { text: "a".into() });
-        assert!(!is_blank(&doc), "one line of text is not blank");
-    }
-
-    #[test]
     fn breaks_go_between_pages_and_only_when_absent() {
         let mut doc = DoclingDocument::new("t");
         doc.nodes = vec![
@@ -195,6 +173,7 @@ mod tests {
                 height: 1,
                 data: tiny_bmp(),
                 dpi: docling::PictureImage::DEFAULT_DPI,
+                display_size: None,
             }),
             classification: None,
             description: None,

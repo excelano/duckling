@@ -20,7 +20,9 @@ use std::thread;
 /// in this crate's public surface — [`Job::format`], [`common_input`] and
 /// [`OutputFormat::sibling_input`] all speak it.
 pub use docling::InputFormat;
-use docling::{ConversionStatus, DoclingDocument, DocumentConverter, Pipeline, SourceDocument};
+use docling::{
+    ConversionStatus, DoclingDocument, DocumentConverter, PageProgress, Pipeline, SourceDocument,
+};
 
 /// Point docling.rs at the models a package installed beside the executable,
 /// when they are there and nothing has said otherwise.
@@ -335,10 +337,11 @@ pub struct Request {
     pub source: PathBuf,
     pub format: OutputFormat,
     pub destination: Destination,
-    /// Read a PDF's embedded text layer and run no models at all: seconds
-    /// rather than minutes on a long digital PDF, at the cost of headings,
-    /// tables and any page that needs OCR. See [`Engine::pipeline`].
-    pub text_only: bool,
+    /// Read a PDF from its embedded text layer and run no models when it has
+    /// one: seconds rather than minutes on a long digital PDF, at the cost of
+    /// headings and tables. A PDF without one, and an image, still go through
+    /// the models.
+    pub prefer_text_layer: bool,
 }
 
 /// What the worker tells the window.
@@ -486,9 +489,6 @@ fn run(
 struct Engine {
     converter: Option<DocumentConverter>,
     pipeline: Option<Pipeline>,
-    /// What the pipeline above was built for. `no_ocr` is a builder and not
-    /// a setter, so changing the mode means building another one.
-    pipeline_text_only: bool,
 }
 
 impl Engine {
@@ -514,7 +514,7 @@ impl Engine {
                 &request.source,
                 &bytes,
                 &name,
-                request.text_only,
+                request.prefer_text_layer,
                 progress,
             )
         }));
@@ -533,15 +533,6 @@ impl Engine {
         };
 
         let mut notes = Vec::new();
-        // A file with no text layer reads as nothing in text-only mode, which
-        // is correct and looks like a failure. Say which it is.
-        if request.text_only && doclang::is_blank(&document) {
-            notes.push(
-                "Nothing to read without the models: this file has no text layer. \
-                 Untick Text layer only to convert it."
-                    .to_string(),
-            );
-        }
         let rendered = match request.format {
             OutputFormat::Doclang | OutputFormat::DoclangArchive => {
                 doclang::insert_page_breaks(&mut document);
@@ -655,13 +646,16 @@ impl Engine {
         path: &Path,
         bytes: &[u8],
         name: &str,
-        text_only: bool,
+        prefer_text_layer: bool,
         progress: impl Fn(usize, usize) + Send + Sync + 'static,
     ) -> Result<(DoclingDocument, ConversionStatus), String> {
         match format {
             InputFormat::Pdf => {
-                let pipeline = self.pipeline(text_only)?;
-                pipeline.set_progress(Some(Arc::new(progress)));
+                let pipeline = self.pipeline()?;
+                pipeline.set_text_layer_auto(prefer_text_layer);
+                pipeline.set_progress(Some(Arc::new(move |p: PageProgress| {
+                    progress(p.pages_done, p.pages_selected)
+                })));
                 let result = pipeline.convert(bytes, None, name);
                 pipeline.set_progress(None);
                 result
@@ -669,7 +663,7 @@ impl Engine {
                     .map_err(|e| e.to_string())
             }
             InputFormat::Image => self
-                .pipeline(text_only)?
+                .pipeline()?
                 .convert_image(bytes, name)
                 .map(|doc| (doc, ConversionStatus::Success))
                 .map_err(|e| e.to_string()),
@@ -685,19 +679,11 @@ impl Engine {
         }
     }
 
-    /// The pipeline, built for `text_only` and kept warm for the next file.
-    ///
-    /// A text-only pipeline loads no models at all, so switching to it is
-    /// free and switching back pays the load once, which is the same price
-    /// the first conversion of a session already pays.
-    fn pipeline(&mut self, text_only: bool) -> Result<&mut Pipeline, String> {
-        if self.pipeline.is_none() || self.pipeline_text_only != text_only {
-            self.pipeline = Some(
-                Pipeline::new()
-                    .map_err(|e| e.to_string())?
-                    .no_ocr(text_only),
-            );
-            self.pipeline_text_only = text_only;
+    /// The pipeline, kept warm for the next file. It loads each model on the
+    /// first page that needs it, so a PDF read from its text layer loads none.
+    fn pipeline(&mut self) -> Result<&mut Pipeline, String> {
+        if self.pipeline.is_none() {
+            self.pipeline = Some(Pipeline::new().map_err(|e| e.to_string())?);
         }
         Ok(self.pipeline.as_mut().expect("just set"))
     }

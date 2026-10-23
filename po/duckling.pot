@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-10-01 18:04-0500\n"
+"POT-Creation-Date: 2026-10-22 21:09-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,12 +148,12 @@ msgstr ""
 
 #: src/main.rs:537
 msgid ""
-"Seconds rather than minutes on a PDF that already has text in it. No "
-"headings, no tables, nothing from a scan."
+"Seconds rather than minutes on a PDF that already has text in it, with no "
+"headings and no tables. A scan still goes through the models."
 msgstr ""
 
 #: src/main.rs:538
-msgid "Text layer only"
+msgid "Text layer when present"
 msgstr ""
 
 #: src/main.rs:542

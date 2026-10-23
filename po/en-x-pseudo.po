@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: duckling\n"
 "Report-Msgid-Bugs-To: https://github.com/excelano/duckling/issues\n"
-"POT-Creation-Date: 2026-10-01 18:01-0500\n"
+"POT-Creation-Date: 2026-10-22 21:09-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: none\n"
@@ -166,16 +166,16 @@ msgstr "[Cöñvért tö ·····]"
 
 #: src/main.rs:537
 msgid ""
-"Seconds rather than minutes on a PDF that already has text in it. No "
-"headings, no tables, nothing from a scan."
+"Seconds rather than minutes on a PDF that already has text in it, with no "
+"headings and no tables. A scan still goes through the models."
 msgstr ""
-"[Sécöñdš räthér thäñ míñütéš öñ ä PDF thät älréädy häš téxt íñ ít. Nö "
-"héädíñgš, ñö täbléš, ñöthíñg fröm ä šcäñ. "
-"·············································]"
+"[Sécöñdš räthér thäñ míñütéš öñ ä PDF thät älréädy häš téxt íñ ít, wíth ñö "
+"héädíñgš äñd ñö täbléš. Å šcäñ štíll göéš thröügh thé mödélš. "
+"·······················································]"
 
 #: src/main.rs:538
-msgid "Text layer only"
-msgstr "[Téxt läyér öñly ·······]"
+msgid "Text layer when present"
+msgstr "[Téxt läyér whéñ préšéñt ··········]"
 
 #: src/main.rs:542
 msgid "Beside each file"
@@ -199,7 +199,7 @@ msgstr "[Cléär fíñíšhéd ······]"
 
 #: src/main.rs:595
 msgid "Use Add files to queue documents."
-msgstr ""
+msgstr "[Üšé Ådd fíléš tö qüéüé döcüméñtš. ··············]"
 
 #: src/main.rs:610
 msgid "File"
@@ -268,9 +268,3 @@ msgid ""
 msgstr ""
 "[{queued} qüéüéd · {converting} cöñvértíñg · {done} döñé · {failed} fäíléd "
 "·······························]"
-
-#~ msgid "Drop files or folders here, or use Add files."
-#~ msgstr "[Dröp fíléš ör földérš héré, ör üšé Ådd fíléš. ···················]"
-
-#~ msgid "Drop to add"
-#~ msgstr "[Dröp tö ädd ·····]"
