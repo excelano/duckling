@@ -20,7 +20,7 @@
 
   WHAT IS DECIDED HERE
 
-  **One file-type association listing fifteen extensions, and it carries no
+  **One file-type association listing every extension Duckling reads, and it carries no
   DisplayName and no Logo.** That is the whole difference from segler's copy,
   and it follows from DESIGN.md 8: *Duckling owns no format. It reads other
   people's.* Segler has two associations because DocLang has two file kinds that
@@ -31,17 +31,17 @@
   on it. Neither is Duckling's to supply, so neither is here, and the four
   images `make-ico` writes are the application's own.
 
-  What the association *does* buy is the Windows counterpart of the fifteen
+  What the association *does* buy is the Windows counterpart of the
   `MimeType=` entries in `packaging/linux/duckling.desktop`: a person can
   right-click a PDF or a Word file and find Duckling under Open With.
   It cannot take a type over: a packaged
   association only ever adds itself to `OpenWithProgids` and never claims the
   extension's default, which segler's `packaging/windows/README.md` measured on
   2026-09-04 - there in the course of finding that a *script* install does claim
-  it. The two files say the same fifteen types for the same reason the Linux
+  it. The two files list the same types for the same reason the Linux
   entry and the Debian package must agree about anything.
 
-  One `uap:Extension` and not fifteen. The schema allows a single
+  One `uap:Extension` and not one per type. The schema allows a single
   `FileTypeAssociation` child per extension, which is why segler needs two
   elements for its two kinds - but one `FileTypeAssociation` may list as many
   `uap:FileType` children as it likes, and these fifteen want identical
