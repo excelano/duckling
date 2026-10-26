@@ -4,11 +4,12 @@ What a store submission needs from a person and no file supplies: the answers
 a form asks that no build can give, and the reasoning behind the screenshots.
 
 The listing text itself is not here. It is `store-listing.toml` beside this,
-which `ship` checks before the tag and pushes to both stores on every release,
+which `ship-winstore` and `ship-macstore` in `excelano/shipping` push to their
+stores on every release,
 and what a release tells them changed is `release-notes.toml`. A field edited
 in this file would reach nobody. Apple's Notes for Review and Microsoft's
 Notes for certification are there too, as `apple-review-notes` and
-`microsoft-review-notes`, which `ship` pushes to `appStoreReviewDetail` and
+`microsoft-review-notes`, which those apps push to `appStoreReviewDetail` and
 `NotesForCertification` on every submission.
 
 `microsoft-review-notes`'s message count in its second paragraph changes with
@@ -20,7 +21,7 @@ submission and update `store-listing.toml`.
 The package declares `runFullTrust`, and Partner Center's justification field
 for it is asked once when the capability is first declared on the product
 rather than on every resubmission - it is not part of the submission document
-`ship` reads and writes, and this repo's own resubmissions have gone to
+`ship-winstore` reads and writes, and this repo's own resubmissions have gone to
 certification since without one being sent. 500-character limit, which counts
 newlines.
 

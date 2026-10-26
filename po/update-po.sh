@@ -31,6 +31,9 @@
 # they are also where a genuine miss would hide, so the way a dropped string is
 # found is not by reading them — it is the pseudolocale,
 # where anything still in English stands out on sight.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
 set -eu
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)

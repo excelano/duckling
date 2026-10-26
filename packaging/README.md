@@ -72,9 +72,8 @@ its own corner rounding and a drawing carrying a smaller shape or an outline
 into that frame reads as a sticker. Check any change at 16, 32 and 128 pixels
 on light and dark grounds. `macos/build-app.sh` renders the `.icns` from it
 with `sips` at build time; `windows/make-ico` writes the `.ico`, the four PNGs
-the MSIX manifest names and the Store listing logo, and `windows.yml` rebuilds
-those on every push and refuses a difference, because they are committed
-artifacts.
+the MSIX manifest names and the Store listing logo, which are committed
+artifacts, so run it again after any change to the drawing.
 
 `icons/` holds the icon in two shapes, `duckling-square` and
 `duckling-rounded`, each as an SVG and as PNGs at 256, 512, 1024, 1080 and

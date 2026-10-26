@@ -6,6 +6,10 @@ name: macos
 # with a document, and the window server is asked whether a window appeared.
 # It does not reach signing, the sandbox, the folder panel or the Store package.
 # Run by hand: `gh workflow run macos`.
+#
+# Author: David M. Anderson
+# Built with AI assistance (Claude, Anthropic)
+
 on:
   workflow_dispatch:
 
