@@ -59,7 +59,7 @@ Duckling converts documents offline, so about 230 MB of the package is ONNX mode
 
 [locales."de-de"]
 website = "https://excelano.com/duckling/"
-support = "https://excelano.com/duckling/#support"
+support = "https://excelano.com/support/?app=Duckling&channel=Mac%20App%20Store"
 privacy = "https://excelano.com/legal/#duckling"
 description = """
 Dokumente kommen als Word-Dateien, Foliensätze, Arbeitsmappen, PDFs und Scans. Was ein Sprachmodell, ein Suchindex oder ein versioniertes Repository will, ist einfacher, strukturierter Text. Duckling ist der Schritt dazwischen.
@@ -127,7 +127,7 @@ keywords = [
 
 [locales."en-us"]
 website = "https://excelano.com/duckling/"
-support = "https://excelano.com/duckling/#support"
+support = "https://excelano.com/support/?app=Duckling&channel=Mac%20App%20Store"
 privacy = "https://excelano.com/legal/#duckling"
 description = """
 Documents arrive as Word files, slide decks, workbooks, PDFs and scans. What a language model, a search index or a version-controlled repository wants is plain, structured text. Duckling is the step between.
