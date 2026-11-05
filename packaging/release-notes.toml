@@ -10,18 +10,18 @@
 # Nothing else reads this. The GitHub release, the Debian changelog and the
 # AppStream entry take commit subjects.
 
-version = "0.4.0"
+version = "0.5.0"
 
 [locales."de-de"]
 whats-new = """
-Das Kästchen „Nur Textebene“ heißt jetzt „Textebene bevorzugen“. Ein PDF, das bereits Text enthält, wird weiterhin in Sekunden aus seiner Textebene gelesen. Ein gescanntes PDF kommt jetzt durch die Texterkennung, statt leer zurückzukommen.
+Sicherheitsversion: Die ZIP-Bibliothek, mit der Duckling Word-, Excel-, PowerPoint- und OpenDocument-Dateien liest, schließt eine kritische und vier weitere Sicherheitslücken beim Lesen von Archiven (GHSA-m665-v7pm-7grj, GHSA-9hj8-73fh-9963, GHSA-hjqx-j4rw-g7xv, GHSA-q7v9-x93c-xqv3, GHSA-8hxf-qr8p-62x4).
 
-Dokumente liest jetzt docling.rs 2.49. Bildunterschriften in PDFs stehen öfter beim richtigen Bild und an der richtigen Stelle im Text. Die DocLang-Ausgabe ordnet Bildunterschriften so, wie es die Spezifikation verlangt. ODT und DOCX behalten die Größe, in der ein Bild in einer Word- oder Writer-Vorlage angezeigt wurde.
+Dokumente liest jetzt docling.rs 2.65. Formen und Textfelder in einem Word-Dokument kommen jetzt als gezeichnete Bilder heraus.
 """
 
 [locales."en-us"]
 whats-new = """
-The Text layer only box is now Text layer when present. A PDF that already has text in it is still read from its text layer in seconds, and a scanned PDF now goes through OCR instead of coming back empty.
+Security release: the ZIP library Duckling reads Word, Excel, PowerPoint and OpenDocument files with fixes one critical and four further vulnerabilities in archive reading (GHSA-m665-v7pm-7grj, GHSA-9hj8-73fh-9963, GHSA-hjqx-j4rw-g7xv, GHSA-q7v9-x93c-xqv3, GHSA-8hxf-qr8p-62x4).
 
-Documents are now read by docling.rs 2.49. Captions in a PDF more often attach to the right picture and sit in the right place in the text. DocLang output orders captions as the specification asks. ODT and DOCX output keeps the size a picture was shown at in a Word or Writer source.
+Documents are now read by docling.rs 2.65. Shapes and text boxes in a Word document now come through as drawn pictures.
 """

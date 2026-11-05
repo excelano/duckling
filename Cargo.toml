@@ -40,12 +40,12 @@ potext = "0.1"
 # application does not ship, `vlm` wants a remote endpoint, `fetch-images`
 # wants the network. Held to one minor, as waddle-core holds docling-core: two
 # docling-core versions in the graph are two DoclingDocument types.
-docling = { version = "~2.49", default-features = false, features = ["pdf"] }
+docling = { version = "~2.65", default-features = false, features = ["pdf"] }
 # The office writer: ODT, DOCX, ODS, ODP and XLSX from the DoclingDocument
 # docling.rs produced. It depends on docling-core alone, so the two share one
 # model version, and it is pure Rust. Duckling adds no conversion logic of its
 # own; DESIGN.md §4 says what the writer keeps and what it reports.
-waddle-core = "0.4"
+waddle-core = "0.5"
 # Same framework as slipcase-desktop and segler on purpose: one set of
 # platform lessons for three applications. Defaults carry accesskit, kept on.
 eframe = "0.36"
