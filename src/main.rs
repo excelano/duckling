@@ -88,6 +88,21 @@ fn window_icon() -> Option<egui::IconData> {
     })
 }
 
+#[cfg(target_os = "windows")]
+fn wgpu_options() -> eframe::egui_wgpu::WgpuConfiguration {
+    use eframe::wgpu::Backends;
+    let mut config = eframe::egui_wgpu::WgpuConfiguration::default();
+    if let eframe::egui_wgpu::WgpuSetup::CreateNew(create_new) = &mut config.wgpu_setup {
+        create_new.instance_descriptor.backends = Backends::from_env().unwrap_or(Backends::DX12);
+    }
+    config
+}
+
+#[cfg(not(target_os = "windows"))]
+fn wgpu_options() -> eframe::egui_wgpu::WgpuConfiguration {
+    eframe::egui_wgpu::WgpuConfiguration::default()
+}
+
 /// What an output format is called in the language the window is drawn in.
 ///
 /// `duckling::OutputFormat::label` stays the canonical English: it is the
@@ -146,6 +161,7 @@ fn main() -> eframe::Result {
 
     let options = eframe::NativeOptions {
         viewport,
+        wgpu_options: wgpu_options(),
         ..Default::default()
     };
     let paths: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();

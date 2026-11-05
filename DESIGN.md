@@ -85,6 +85,11 @@ Windows DirectML as well; `packaging/windows/check-imports.ps1` keeps the
 shipped list at five and refuses a sixth. `packaging/windows/README.md` has the
 lane.
 
+**On Windows the window draws through Direct3D 12 alone**, unless
+`WGPU_BACKEND` names another backend. wgpu's default set includes Vulkan, and
+creating a Vulkan instance loads every installed Vulkan driver into the
+process, where a faulty one ends it before a window opens.
+
 **On macOS the build is Apple silicon only.** No prebuilt ONNX Runtime exists
 for `x86_64-apple-darwin`, at `ort` or at Microsoft since the version `ort`
 pins, and building one from source is a project of its own; App Store Connect
