@@ -1,3 +1,12 @@
+duckling (0.5.0) unstable; urgency=medium
+
+  * docling 2.65 and waddle-core 0.5: zip 9.1 fixes GHSA-m665-v7pm-7grj (critical) and four high/medium advisories in archive reading
+  * Bump pillow from 12.3.0 to 13.0.0 in /packaging/demo (#19)
+  * Screenshot scripts drop the generated-by-ship line; AppxManifest.xml.in stops counting the extensions
+  * Packaging docs stop naming windows.yml and ship: the icon rasters are committed artifacts, ship-winstore and ship-macstore push the listings, and the take-shots scripts are described without a generator; attribution headers in workflows and scripts
+
+ -- David M. Anderson <david.anderson@excelano.com>  Wed, 04 Nov 2026 23:14:46 -0600
+
 duckling (0.4.0) unstable; urgency=medium
 
   * Windows shots: Convert moved right with the longer text-layer label
