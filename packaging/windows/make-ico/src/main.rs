@@ -164,9 +164,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // Written fresh every time. A renamed or dropped asset would otherwise be
-    // left behind by a rebuild, and `windows.yml` compares this directory
-    // against a rebuild - so a stale file would sit in the package and in the
-    // tree with nothing objecting to it.
+    // left behind by a rebuild, and would sit in the package and in the tree with
+    // nothing objecting to it.
     if assets.exists() {
         std::fs::remove_dir_all(&assets)?;
     }

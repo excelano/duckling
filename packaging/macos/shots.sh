@@ -3,7 +3,7 @@
 # window is doing when the shutter goes.
 #
 # `screenshot.sh` beside this is the driver and `take-shots.sh` sits between
-# them; both are ship's and the same in every repository. This file is
+# them; both are the same in every repository. This file is
 # Duckling's half. `packaging/windows/shots.ps1` is the same two frames for the
 # other store, and `packaging/submission-notes.md` says why they are these two.
 #

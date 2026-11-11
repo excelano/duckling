@@ -2,9 +2,9 @@
 # this repository's to hold.
 #
 # `Publisher` is not here. It is the X.500 string Partner Center assigns per
-# account, identical for every Excelano product, and it comes from the
-# organisation secret STORE_PUBLISHER, which `windows.yml` passes to
-# `build-msix.ps1` and which a Windows machine sets in its own environment.
+# account, identical for every Excelano product, and `build-msix.ps1`
+# reads it from STORE_PUBLISHER, which `build-release` and `shots-winstore` set
+# from `ship.toml`.
 # Everything below is public: the name and the store id are on the listing page
 # and the package family name is in every package the Store distributes.
 #

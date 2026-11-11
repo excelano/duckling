@@ -2,8 +2,8 @@
 # arrives as a pull request rather than slipping past. The bumps are grouped
 # into one pull request so they land together.
 #
-# Package versions are not Dependabot's work here. `ship` runs the language's
-# own update as a release step, which puts the decision at the moment the tree
+# Package versions are not Dependabot's work here. `build-release` runs
+# `cargo update` as a release step, which puts the decision at the moment the tree
 # is being looked at anyway, and keeps what a release ships current as of that
 # release. Security alerts are a separate switch and stay on.
 version: 2

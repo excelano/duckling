@@ -2,16 +2,16 @@
 #
 # Every line of this is a claim about the code, and a claim like that goes
 # stale silently in a web form nobody diffs. So it lives here, is reviewed and
-# committed like anything else, and `ship` pushes it to both stores on every
-# release. Edit here; do not edit a listing in a browser.
+# committed like anything else, and `ship-winstore` and `ship-macstore` push
+# it to their stores on every release. Edit here; do not edit a listing in a browser.
 #
 # The fields both stores take sit at the top of a language. The rest sit under
 # the store that takes them, because the two do not take the same fields and do
 # not count them the same way. The name is under each store because the two can
 # disagree about it.
 #
-# Limits, which ship checks before the tag and counts in characters rather than
-# bytes: apple.name and apple.subtitle 30, apple.promotional-text 170,
+# Limits, which `ship-winstore` and `ship-macstore` check before they submit,
+# counting characters rather than bytes: apple.name and apple.subtitle 30, apple.promotional-text 170,
 # apple.keywords 100 including the commas, description 4,000 - the Microsoft
 # Store allows 10,000 and this is written to Apple's - microsoft.short-description
 # 500, microsoft.features 20 of 200, microsoft.keywords 7 of 30, apple-review-notes
@@ -33,8 +33,8 @@
 # word the product has no use for, so where the catalogue has a term it wins.
 #
 # German runs longer than English, which is what the limits above are for:
-# `ship` counts every field before the tag, in characters rather than bytes,
-# and a release stops rather than a submission failing.
+# the store apps count every field before they submit, and stop rather than
+# send a submission the store would refuse.
 
 apple-review-notes = """
 Duckling converts documents. It reads Word, PowerPoint and Excel files, PDFs, HTML, EPUB, RTF, OpenDocument, Apple Pages, Numbers and Keynote and some forty formats in all, and writes DocLang, Markdown, docling JSON, LaTeX, ODT, ODS, ODP, DOCX or XLSX. No account, no sign-in, no test credentials, and no network connection of any kind are needed to test it.

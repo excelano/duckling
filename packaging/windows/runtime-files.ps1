@@ -114,9 +114,9 @@ foreach ($name in $vcNames) {
 # outlive the build that named it. `ort` extracts into a user cache directory
 # unless `ORT_CACHE_DIR` says otherwise, and a build restored from a cache that
 # carried the target directory alone arrives here naming a directory that was
-# never created on this machine. `.github/workflows/windows.yml` sets the
-# variable so that the two travel together; the refusal below says which of the
-# two things went wrong.
+# never created on this machine. Setting `ORT_CACHE_DIR`
+# keeps the two together; the refusal below says which of the two things went
+# wrong.
 if (-not $TargetDir) {
     $TargetDir = Join-Path $root 'target'
     if (Get-Command cargo -ErrorAction SilentlyContinue) {

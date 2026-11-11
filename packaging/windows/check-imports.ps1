@@ -16,9 +16,9 @@
     toolchain that causes it, so the check has to be about the artefact rather
     than about whether it runs here.
 
-    This is the Windows analogue of the `ldd` line `linux.yml` uses and of
-    `packaging/linux/check-libraries.sh`, and it exists for the same reason: the
-    rule means the outcome, so check the outcome.
+    This is the Windows analogue of `packaging/linux/check-libraries.sh`, and
+    it exists for the same reason: the rule means the outcome, so check the
+    outcome.
 
     It parses the PE import table itself rather than shelling out to dumpbin,
     because dumpbin comes with Visual C++ and a check that needs the toolchain
