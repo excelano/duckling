@@ -632,9 +632,9 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
 name = "calamine"
-version = "0.37.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9ca341b94bc4b29e08970b1a03914fad2dfe177e2ecb67fcd6de9046004aafb"
+checksum = "f431b67cba6122a1f7d26b7adafc71bbdf07026095fe811f5efc025d8748e1d8"
 dependencies = [
  "atoi_simd",
  "byteorder",
@@ -1274,9 +1274,9 @@ dependencies = [
 
 [[package]]
 name = "docling"
-version = "2.65.1"
+version = "2.80.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08e9e40b738584d727ec1600b8fb43b58aea751cd95750679e4a7c2dc251cd42"
+checksum = "997f20f64c8cdd1c7d38bd369ee37edf754b9c87ff11d69b1b028a5d7d58ba3c"
 dependencies = [
  "aes",
  "base64 0.22.1",
@@ -1312,9 +1312,9 @@ dependencies = [
 
 [[package]]
 name = "docling-asr"
-version = "2.65.1"
+version = "2.80.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdad53c8bc87cf5a9bf24ed5a871f0976eecb87e7a8d0ce59104a8b0b51a5349"
+checksum = "bf30066e6ecb8ca7bf1f10e42dac34e454dbcc68bca0bda537cb765cc90e7b83"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -1325,9 +1325,9 @@ dependencies = [
 
 [[package]]
 name = "docling-core"
-version = "2.65.1"
+version = "2.80.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71a3c43802f66bfc2ccd4c051baa2cb975e5e103eea9756935ce64ca724ff998"
+checksum = "f44f823d84df03eac0e077a012458a7314701efb744f83d4a128080c5a2156c2"
 dependencies = [
  "libc",
  "png 0.18.1",
@@ -1339,9 +1339,9 @@ dependencies = [
 
 [[package]]
 name = "docling-onnx"
-version = "2.65.1"
+version = "2.80.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7a7cf55455781045588f69648aa4a1241a50140884a8ae3ab2477f1d3749f74"
+checksum = "b5d5ed020b576530e893b6a21abc244fdbd2b2ecfe1733d6c7b1aa8eb098b03f"
 dependencies = [
  "docling-core",
  "libloading 0.8.9",
@@ -1350,9 +1350,9 @@ dependencies = [
 
 [[package]]
 name = "docling-pdf"
-version = "2.65.1"
+version = "2.80.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b45be4bf7027074fc206eddce3f6b712b006ddf7ba095ad92beee9e6e547e4fd"
+checksum = "db3e147d0a68777d97ab85741f592cd83e4d63ee30f670bcbc543de38e4a593f"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -1370,6 +1370,7 @@ dependencies = [
  "tar",
  "tiny-skia 0.12.0",
  "tokenizers",
+ "unicode-normalization",
  "weezl 0.2.1",
 ]
 
@@ -5422,11 +5423,12 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "waddle-core"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a2add97c30f5e2c6b02e0fc023f039b474b27af0296d98e9f321fbc7254e48b"
+checksum = "d99b8a85c9bef0bd04abf79ef46f8aa09c606271f6f6527ccfc2f4abb9443448"
 dependencies = [
  "docling-core",
+ "resvg",
  "zip",
 ]
 
