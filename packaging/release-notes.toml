@@ -10,18 +10,22 @@
 # Nothing else reads this. The GitHub release, the Debian changelog and the
 # AppStream entry take commit subjects.
 
-version = "0.5.0"
+version = "0.6.0"
 
 [locales."de-de"]
 whats-new = """
-Sicherheitsversion: Die ZIP-Bibliothek, mit der Duckling Word-, Excel-, PowerPoint- und OpenDocument-Dateien liest, schließt eine kritische und vier weitere Sicherheitslücken beim Lesen von Archiven (GHSA-m665-v7pm-7grj, GHSA-9hj8-73fh-9963, GHSA-hjqx-j4rw-g7xv, GHSA-q7v9-x93c-xqv3, GHSA-8hxf-qr8p-62x4).
+Sicherheitsversion: Eine präparierte Excel-Datei im alten .xls- oder im .xlsb-Format konnte Duckling zum Absturz bringen oder den gesamten Arbeitsspeicher belegen. Die Tabellenbibliothek, mit der Duckling diese Dateien liest, schließt diese Lücke (RUSTSEC-2026-0436).
 
-Dokumente liest jetzt docling.rs 2.65. Formen und Textfelder in einem Word-Dokument kommen jetzt als gezeichnete Bilder heraus.
+Dokumente liest jetzt docling.rs 2.80. Duckling öffnet jetzt auch Numbers-Tabellen, iCalendar-Dateien, Box Notes und AFP-Druckdateien. PDFs kommen in besserer Lesereihenfolge heraus, chinesische, japanische und koreanische Schriften ohne Zuordnungstabelle werden gelesen, und eine gescannte Seite unter einer unvollständigen Textebene wird erkannt.
+
+Unter Windows lädt Duckling die installierten Vulkan-Treiber nicht mehr, an denen es auf manchen Rechnern mit Intel-Grafik beim Start abstürzen konnte.
 """
 
 [locales."en-us"]
 whats-new = """
-Security release: the ZIP library Duckling reads Word, Excel, PowerPoint and OpenDocument files with fixes one critical and four further vulnerabilities in archive reading (GHSA-m665-v7pm-7grj, GHSA-9hj8-73fh-9963, GHSA-hjqx-j4rw-g7xv, GHSA-q7v9-x93c-xqv3, GHSA-8hxf-qr8p-62x4).
+Security release: a crafted Excel file in the old .xls format or in .xlsb could crash Duckling or exhaust its memory. The spreadsheet library Duckling reads those files with closes the hole (RUSTSEC-2026-0436).
 
-Documents are now read by docling.rs 2.65. Shapes and text boxes in a Word document now come through as drawn pictures.
+Documents are now read by docling.rs 2.80. Duckling now also opens Numbers spreadsheets, iCalendar files, Box Notes and AFP print files. PDFs come out in a better reading order, Chinese, Japanese and Korean fonts without a mapping table are read, and a scanned page under an incomplete text layer is recognized.
+
+On Windows, Duckling no longer loads the installed Vulkan drivers, which could crash it at launch on some PCs with Intel graphics.
 """
