@@ -2,13 +2,13 @@
 
 ## Reporting a vulnerability
 
-Please report suspected vulnerabilities privately through GitHub Security Advisories at https://github.com/excelano/duckling/security/advisories/new. If you would rather not use GitHub, email david.anderson@excelano.com instead. I aim to respond within seven days.
+Please report suspected vulnerabilities privately, using the **Report a vulnerability** button on the Security tab of this repository. If that button is not there, or you would rather not go through GitHub, email david.anderson@excelano.com instead. I aim to respond within seven days.
 
 Please do not open public issues for security problems.
 
 ## Supported versions
 
-The latest 0.x release receives security fixes. Older versions are not supported.
+The latest release receives security fixes. Older versions are not supported. A fix ships in a new release; update the way you installed.
 
 ## What Duckling can access
 
@@ -21,7 +21,3 @@ Duckling stores nothing outside the files you explicitly convert. There is no co
 ## Third-party code in the package
 
 The package carries ONNX Runtime (linked into the executable) and the Docling and PaddleOCR models. Each is pinned by version or by SHA-256 in the repository, and a fix in any of them reaches you through a new Duckling release.
-
-## Verifying releases
-
-Every GitHub release includes a `.sha256` file next to each archive listing its SHA-256 hash. Verify any download before running it. Release artifacts are built by GitHub Actions from a tagged commit; the workflows in this repository are public and auditable.

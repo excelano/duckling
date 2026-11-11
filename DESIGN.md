@@ -73,17 +73,13 @@ names the file each must be, so a release that reordered a preference,
 promoted a candidate above the shipped file, or withdrew an export fails the
 test before it fails a conversion.
 
-**On Windows, `+crt-static` cannot be used and five DLLs ship in the package.**
-The prebuilt ONNX Runtime `ort` fetches for `x86_64-pc-windows-msvc` is
-compiled against the dynamic CRT, so the link against the static one fails;
-the four Visual C++ runtime DLLs ship beside the executable instead, where the
-loader finds them first. The same dist carries the
-DirectML execution provider, so `directml.dll` is a hard import although
-docling.rs runs the CPU provider, and the dist's own copy ships as the fifth.
-The C in this application is therefore ONNX Runtime and oniguruma, and on
-Windows DirectML as well; `packaging/windows/check-imports.ps1` keeps the
-shipped list at five and refuses a sixth. `packaging/windows/README.md` has the
-lane.
+**On Windows, `+crt-static` cannot be used, and DLLs ship in the package.**
+The prebuilt ONNX Runtime is compiled against the dynamic CRT, so the Visual
+C++ runtime ships beside the executable, and the same dist makes DirectML a
+hard import. The C in this application is therefore ONNX Runtime and
+oniguruma, and on Windows DirectML as well; `packaging/windows/check-imports.ps1`
+refuses any other import that is not in-box. `packaging/windows/README.md`
+names the files and says why each one ships.
 
 **On Windows the window draws through Direct3D 12 alone**, unless
 `WGPU_BACKEND` names another backend. wgpu's default set includes Vulkan, and
@@ -269,7 +265,7 @@ for one product, and `/usr/lib/duckling` is a private application directory
 where that data may live.
 
 **Duckling claims no file type, on any platform.** It owns no format. The
-desktop entry lists fifteen of the types it reads and the MSIX one association
+desktop entry lists the common types it reads and the MSIX one association
 over the same types, each with no display name and no logo because every one
 of them is somebody else's to name and to draw, so a file manager offers
 Duckling under Open With for a PDF without making it the default. Nothing on
@@ -305,7 +301,7 @@ headers do not declare.
 ## 9. The language a person reads
 
 German where the desktop asks for German, English everywhere else, through
-the `potext` crate and the catalogues in `po/`. `po/update-po.sh` is the only
+the `potext` crate and the catalogs in `po/`. `po/update-po.sh` is the only
 way they move and `po/pseudo.sh` writes the pseudolocale that finds a string
 which never went through `t`. **A message is looked up by its English text,
 never by a key**, so a call site reads as the sentence a person sees and an
@@ -314,7 +310,7 @@ that has gone stale is not shown:** `msgmerge` marks a reworded message
 `#, fuzzy`, `potext` refuses to load one, and the window falls back to
 English until somebody has read the new sentence.
 
-**The catalogue is declared in `src/main.rs` and not in `src/lib.rs`**, which
+**The catalog is declared in `src/main.rs` and not in `src/lib.rs`**, which
 is §4's rule about the interface being a renderer holding for language too:
 every sentence a person reads is produced in the window, and the library says
 nothing to anybody. A second front end would translate its own words rather
@@ -326,7 +322,7 @@ skipped-file list is an extension. `OutputFormat::label` stays the canonical
 English in the library, and the window translates a format name where it
 draws one: most are names of formats and do not move, but *DocLang archive*
 has an ordinary noun in it and is *DocLang-Archiv* in German, and sending all
-of them through the catalogue lets a translator decide that. The line after
+of them through the catalog lets a translator decide that. The line after
 adding files is two whole messages, chosen by whether the skipped list is
 empty, rather than one sentence with an extension list spliced onto its end,
 which a translator cannot place. The line printed to stderr when the window

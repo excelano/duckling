@@ -1,15 +1,23 @@
 # Packaging
 
-One directory per platform, plus `debian` for the way Linux is distributed, and
-the files shared by all of them: `fetch-models.sh`, which puts the pinned models
-under `.models/` at the repository root and is what every package copies from; `version.sh`, the only thing that reads the version
-out of `Cargo.toml`; `store-listing.toml`, the text both stores are given in
-both languages, which the release apps push to both on every release;
-`release-notes.toml`, what the release being cut changed;
-`submission-notes.md`, what a submission needs from a person that no file
-supplies; and `privacy-entry.html`, the privacy section pasted
-into the legal page. `DESIGN.md` §8 has the reasoning behind each package's
-shape.
+How Duckling is built into what each platform installs. Releases are the apps
+in `excelano/shipping`, run from the repository root with `ship.toml`; this
+directory is what they build from. `DESIGN.md` §8 has the reasoning behind each
+package's shape.
+
+| Path | What it is |
+|---|---|
+| `fetch-models.sh` | Puts the pinned models under `.models/` at the repository root, which every package copies from |
+| `version.sh` | The version in the spellings the platforms want; the only reader of `Cargo.toml`'s |
+| `icons/` | The icon square and rounded, with PNG exports for submission forms |
+| `linux/` | The desktop entry, the icon, the per-user install, and `check-libraries.sh` |
+| `debian/` | `build-deb.sh`, the control file, the changelog, the copyright file and the manual page |
+| `windows/` | The MSIX, the side-loaded install and their checks; its README has the lane |
+| `macos/` | The bundle and the Store package; its README has the lane |
+| `demo/` | The documents the store screenshots show, and the script that writes them |
+| `store-listing.toml`, `release-notes.toml` | What the stores show, and what a release tells them changed |
+| `submission-notes.md` | What a submission form asks that no file answers |
+| `privacy-entry.html` | The section for the privacy page at excelano.com/legal |
 
 ## What every package carries
 
@@ -18,8 +26,8 @@ application finds them by looking beside its own executable
 (`locate_assets` in `src/lib.rs`), so every platform's package puts them where
 it looks: `/usr/lib/duckling/` on Linux with a symlink on `PATH`, the
 application directory in an MSIX, and in a bundle `Contents/Resources/models`,
-the second place `locate_assets` looks. There is no
-download at run time and no code for one.
+the second place `locate_assets` looks. There is no download at run time and no
+code for one.
 
 ## linux
 
@@ -61,7 +69,7 @@ One package, `duckling`, with the models under `/usr/lib/duckling` beside the
 executable that finds them there. It carries no maintainer scripts:
 `desktop-file-utils` and `hicolor-icon-theme` own the dpkg triggers on the
 directories it writes into. `copyright` is DEP-5 because the package carries
-two licences: Duckling's MIT and the models' (Docling's MIT and PaddleOCR's
+two licenses: Duckling's MIT and the models' (Docling's MIT and PaddleOCR's
 Apache-2.0). lintian runs at error and warning on the built package.
 
 ## The icon
@@ -87,43 +95,3 @@ does not tell apart from Apple's continuous curve below about 512 pixels.
 Nothing in `icons/` ships: the deb installs named files out of `linux/icons`,
 `build-msix.ps1` copies `windows/assets/*.png`, and no code reads one at run
 time.
-
-## windows
-
-The MSIX the Microsoft Store distributes, and a script pair that installs the
-same application without one:
-
-    ./packaging/fetch-models.sh                      # in Git Bash
-    cargo build --release
-    powershell -ExecutionPolicy Bypass -File packaging\windows\build-msix.ps1 -SelfSign
-    powershell -ExecutionPolicy Bypass -File packaging\windows\install.ps1
-
-Five DLLs ship inside the package beside the executable, four Visual C++
-runtime files and DirectML, because `+crt-static` will not link the prebuilt
-ONNX Runtime; `runtime-files.ps1` finds them for both install routes and
-`check-imports.ps1` refuses any import that is neither in-box nor one of them.
-Duckling claims no file type, so the manifest's one association carries no
-display name and no logo, the scripts never write an extension's default
-value, and `uninstall.ps1` never removes a `UserChoice`. `windows/README.md`
-has the lane.
-
-## macos
-
-The application bundle the Mac App Store distributes:
-
-    ./packaging/fetch-models.sh
-    MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --target aarch64-apple-darwin
-    ./packaging/macos/build-app.sh                         # dist/Duckling.app, unsigned
-    ./packaging/macos/build-app.sh --store PROFILE         # dist/Duckling.pkg, what is uploaded
-
-The build is Apple silicon only, because no prebuilt ONNX Runtime exists for
-an Intel Mac; an Intel lane machine packages what it cannot run,
-`macos.yml` runs it, and the `intel-mac` feature builds a
-runtime-less application for measuring the rest. The models are resources,
-because a signed bundle will not carry them beside the executable. The sandbox
-grants a file and not its folder, so the application asks for the folder
-before writing beside a file that arrived alone. No document types are
-declared, so no Open With on this platform. `check-install.sh` asks an
-installed bundle what it is on the machine it is on, and `screenshot.sh`
-photographs the window at a size App Store Connect accepts; both want an Apple
-silicon Mac to say anything about a conversion. `macos/README.md` has the lane.

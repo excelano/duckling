@@ -30,7 +30,7 @@ Releases: the apps in excelano/shipping, run from this directory. There is no re
 ## Rules
 
 Logic another front end would need lives in `src/lib.rs`, never in `src/main.rs`; the translation
-catalogue is declared in `src/main.rs`, since only the window speaks. Nothing writes around
+catalog is declared in `src/main.rs`, since only the window speaks. Nothing writes around
 `available_path`: no existing file is overwritten. The models ship in the package from
 `fetch-models.sh`'s pins; there is no download at run time and no code for one. The C in the tree is
 ONNX Runtime and oniguruma, plus DirectML on Windows; another C dependency is David's decision

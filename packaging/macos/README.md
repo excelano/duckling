@@ -42,7 +42,7 @@ identity so that the sandbox is real:
 
     MACOSX_DEPLOYMENT_TARGET=13.4 cargo build --release --features intel-mac
     ./packaging/macos/build-app.sh --binary target/release/duckling \
-        --sign "Apple Development: David Anderson (Y79D796839)"
+        --sign "Apple Development: <Your Name> (<TEAMID>)"
     open -a dist/Duckling.app
 
 Add files through the button: a file given as an argument to a sandboxed

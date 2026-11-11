@@ -17,7 +17,7 @@ executable, and `-Prefix DIR` puts the files somewhere else. `uninstall.ps1
 Certification Kit; the findings it expects are `$KNOWN_FINDINGS` in the
 script, and a new one goes into that list with a traced reason or nowhere.
 
-## The five DLLs
+## The DLLs in the package
 
 `+crt-static` cannot link the prebuilt ONNX Runtime `ort` fetches for this
 target: it is compiled against the dynamic CRT and the link fails with
@@ -25,10 +25,10 @@ unresolved `__imp_` externals. So the runtime ships inside the package, beside
 the executable where the loader finds it first: `vcruntime140.dll`,
 `vcruntime140_1.dll`, `msvcp140.dll` and `msvcp140_1.dll`, taken from the
 Visual Studio redistributable directory, which is the copy Microsoft ships for
-app-local deployment and whose licence covers it. `.cargo/config.toml` says
+app-local deployment and whose license covers it. `.cargo/config.toml` says
 why the flag is absent; do not add it back without rerunning the link.
 
-The fifth is `directml.dll`. The dist `ort` chooses carries the DirectML
+DirectML ships as well. The dist `ort` chooses carries the DirectML
 execution provider, so it is a hard import although docling.rs runs the CPU
 provider and Duckling never selects another. In-box DirectML began at Windows
 10 10.0.18362, `AppxManifest.xml.in` declares a floor of 10.0.17763, and an
@@ -41,12 +41,12 @@ if the floor ever needs defending, raising it to 10.0.18362 is cheaper than
 finding the machine.
 
 `check-imports.ps1` walks the release binary's import table and refuses any DLL
-that is neither in-box nor one of the five; it prints every name it sees, so
+that is neither in-box nor one of these; it prints every name it sees, so
 the listing's claim of no network connection is checkable against the
-artefact: none of `ws2_32`, `winhttp`, `wininet`, `iphlpapi`, `urlmon`,
+artifact: none of `ws2_32`, `winhttp`, `wininet`, `iphlpapi`, `urlmon`,
 `netapi32`, `dnsapi`, `ncrypt` or `secur32` is imported. To see which copy of
 each DLL a running install uses, read `Get-Process duckling | Select-Object
--Expand Modules`: every one of the five resolves inside the package directory
+-Expand Modules`: every one of them resolves inside the package directory
 and none in `System32`. A clean machine, one with no Visual C++
 Redistributable (check `Test-Path C:\Windows\System32\vcruntime140.dll`
 first), proves only that the application started.
@@ -126,13 +126,13 @@ hands the MSVC linker `/MANIFEST:EMBED` and `/MANIFESTINPUT` so that
 | --- | --- |
 | `install.ps1` | Copies the files, registers Open With, makes the Start menu shortcut |
 | `uninstall.ps1` | Removes all of it. Copied into the install directory, because Add/Remove Programs points at it and a checkout may be gone |
-| `runtime-files.ps1` | Finds the five DLLs. Shared, so the packaged and side-loaded routes cannot ship different sets |
+| `runtime-files.ps1` | Finds the DLLs the package carries. Shared, so the packaged and side-loaded routes cannot ship different sets |
 | `duckling.ico` | The application icon, nine sizes. Built from the Linux SVG, not drawn separately |
 | `assets/` | The four PNGs `AppxManifest.xml` names and their scale variants, from the same SVG. Committed for the same reason the `.ico` is |
 | `listing/` | The Store logo at the two sizes Partner Center's listing form accepts. Not in the package |
 | `make-ico/` | The tool that builds all of it |
 | `AppxManifest.xml.in` | The MSIX manifest, with the identity and the version left as placeholders |
-| `identity.psd1` | What Partner Center assigned when the name was reserved, less the publisher, which is the `STORE_PUBLISHER` organisation secret |
+| `identity.psd1` | What Partner Center assigned when the name was reserved, less the publisher, which `build-msix.ps1` reads from `STORE_PUBLISHER` |
 | `build-msix.ps1` | Builds the package from a release binary, and optionally signs it and runs the certification kit |
 | `check-imports.ps1` | Walks the PE import table and refuses any DLL that is neither in-box nor shipped in the package |
 | `shots.ps1` | The listing's two frames as recipes: which documents, which state, and what happens before each shutter |

@@ -12,6 +12,16 @@ The converter is [docling.rs](https://github.com/docling-project/docling.rs),
 the Rust port of IBM's Docling. Duckling is the window around it, and adds
 no conversion logic of its own.
 
+## Install
+
+On Debian and Ubuntu, from the Excelano apt repository:
+
+```
+curl -fsSL https://excelano.com/apt/setup.sh | sudo sh && sudo apt install duckling
+```
+
+https://excelano.com/duckling/ is the product page for every platform.
+
 ## Build
 
 ```
@@ -28,14 +38,11 @@ pure Rust.
 On macOS the build is Apple silicon only: no prebuilt ONNX Runtime exists for
 an Intel Mac. `cargo build --release --features intel-mac` builds a copy with
 no runtime in it for such a machine, which converts everything but PDFs and
-images. `packaging/macos/README.md` is the whole of it.
+images. `packaging/macos/README.md` has the details.
 
 On Windows, `fetch-models.sh` runs under the Git Bash that Git for Windows
-installs, and the packaged application carries five DLLs beside the executable
-that no other platform needs — four Visual C++ runtime files, because the
-prebuilt ONNX Runtime cannot be linked against the static CRT, and DirectML,
-which that library brings whether or not anything asks for it.
-`packaging/windows/README.md` is the whole of it.
+installs, and the packaged application carries DLLs beside the executable that
+no other platform needs. `packaging/windows/README.md` says which and why.
 
 ## Run
 
