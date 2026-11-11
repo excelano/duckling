@@ -1,10 +1,5 @@
 [package]
-# The crate coordinate alone. `duckling` on crates.io is wafer-inc's Rust port
-# of Facebook's Duckling, published since 2026 and nothing to do with this;
-# every other coordinate — the binary, the Debian package, the desktop entry,
-# the Store identity — stays `duckling`. Same shape as xray, which publishes as
-# `x-ray` and installs as `xray`. `ship.conf` carries both spellings.
-name = "duckling-converter"
+name = "duckling"
 description = "Convert documents to DocLang, Markdown, JSON, LaTeX and office formats with docling.rs"
 publish = false
 version = "0.6.0"
@@ -14,19 +9,6 @@ license = "MIT"
 repository = "https://github.com/excelano/duckling"
 # eframe's number, not this code's; it rises whenever egui raises its own.
 rust-version = "1.95"
-
-# The library keeps the name the code imports. `src/main.rs` and
-# `tests/convert.rs` say `use duckling::...`, and without this the library
-# takes its name from the package — `duckling_converter` — and every one of
-# those imports stops resolving. The package name is a crates.io coordinate
-# and nothing else; it is not a rename of this code.
-[lib]
-name = "duckling"
-path = "src/lib.rs"
-
-[[bin]]
-name = "duckling"
-path = "src/main.rs"
 
 [dependencies]
 # The language the window draws in, and the reader for the `.po` catalogues in
