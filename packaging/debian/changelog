@@ -1,3 +1,12 @@
+duckling (0.6.0) unstable; urgency=medium
+
+  * Read documents with docling.rs 2.80 and write office files with waddle 0.6
+  * Draw through Direct3D 12 alone on Windows (#20)
+  * Store listing: the Microsoft Store's support info is the account's contact details
+  * Store listing: the support URL is excelano.com/support with the app and store filled in
+
+ -- David M. Anderson <david.anderson@excelano.com>  Tue, 10 Nov 2026 20:01:11 -0600
+
 duckling (0.5.0) unstable; urgency=medium
 
   * docling 2.65 and waddle-core 0.5: zip 9.1 fixes GHSA-m665-v7pm-7grj (critical) and four high/medium advisories in archive reading
