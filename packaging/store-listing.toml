@@ -94,7 +94,7 @@ Duckling ist Open Source unter der MIT-Lizenz, ebenso wie docling.rs, worauf es 
 name = "Duckling Converter"
 subtitle = "Dokumente zu DocLang, offline"
 promotional-text = "Hinein: Word, PowerPoint, Excel, PDF und vierzig weitere Formate. Heraus: DocLang, Markdown, JSON, LaTeX oder Office-Formate — auf Ihrem Rechner, nichts wird gesendet."
-keywords = "Markdown,umwandeln,PDF,Word,DOCX,ODT,ODS,ODP,XLSX,OCR,docling,DocLang,JSON,LaTeX"
+keywords = "Markdown,umwandeln,PDF,Word,DOCX,ODT,ODS,ODP,XLSX,OCR,EPUB,DocLang,JSON,LaTeX"
 
 [locales."de-de".microsoft]
 name = "Duckling"
@@ -122,7 +122,7 @@ keywords = [
   "PDF",
   "Word",
   "OCR",
-  "docling",
+  "EPUB",
   "DocLang",
 ]
 
@@ -162,7 +162,7 @@ Duckling is open source under the MIT licence, the same as the converter it is b
 name = "Duckling Converter"
 subtitle = "Documents to DocLang, offline"
 promotional-text = "Drop in Word, PowerPoint, Excel, PDF and forty other formats. Get DocLang, Markdown, JSON, LaTeX or an office file back, on your own machine, with nothing sent anywhere."
-keywords = "markdown,convert,pdf,word,docx,odt,ocr,docling,doclang,json,latex"
+keywords = "markdown,convert,pdf,word,docx,odt,ocr,epub,doclang,json,latex"
 
 [locales."en-us".microsoft]
 name = "Duckling"
@@ -190,6 +190,6 @@ keywords = [
   "PDF",
   "Word",
   "OCR",
-  "docling",
+  "EPUB",
   "DocLang",
 ]
