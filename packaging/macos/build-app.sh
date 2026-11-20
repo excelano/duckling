@@ -302,6 +302,7 @@ sed -e "s/@VERSION@/${version}/g" -e "s/@BUILD@/${build}/g" \
 plutil -lint "${app}/Contents/Info.plist" >/dev/null
 
 install -m 0755 "$binary" "${app}/Contents/MacOS/duckling"
+install -m 0644 "${root}/THIRD-PARTY-NOTICES.txt" "${app}/Contents/Resources/THIRD-PARTY-NOTICES.txt"
 
 # **The models, in the place a signed bundle allows them.** Linux and Windows
 # put `models/` beside the executable, and a bundle cannot: `codesign` treats

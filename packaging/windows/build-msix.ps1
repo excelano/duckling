@@ -377,6 +377,7 @@ if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 New-Item -ItemType Directory -Path (Join-Path $stage 'Assets') -Force | Out-Null
 
 Copy-Item $Binary (Join-Path $stage 'duckling.exe')
+Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.txt') (Join-Path $stage 'THIRD-PARTY-NOTICES.txt')
 
 # --- the models -------------------------------------------------------------
 #

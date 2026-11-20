@@ -115,6 +115,7 @@ install -m 0644 "${here}/../linux/icons/duckling.svg" \
 # DEP-5, because the package carries two licences: ours and the models'. MIT
 # is not a Debian common licence, so its text is inline.
 install -m 0644 "${here}/copyright" "${stage}/usr/share/doc/duckling/copyright"
+install -m 0644 "${root}/THIRD-PARTY-NOTICES.txt" "${stage}/usr/share/doc/duckling/THIRD-PARTY-NOTICES.txt"
 
 gzip -9nc "${here}/changelog" > "${stage}/usr/share/doc/duckling/changelog.gz"
 chmod 0644 "${stage}/usr/share/doc/duckling/changelog.gz"
