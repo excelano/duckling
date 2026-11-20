@@ -2,7 +2,7 @@
 name = "duckling"
 description = "Convert documents to DocLang, Markdown, JSON, LaTeX and office formats with docling.rs"
 publish = false
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 authors = ["David M. Anderson"]
 license = "MIT"
