@@ -1192,15 +1192,15 @@ dependencies = [
 
 [[package]]
 name = "djvu-bitmap"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "490a6f7edf2e412bb5d9f90f61cffcfffe0dc466de14a111057f43060b4f270f"
+checksum = "3ce31e1f40539fa8b8daab443e57006153c353f060413aeb18ad3dd4f8d6fd64"
 
 [[package]]
 name = "djvu-bzz"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5ba9158628b5e6b144efb6579b1460bdeec347ce900e95a4c3537d49adf8bc4"
+checksum = "8b4970e5d623d963c84a2c52e3bb95898144bd013e368c625fbbc77cfa1492c0"
 dependencies = [
  "djvu-zp",
  "thiserror 2.0.21",
@@ -1208,18 +1208,18 @@ dependencies = [
 
 [[package]]
 name = "djvu-iff"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "101574269c373cefa66a23f94c18d6bd88d7c8e6b71aee34cb5a0a3b0d6cf48e"
+checksum = "7b4bca9d51f779a609e900cba2838f9c2e8d2d737022ced88b0e1273551e054b"
 dependencies = [
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "djvu-iw44"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba95dcee392e777898032b73ee83f2cd6912b3cabacd6ccb2a0bfc8fef002d07"
+checksum = "aaa3eabe5fc41be02bdb113444b0a53535059047dc0aff02d57d3dea18cc265e"
 dependencies = [
  "djvu-pixmap",
  "djvu-zp",
@@ -1229,9 +1229,9 @@ dependencies = [
 
 [[package]]
 name = "djvu-jb2"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33925a276e3a08b20291a18b085a39d537d867c0587dfba037ec303d4c2bc3d0"
+checksum = "86aa0a99eeba7904fe86b431b6e96af8b1fbe05facbfc20cd9b8bd3965fac628"
 dependencies = [
  "djvu-bitmap",
  "djvu-zp",
@@ -1240,15 +1240,15 @@ dependencies = [
 
 [[package]]
 name = "djvu-pixmap"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f83b64061fa6aef97fd0a6d386da733c57644bbd2b15fd476f6bac9d0dffdc6"
+checksum = "08ea141007ba50d115539cd40bff066447c49f93f9ed0680a76ad7e669a5dbba"
 
 [[package]]
 name = "djvu-rs"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "100254aacc7b7973aed023432681c9604e8ded7563391e4d8abb12bf8eebd303"
+checksum = "28f07b40a346c1f1a8220cd7be77bc7ddcbf13498c9eebad3d6d8a38f643ba84"
 dependencies = [
  "djvu-bitmap",
  "djvu-bzz",
@@ -1257,7 +1257,7 @@ dependencies = [
  "djvu-jb2",
  "djvu-pixmap",
  "djvu-zp",
- "png 0.17.16",
+ "png 0.18.1",
  "thiserror 2.0.21",
  "wide",
  "zune-jpeg",
@@ -1265,9 +1265,9 @@ dependencies = [
 
 [[package]]
 name = "djvu-zp"
-version = "0.33.0"
+version = "0.45.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da949c295a09b28f68d5facd2d00e53c181a58532b3a9b8b21f23fd84012f55c"
+checksum = "8320ea950e16079676a8d5371a5f2e9f3bc3391e9a650d6beaa858f4f0404a49"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -1283,9 +1283,9 @@ dependencies = [
 
 [[package]]
 name = "docling"
-version = "2.80.0"
+version = "2.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "997f20f64c8cdd1c7d38bd369ee37edf754b9c87ff11d69b1b028a5d7d58ba3c"
+checksum = "683be07262d5d4705b8839b14357c1c5f05e81fcf5e47216fa6e4544aefff039"
 dependencies = [
  "aes",
  "base64 0.22.1",
@@ -1321,9 +1321,9 @@ dependencies = [
 
 [[package]]
 name = "docling-asr"
-version = "2.80.0"
+version = "2.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf30066e6ecb8ca7bf1f10e42dac34e454dbcc68bca0bda537cb765cc90e7b83"
+checksum = "95283b4ed8c98b29bd29a4b0caf3690c0d43570033746ee984f255a79803c62b"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -1334,9 +1334,9 @@ dependencies = [
 
 [[package]]
 name = "docling-core"
-version = "2.80.0"
+version = "2.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f44f823d84df03eac0e077a012458a7314701efb744f83d4a128080c5a2156c2"
+checksum = "675708376dca65e4c1907372dc5d83741118898170f6752f06c39af4aee6a578"
 dependencies = [
  "libc",
  "png 0.18.1",
@@ -1348,9 +1348,9 @@ dependencies = [
 
 [[package]]
 name = "docling-onnx"
-version = "2.80.0"
+version = "2.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5d5ed020b576530e893b6a21abc244fdbd2b2ecfe1733d6c7b1aa8eb098b03f"
+checksum = "0f27add24bd0573d7456e3c7099141d00d52d441b3a5d867435633e510ccdb2d"
 dependencies = [
  "docling-core",
  "libloading 0.8.9",
@@ -1359,9 +1359,9 @@ dependencies = [
 
 [[package]]
 name = "docling-pdf"
-version = "2.80.0"
+version = "2.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db3e147d0a68777d97ab85741f592cd83e4d63ee30f670bcbc543de38e4a593f"
+checksum = "315f69725bc272e6097ff0f8da57cdd1a1fb5f822aa140dbee4c6760ec4cda03"
 dependencies = [
  "docling-core",
  "docling-onnx",
@@ -4256,9 +4256,9 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "safe_arch"
-version = "0.7.4"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96b02de82ddbe1b636e6170c21be622223aea188ef2e139be0a5b219ec215323"
+checksum = "42c6efa15875e6ecb39ca61fb0b0c1a40b84fac5a5ffe71eef7d1000c8eb3f5f"
 dependencies = [
  "bytemuck",
 ]
@@ -5432,9 +5432,9 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "waddle-core"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d99b8a85c9bef0bd04abf79ef46f8aa09c606271f6f6527ccfc2f4abb9443448"
+checksum = "fa80fe7a7076b1ccb65fc60e6c16faaa438fb0488f3ed8aced76f492f8500efa"
 dependencies = [
  "docling-core",
  "resvg",
@@ -5910,9 +5910,9 @@ dependencies = [
 
 [[package]]
 name = "wide"
-version = "0.7.33"
+version = "1.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ce5da8ecb62bcd8ec8b7ea19f69a51275e91299be594ea5cc6ef7819e16cd03"
+checksum = "d920ac99c3c8edce110cb8d07dbb324d6d026011dce85b1e9355b70f0adacc4f"
 dependencies = [
  "bytemuck",
  "safe_arch",
