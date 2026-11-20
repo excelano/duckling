@@ -1,3 +1,10 @@
+duckling (0.6.1) unstable; urgency=medium
+
+  * Ship third-party notices in every package
+  * Name the release apps instead of ship and windows.yml
+
+ -- David M. Anderson <david.anderson@excelano.com>  Fri, 20 Nov 2026 07:34:41 -0600
+
 duckling (0.6.0) unstable; urgency=medium
 
   * Read documents with docling.rs 2.80 and write office files with waddle 0.6
