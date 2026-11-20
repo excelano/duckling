@@ -10,22 +10,18 @@
 # Nothing else reads this. The GitHub release, the Debian changelog and the
 # AppStream entry take commit subjects.
 
-version = "0.6.0"
+version = "0.6.1"
 
 [locales."de-de"]
 whats-new = """
-Sicherheitsversion: Eine präparierte Excel-Datei im alten .xls- oder im .xlsb-Format konnte Duckling zum Absturz bringen oder den gesamten Arbeitsspeicher belegen. Die Tabellenbibliothek, mit der Duckling diese Dateien liest, schließt diese Lücke (RUSTSEC-2026-0436).
+Dokumente liest jetzt docling.rs 2.85, das PDFs genauer liest: Text in Symbol-, ZapfDingbats- und TeX-Mathematikschriften kommt als die Zeichen heraus, die auf der Seite stehen, eine Tabelle, deren Zellen keine Textebene haben, bleibt mit ihrer Beschriftung erhalten, und Kontrollkästchen werden von umrahmten Buchstaben und Ziffern unterschieden.
 
-Dokumente liest jetzt docling.rs 2.80. Duckling öffnet jetzt auch Numbers-Tabellen, iCalendar-Dateien, Box Notes und AFP-Druckdateien. PDFs kommen in besserer Lesereihenfolge heraus, chinesische, japanische und koreanische Schriften ohne Zuordnungstabelle werden gelesen, und eine gescannte Seite unter einer unvollständigen Textebene wird erkannt.
-
-Unter Windows lädt Duckling die installierten Vulkan-Treiber nicht mehr, an denen es auf manchen Rechnern mit Intel-Grafik beim Start abstürzen konnte.
+Die Pakete enthalten jetzt die Lizenzen des fremden Codes und der Daten, aus denen Duckling gebaut ist.
 """
 
 [locales."en-us"]
 whats-new = """
-Security release: a crafted Excel file in the old .xls format or in .xlsb could crash Duckling or exhaust its memory. The spreadsheet library Duckling reads those files with closes the hole (RUSTSEC-2026-0436).
+Documents are now read by docling.rs 2.85, which reads PDFs more faithfully: text in Symbol, ZapfDingbats and TeX math fonts comes out as the characters on the page, a table whose cells have no text layer is kept with its caption, and checkboxes are told apart from boxed letters and digits.
 
-Documents are now read by docling.rs 2.80. Duckling now also opens Numbers spreadsheets, iCalendar files, Box Notes and AFP print files. PDFs come out in a better reading order, Chinese, Japanese and Korean fonts without a mapping table are read, and a scanned page under an incomplete text layer is recognized.
-
-On Windows, Duckling no longer loads the installed Vulkan drivers, which could crash it at launch on some PCs with Intel graphics.
+The packages now include the licenses of the third-party code and data Duckling is built from.
 """
