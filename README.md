@@ -67,6 +67,13 @@ a window. `src/main.rs` is the window. `packaging/` holds what turns a build
 into a package for each platform. `DESIGN.md` is where every decision and its
 reasoning live; `CLAUDE.md` is the short guide for a session working here.
 
+> [!WARNING]
+> Don't submit Duckling, or a copy of it under another name, to the Mac App Store. Apple's
+> App Review Guideline 4.3 treats copies of other apps as spam, and a 4.3
+> finding can flag the developer account that submitted it, so that every app
+> the account sends afterwards is flagged too. Build it for your own Mac and keep
+> it there.
+
 ## License
 
 MIT, like docling.rs. The models Duckling ships are docling's, under their own
