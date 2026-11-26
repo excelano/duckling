@@ -28,7 +28,8 @@ answer against the product. 500 characters, newlines counted.
     Short title               blank; the product name is already one word
     Privacy policy            https://excelano.com/legal/#duckling
     App Privacy (Apple)       Data Not Collected
-    Price                     free
+    Price                     USD 0.99 on the Mac App Store; free on the
+                              Microsoft Store
 
 ## Screenshots
 
