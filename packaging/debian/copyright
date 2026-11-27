@@ -4,7 +4,7 @@ Upstream-Contact: David M. Anderson <david.anderson@excelano.com>
 Source: https://github.com/excelano/duckling
 
 Files: *
-Copyright: 2026 Excelano LLC
+Copyright: 2026 David M. Anderson <david.anderson@excelano.com>
 License: MIT
 
 Files: usr/lib/duckling/models/*

@@ -22,7 +22,7 @@ answer against the product. 500 characters, newlines counted.
 
 ## The answers a form asks
 
-    Copyright and trademark   Excelano LLC
+    Copyright and trademark   David M. Anderson
     Additional license terms  blank; the application is MIT and the
                               repository carries the license
     Short title               blank; the product name is already one word
